@@ -1,7 +1,7 @@
 import "reflect-metadata"
 import path from 'path'
 import { DataSource } from 'typeorm'
-
+// ALTER USER postgres WITH PASSWORD '5432';
 export default new DataSource({
     type: "postgres",
     host: "localhost",
