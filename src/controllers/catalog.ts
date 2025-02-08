@@ -258,7 +258,7 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
 
         const subcatalog = await subcatalogRepository.findOne({
             where: {
-                id,
+                catalogId: id,
                 deletedAt: IsNull()
             }
         });
