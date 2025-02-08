@@ -213,7 +213,8 @@ export const deleteCatalog = async (req: Request, res: Response) => {
 export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-
+        console.log(req.params);
+        
         const queryBuilder = subcatalogRepository.createQueryBuilder('subcatalog')
             .leftJoinAndSelect('subcatalog.categories', 'category')
             .where('subcatalog.catalogId = :catalogId', { catalogId: id })
