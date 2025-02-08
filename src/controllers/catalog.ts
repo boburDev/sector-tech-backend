@@ -213,17 +213,14 @@ export const deleteCatalog = async (req: Request, res: Response) => {
 export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        console.log(req.params);
         
         const queryBuilder = subcatalogRepository.createQueryBuilder('subcatalog')
-            .leftJoinAndSelect('subcatalog.categories', 'category')
+            .leftJoinAndSelect('subcatalog.categories', 'category', 'category.deletedAt IS NULL')
             .where('subcatalog.catalogId = :catalogId', { catalogId: id })
             .andWhere('subcatalog.deletedAt IS NULL')
             .orderBy('subcatalog.createdAt', 'DESC');
 
         const subcatalogs = await queryBuilder.getMany();
-        console.log(subcatalogs);
-        
 
         if (!subcatalogs.length) {
             res.json({
@@ -235,8 +232,14 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
         }
 
         const formattedSubcatalogs = subcatalogs.map(subcatalog => {
-            const { createdAt, deletedAt, categories, ...subcatalogData } = subcatalog;
-            return subcatalogData;
+            const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
+            return {
+                ...subcatalogData,
+                categories: subcatalog.categories.map(category => {
+                    const { createdAt, deletedAt, ...categoryData } = category;
+                    return categoryData;
+                })
+            };
         });
 
         res.json({
@@ -259,26 +262,32 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const subcatalog = await subcatalogRepository.findOne({
+        const subcatalogs = await subcatalogRepository.find({
             where: {
                 catalogId: id,
                 deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
             }
         });
 
-        if (!subcatalog) {
+        if (!subcatalogs.length) {
             res.json({
-                data: null,
-                error: 'Subcatalog not found',
-                status: 404
+                data: [],
+                error: null,
+                status: 200
             });
             return;
         }
 
-        const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
+        const formattedSubcatalogs = subcatalogs.map(subcatalog => {
+            const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
+            return subcatalogData;
+        });
 
         res.json({
-            data: subcatalogData,
+            data: formattedSubcatalogs,
             error: null,
             status: 200
         });
@@ -292,6 +301,7 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
         return;
     }
 };
+
 export const createSubcatalog = async (req: Request, res: Response) => {
     try {
         const { title, catalogId } = req.body;
