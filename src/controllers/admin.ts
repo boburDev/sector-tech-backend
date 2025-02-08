@@ -50,11 +50,13 @@ export const login = async (req: Request, res: Response) => {
 export const createAdmin = async (req: Request, res: Response) => {
     try {
         const { username, password, role, status } = req.body;
-        console.log(req.admin);
-        
-        const existingAdmin = await adminRepository.findOne({ where: { username } });
-        
-        if (existingAdmin) {
+               
+        if (req.admin.role !== 'super') {
+            res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
+            return;
+        }
+
+        if (req.admin.username === username) {
             res.status(400).json({ message: 'Username already exists' });
             return;
         }

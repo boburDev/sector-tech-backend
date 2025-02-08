@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from '../utils/jwt';
+import AppDataSource from '../config/ormconfig';
+import { Admin } from '../entities/admin.entity';
 
 declare global {
     namespace Express {
@@ -9,8 +11,13 @@ declare global {
     }
 }
 
-export function validateAdminToken(req: Request, res: Response, next: NextFunction) {
+
+const adminRepository = AppDataSource.getRepository(Admin);
+
+export async function validateAdminToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
+    console.log(authHeader);
+    
 
     if (!authHeader) {
         res.status(401).json({ message: 'No token provided' })
@@ -26,7 +33,25 @@ export function validateAdminToken(req: Request, res: Response, next: NextFuncti
         return;
     }
 
-    req.admin = decoded;
+    const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username } });
 
+    if (!existingAdmin) {
+        res.status(401).json({ message: 'Admin not found' })
+        return;
+    }
+
+    if (existingAdmin && existingAdmin.status !== 'active') {
+        res.status(400).json({ message: 'Your account is not active' });
+        return;
+    }
+    
+    req.admin = {
+        id: existingAdmin.id,
+        username: existingAdmin.username,
+        role: existingAdmin.role,
+        status: existingAdmin.status
+    };
     next();
+
 }
+

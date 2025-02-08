@@ -22,8 +22,10 @@ export const getCatalogById = async (req: Request, res: Response) => {
             return;
         }
 
+        const { createdAt, deletedAt, ...catalogData } = catalog;
+
         res.json({
-            data: catalog,
+            data: catalogData,
             error: null,
             status: 200
         });
@@ -46,8 +48,13 @@ export const getAllCatalogs = async (req: Request, res: Response) => {
             .orderBy('catalog.createdAt', 'DESC')
             .getMany();
         
+        const catalogsWithoutDates = catalogs.map(catalog => {
+            const { createdAt, deletedAt, ...catalogData } = catalog;
+            return catalogData;
+        });
+
         res.json({
-            data: catalogs,
+            data: catalogsWithoutDates,
             error: null,
             status: 200
         });
@@ -81,8 +88,10 @@ export const createCatalog = async (req: Request, res: Response) => {
 
         const savedCatalog = await catalogRepository.save(catalog);
         
+        const { createdAt, deletedAt, ...catalogData } = savedCatalog;
+        
         res.json({
-            data: savedCatalog,
+            data: catalogData,
             error: null,
             status: 200
         });
@@ -115,8 +124,10 @@ export const updateCatalog = async (req: Request, res: Response) => {
         catalog.title = title;
         const updatedCatalog = await catalogRepository.save(catalog);
         
+        const { createdAt, deletedAt, ...catalogData } = updatedCatalog;
+
         res.json({
-            data: updatedCatalog,
+            data: catalogData,
             error: null,
             status: 200
         });
@@ -194,8 +205,10 @@ export const createSubcatalog = async (req: Request, res: Response) => {
 
         const savedSubcatalog = await subcatalogRepository.save(subcatalog);
         
+        const { createdAt, deletedAt, ...subcatalogData } = savedSubcatalog;
+
         res.json({
-            data: savedSubcatalog,
+            data: subcatalogData,
             error: null,
             status: 200
         });
@@ -244,8 +257,10 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
 
         const updatedSubcatalog = await subcatalogRepository.save(subcatalog);
         
+        const { createdAt, deletedAt, ...subcatalogData } = updatedSubcatalog;
+
         res.json({
-            data: updatedSubcatalog,
+            data: subcatalogData,
             error: null,
             status: 200
         });
@@ -324,8 +339,10 @@ export const createCategory = async (req: Request, res: Response) => {
 
         const savedCategory = await categoryRepository.save(category);
         
+        const { createdAt, deletedAt, ...categoryData } = savedCategory;
+
         res.json({
-            data: savedCategory,
+            data: categoryData,
             error: null,
             status: 200
         });
@@ -373,8 +390,10 @@ export const updateCategory = async (req: Request, res: Response) => {
 
         const updatedCategory = await categoryRepository.save(category);
         
+        const { createdAt, deletedAt, ...categoryData } = updatedCategory;
+
         res.json({
-            data: updatedCategory,
+            data: categoryData,
             error: null,
             status: 200
         });
