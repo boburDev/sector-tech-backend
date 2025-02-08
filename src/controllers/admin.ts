@@ -34,6 +34,7 @@ export const login = async (req: Request, res: Response) => {
         );
 
         res.json({ 
+            id: admin.id,
             username: admin.username,
             status: admin.status,
             role: admin.role,

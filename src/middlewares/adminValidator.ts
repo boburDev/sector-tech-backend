@@ -33,7 +33,7 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
         return;
     }
 
-    const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username } });
+    const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username, id: decoded.id } });
 
     if (!existingAdmin) {
         res.status(401).json({ message: 'Admin not found' })
