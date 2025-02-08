@@ -17,7 +17,7 @@ const adminRepository = AppDataSource.getRepository(Admin);
 export async function validateAdminToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     console.log(authHeader);
-    
+
 
     if (!authHeader) {
         res.status(401).json({ message: 'No token provided' })
@@ -27,7 +27,7 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
     const token = authHeader.split(' ')[1];
 
     const decoded = verify(token);
-    
+
     if (!decoded) {
         res.status(401).json({ message: 'Invalid or expired token' })
         return;
@@ -44,7 +44,7 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
         res.status(400).json({ message: 'Your account is not active' });
         return;
     }
-    
+
     req.admin = {
         id: existingAdmin.id,
         username: existingAdmin.username,
