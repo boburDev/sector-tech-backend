@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../entities/catalog.entity';
+import { IsNull } from 'typeorm';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -11,7 +12,15 @@ export const getCatalogById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const catalog = await catalogRepository.findOne({ where: { id } });
+        const catalog = await catalogRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
 
         if (!catalog) {
             res.json({
@@ -44,7 +53,8 @@ export const getAllCatalogs = async (req: Request, res: Response) => {
     try {
         const catalogs = await catalogRepository
             .createQueryBuilder('catalog')
-            .leftJoinAndSelect('catalog.subcatalogs', 'subcatalogs')
+            .leftJoinAndSelect('catalog.subcatalogs', 'subcatalogs', 'subcatalogs.deletedAt IS NULL')
+            .where('catalog.deletedAt IS NULL')
             .orderBy('catalog.createdAt', 'DESC')
             .getMany();
         
@@ -73,7 +83,15 @@ export const createCatalog = async (req: Request, res: Response) => {
     try {
         const { title } = req.body;
 
-        const existingCatalog = await catalogRepository.findOne({ where: { title } });
+        const existingCatalog = await catalogRepository.findOne({ 
+            where: { 
+                title,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (existingCatalog) {
             res.json({
                 data: null,
@@ -111,7 +129,15 @@ export const updateCatalog = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { title } = req.body;
 
-        const catalog = await catalogRepository.findOne({ where: { id } });
+        const catalog = await catalogRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!catalog) {
             res.json({
                 data: null,
@@ -146,7 +172,15 @@ export const deleteCatalog = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
-        const catalog = await catalogRepository.findOne({ where: { id } });
+        const catalog = await catalogRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!catalog) {
             res.json({
                 data: null,
@@ -156,7 +190,8 @@ export const deleteCatalog = async (req: Request, res: Response) => {
             return;
         }
 
-        await catalogRepository.softDelete(id);
+        catalog.deletedAt = new Date();
+        await catalogRepository.save(catalog);
         
         res.json({
             data: { message: 'Catalog deleted successfully' },
@@ -179,7 +214,15 @@ export const createSubcatalog = async (req: Request, res: Response) => {
     try {
         const { title, catalogId } = req.body;
 
-        const existingSubcatalog = await subcatalogRepository.findOne({ where: { title } });
+        const existingSubcatalog = await subcatalogRepository.findOne({ 
+            where: { 
+                title,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (existingSubcatalog) {
             res.json({
                 data: null,
@@ -189,7 +232,15 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             return;
         }
 
-        const catalog = await catalogRepository.findOne({ where: { id: catalogId } });
+        const catalog = await catalogRepository.findOne({ 
+            where: { 
+                id: catalogId,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!catalog) {
             res.json({
                 data: null,
@@ -228,7 +279,15 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { title, catalogId } = req.body;
 
-        const subcatalog = await subcatalogRepository.findOne({ where: { id } });
+        const subcatalog = await subcatalogRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!subcatalog) {
             res.json({
                 data: null,
@@ -239,7 +298,15 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
         }
 
         if (catalogId) {
-            const catalog = await catalogRepository.findOne({ where: { id: catalogId } });
+            const catalog = await catalogRepository.findOne({ 
+                where: { 
+                    id: catalogId,
+                    deletedAt: IsNull()
+                },
+                order: {
+                    createdAt: 'DESC'
+                }
+            });
             if (!catalog) {
                 res.json({
                     data: null,
@@ -279,7 +346,15 @@ export const deleteSubcatalog = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
-        const subcatalog = await subcatalogRepository.findOne({ where: { id } });
+        const subcatalog = await subcatalogRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!subcatalog) {
             res.json({
                 data: null,
@@ -289,7 +364,8 @@ export const deleteSubcatalog = async (req: Request, res: Response) => {
             return;
         }
 
-        await subcatalogRepository.softDelete(id);
+        subcatalog.deletedAt = new Date();
+        await subcatalogRepository.save(subcatalog);
         
         res.json({
             data: { message: 'Subcatalog deleted successfully' },
@@ -312,7 +388,15 @@ export const createCategory = async (req: Request, res: Response) => {
     try {
         const { title, path, subCatalogId } = req.body;
 
-        const existingCategory = await categoryRepository.findOne({ where: { title } });
+        const existingCategory = await categoryRepository.findOne({ 
+            where: { 
+                title,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (existingCategory) {
             res.json({
                 data: null,
@@ -322,7 +406,15 @@ export const createCategory = async (req: Request, res: Response) => {
             return;
         }
 
-        const subcatalog = await subcatalogRepository.findOne({ where: { id: subCatalogId } });
+        const subcatalog = await subcatalogRepository.findOne({ 
+            where: { 
+                id: subCatalogId,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!subcatalog) {
             res.json({
                 data: null,
@@ -362,7 +454,15 @@ export const updateCategory = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { title, path, subCatalogId } = req.body;
 
-        const category = await categoryRepository.findOne({ where: { id } });
+        const category = await categoryRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!category) {
             res.json({
                 data: null,
@@ -373,7 +473,15 @@ export const updateCategory = async (req: Request, res: Response) => {
         }
 
         if (subCatalogId) {
-            const subcatalog = await subcatalogRepository.findOne({ where: { id: subCatalogId } });
+            const subcatalog = await subcatalogRepository.findOne({ 
+                where: { 
+                    id: subCatalogId,
+                    deletedAt: IsNull()
+                },
+                order: {
+                    createdAt: 'DESC'
+                }
+            });
             if (!subcatalog) {
                 res.json({
                     data: null,
@@ -412,7 +520,15 @@ export const deleteCategory = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
-        const category = await categoryRepository.findOne({ where: { id } });
+        const category = await categoryRepository.findOne({ 
+            where: { 
+                id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
         if (!category) {
             res.json({
                 data: null,
@@ -422,7 +538,8 @@ export const deleteCategory = async (req: Request, res: Response) => {
             return;
         }
 
-        await categoryRepository.softDelete(id);
+        category.deletedAt = new Date();
+        await categoryRepository.save(category);
         
         res.json({
             data: { message: 'Category deleted successfully' },
