@@ -305,6 +305,8 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
 export const createSubcatalog = async (req: Request, res: Response) => {
     try {
         const { title, catalogId } = req.body;
+        console.log(req.body);
+        
 
         // Validate required fields
         if (!title || !catalogId) {
