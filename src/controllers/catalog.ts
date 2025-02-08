@@ -292,18 +292,27 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
         return;
     }
 };
-
 export const createSubcatalog = async (req: Request, res: Response) => {
     try {
         const { title, catalogId } = req.body;
 
-        const existingSubcatalog = await subcatalogRepository.findOne({
-            where: {
-                title,
-                catalogId,
-                deletedAt: IsNull()
-            }
-        });
+        // Validate required fields
+        if (!title || !catalogId) {
+            res.json({
+                data: null,
+                error: 'Title and catalogId are required',
+                status: 400
+            });
+            return;
+        }
+
+        // Check if subcatalog already exists
+        const existingSubcatalog = await subcatalogRepository
+            .createQueryBuilder('subcatalog')
+            .where('LOWER(subcatalog.title) = LOWER(:title)', { title })
+            .andWhere('subcatalog.catalogId = :catalogId', { catalogId })
+            .andWhere('subcatalog.deletedAt IS NULL')
+            .getOne();
 
         if (existingSubcatalog) {
             res.json({
@@ -314,12 +323,12 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             return;
         }
 
-        const catalog = await catalogRepository.findOne({
-            where: {
-                id: catalogId,
-                deletedAt: IsNull()
-            }
-        });
+        // Verify parent catalog exists
+        const catalog = await catalogRepository
+            .createQueryBuilder('catalog')
+            .where('catalog.id = :id', { id: catalogId })
+            .andWhere('catalog.deletedAt IS NULL')
+            .getOne();
 
         if (!catalog) {
             res.json({
@@ -330,12 +339,25 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             return;
         }
 
-        const subcatalog = new Subcatalog();
-        subcatalog.title = title;
-        subcatalog.catalogId = catalogId;
+        // Create and save new subcatalog
+        const subcatalog = subcatalogRepository.create({
+            title: title.trim(),
+            catalogId: catalogId,
+            catalog: catalog
+        });
 
         const savedSubcatalog = await subcatalogRepository.save(subcatalog);
 
+        if (!savedSubcatalog) {
+            res.json({
+                data: null,
+                error: 'Failed to create subcatalog',
+                status: 500
+            });
+            return;
+        }
+
+        // Format response data
         const { createdAt, deletedAt, ...subcatalogData } = savedSubcatalog;
 
         res.json({
@@ -344,7 +366,9 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             status: 200
         });
         return;
+
     } catch (error: unknown) {
+        console.error('Error creating subcatalog:', error);
         res.json({
             data: null,
             error: error instanceof Error ? error.message : 'An unknown error occurred',
