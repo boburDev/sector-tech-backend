@@ -514,6 +514,69 @@ export const deleteSubcatalog = async (req: Request, res: Response) => {
 };
 
 // Category Controllers
+export const getCategoriesBySubcatalogId = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        // First check if subcatalog exists
+        const subcatalog = await subcatalogRepository.findOne({
+            where: {
+                id,
+                deletedAt: IsNull()
+            }
+        });
+
+        if (!subcatalog) {
+            res.json({
+                data: null,
+                error: 'Subcatalog not found',
+                status: 404
+            });
+            return;
+        }
+
+        // Get categories for this subcatalog
+        const categories = await categoryRepository.find({
+            where: {
+                subCatalogId: id,
+                deletedAt: IsNull()
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
+
+        if (!categories.length) {
+            res.json({
+                data: [],
+                error: null,
+                status: 200
+            });
+            return;
+        }
+
+        // Format response by removing timestamps
+        const formattedCategories = categories.map(category => {
+            const { createdAt, deletedAt, ...categoryData } = category;
+            return categoryData;
+        });
+
+        res.json({
+            data: formattedCategories,
+            error: null,
+            status: 200
+        });
+        return;
+    } catch (error: unknown) {
+        res.json({
+            data: null,
+            error: error instanceof Error ? error.message : 'An unknown error occurred',
+            status: 400
+        });
+        return;
+    }
+};
+
 export const createCategory = async (req: Request, res: Response) => {
     try {
         const { title, path, subCatalogId } = req.body;
