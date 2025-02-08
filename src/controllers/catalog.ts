@@ -221,32 +221,20 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             .orderBy('subcatalog.createdAt', 'DESC');
 
         const subcatalogs = await queryBuilder.getMany();
-        console.log(subcatalogs);
 
         if (!subcatalogs.length) {
             res.json({
-                data: null,
-                error: 'No subcatalogs found for this catalog',
-                status: 404
+                data: [],
+                error: null,
+                status: 200
             });
             return;
         }
 
-        const formattedSubcatalogs = subcatalogs
-            .filter(subcatalog => !subcatalog.categories || subcatalog.categories.length === 0)
-            .map(subcatalog => {
-                const { createdAt, deletedAt, categories, ...subcatalogData } = subcatalog;
-                return subcatalogData;
-            });
-
-        if (!formattedSubcatalogs.length) {
-            res.json({
-                data: null,
-                error: 'No subcatalogs without categories found for this catalog',
-                status: 404
-            });
-            return;
-        }
+        const formattedSubcatalogs = subcatalogs.map(subcatalog => {
+            const { createdAt, deletedAt, categories, ...subcatalogData } = subcatalog;
+            return subcatalogData;
+        });
 
         res.json({
             data: formattedSubcatalogs,
@@ -272,16 +260,14 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
             where: {
                 id,
                 deletedAt: IsNull()
-            },
-            order: {
-                createdAt: 'DESC'
             }
         });
+
         if (!subcatalog) {
             res.json({
                 data: null,
                 error: 'Subcatalog not found',
-                status: 400
+                status: 404
             });
             return;
         }
@@ -311,16 +297,15 @@ export const createSubcatalog = async (req: Request, res: Response) => {
         const existingSubcatalog = await subcatalogRepository.findOne({
             where: {
                 title,
+                catalogId,
                 deletedAt: IsNull()
-            },
-            order: {
-                createdAt: 'DESC'
             }
         });
+
         if (existingSubcatalog) {
             res.json({
                 data: null,
-                error: 'Subcatalog with this title already exists',
+                error: 'Subcatalog with this title already exists in this catalog',
                 status: 400
             });
             return;
@@ -330,16 +315,14 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             where: {
                 id: catalogId,
                 deletedAt: IsNull()
-            },
-            order: {
-                createdAt: 'DESC'
             }
         });
+
         if (!catalog) {
             res.json({
                 data: null,
                 error: 'Parent catalog not found',
-                status: 400
+                status: 404
             });
             return;
         }
@@ -377,16 +360,14 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
             where: {
                 id,
                 deletedAt: IsNull()
-            },
-            order: {
-                createdAt: 'DESC'
             }
         });
+
         if (!subcatalog) {
             res.json({
                 data: null,
                 error: 'Subcatalog not found',
-                status: 400
+                status: 404
             });
             return;
         }
@@ -396,16 +377,14 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
                 where: {
                     id: catalogId,
                     deletedAt: IsNull()
-                },
-                order: {
-                    createdAt: 'DESC'
                 }
             });
+
             if (!catalog) {
                 res.json({
                     data: null,
                     error: 'Parent catalog not found',
-                    status: 400
+                    status: 404
                 });
                 return;
             }
@@ -444,16 +423,14 @@ export const deleteSubcatalog = async (req: Request, res: Response) => {
             where: {
                 id,
                 deletedAt: IsNull()
-            },
-            order: {
-                createdAt: 'DESC'
             }
         });
+
         if (!subcatalog) {
             res.json({
                 data: null,
                 error: 'Subcatalog not found',
-                status: 400
+                status: 404
             });
             return;
         }
