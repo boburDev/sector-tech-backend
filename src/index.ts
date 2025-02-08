@@ -9,7 +9,7 @@ import 'dotenv/config';
 dotenv.config()
 
 
-const PORT = process.env.PORT || 4001
+const PORT = process.env.PORT || 4000
 
 AppDataSource.initialize().then(() => { }).catch((error) => console.log(error))
 const app = express()
