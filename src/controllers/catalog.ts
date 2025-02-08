@@ -213,12 +213,31 @@ export const deleteCatalog = async (req: Request, res: Response) => {
 export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+
+        // First check if catalog exists
+        const catalog = await catalogRepository.findOne({
+            where: {
+                id,
+                deletedAt: IsNull()
+            }
+        });
+
+        if (!catalog) {
+            res.json({
+                data: null,
+                error: 'Catalog not found',
+                status: 404
+            });
+            return;
+        }
         
+        // Get subcatalogs with categories for this catalog
         const queryBuilder = subcatalogRepository.createQueryBuilder('subcatalog')
             .leftJoinAndSelect('subcatalog.categories', 'category', 'category.deletedAt IS NULL')
             .where('subcatalog.catalogId = :catalogId', { catalogId: id })
             .andWhere('subcatalog.deletedAt IS NULL')
-            .orderBy('subcatalog.createdAt', 'DESC');
+            .orderBy('subcatalog.createdAt', 'DESC')
+            .addOrderBy('category.createdAt', 'DESC');
 
         const subcatalogs = await queryBuilder.getMany();
 
@@ -231,6 +250,7 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             return;
         }
 
+        // Format response by removing timestamps
         const formattedSubcatalogs = subcatalogs.map(subcatalog => {
             const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
             return {
