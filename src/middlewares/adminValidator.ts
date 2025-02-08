@@ -16,8 +16,6 @@ const adminRepository = AppDataSource.getRepository(Admin);
 
 export async function validateAdminToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
-    
 
     if (!authHeader) {
         res.status(401).json({ message: 'No token provided' })
@@ -34,7 +32,7 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
     }
 
     const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username, id: decoded.id } });
-
+	
     if (!existingAdmin) {
         res.status(401).json({ message: 'Admin not found' })
         return;
