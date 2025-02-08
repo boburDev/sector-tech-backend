@@ -210,6 +210,52 @@ export const deleteCatalog = async (req: Request, res: Response) => {
 };
 
 // Subcatalog Controllers
+export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const queryBuilder = subcatalogRepository.createQueryBuilder('subcatalog')
+            .leftJoinAndSelect('subcatalog.categories', 'category')
+            .where('subcatalog.catalogId = :catalogId', { catalogId: id })
+            .andWhere('subcatalog.deletedAt IS NULL')
+            .andWhere('category.deletedAt IS NULL')
+            .orderBy('subcatalog.createdAt', 'DESC');
+
+        const subcatalogs = await queryBuilder.getMany();
+
+        if (!subcatalogs.length) {
+            res.json({
+                data: null,
+                error: 'No subcatalogs found for this catalog',
+                status: 404
+            });
+            return;
+        }
+
+        const formattedSubcatalogs = subcatalogs.map(subcatalog => {
+            const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
+            return {
+                ...subcatalogData,
+                categories: subcatalog.categories.map(({ createdAt, deletedAt, ...categoryData }) => categoryData)
+            };
+        });
+
+        res.json({
+            data: formattedSubcatalogs,
+            error: null,
+            status: 200
+        });
+        return;
+    } catch (error: unknown) {
+        res.json({
+            data: null,
+            error: error instanceof Error ? error.message : 'An unknown error occurred',
+            status: 400
+        });
+        return;
+    }
+};
+
 export const createSubcatalog = async (req: Request, res: Response) => {
     try {
         const { title, catalogId } = req.body;

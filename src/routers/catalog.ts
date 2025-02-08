@@ -12,6 +12,7 @@ router.put('/update/:id', validateAdminToken, Catalog.updateCatalog);
 router.delete('/delete/:id', validateAdminToken, Catalog.deleteCatalog);
 
 // Subcatalog routes
+router.get('/subcatalog/by/:id', validateAdminToken, Catalog.getSubcatalogWithCategoryByCatalogId);
 router.post('/subcatalog/create', validateAdminToken, Catalog.createSubcatalog);
 router.put('/subcatalog/update/:id', validateAdminToken, Catalog.updateSubcatalog);
 router.delete('/subcatalog/delete/:id', validateAdminToken, Catalog.deleteSubcatalog);
