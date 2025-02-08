@@ -221,7 +221,8 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             .orderBy('subcatalog.createdAt', 'DESC');
 
         const subcatalogs = await queryBuilder.getMany();
-
+        console.log(subcatalogs);
+        
         if (!subcatalogs.length) {
             res.json({
                 data: null,
