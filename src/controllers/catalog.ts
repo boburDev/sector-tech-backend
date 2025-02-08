@@ -218,7 +218,6 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             .leftJoinAndSelect('subcatalog.categories', 'category')
             .where('subcatalog.catalogId = :catalogId', { catalogId: id })
             .andWhere('subcatalog.deletedAt IS NULL')
-            .andWhere('category.deletedAt IS NULL')
             .orderBy('subcatalog.createdAt', 'DESC');
 
         const subcatalogs = await queryBuilder.getMany();
@@ -232,13 +231,21 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             return;
         }
 
-        const formattedSubcatalogs = subcatalogs.map(subcatalog => {
-            const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
-            return {
-                ...subcatalogData,
-                categories: subcatalog.categories.map(({ createdAt, deletedAt, ...categoryData }) => categoryData)
-            };
-        });
+        const formattedSubcatalogs = subcatalogs
+            .filter(subcatalog => !subcatalog.categories || subcatalog.categories.length === 0)
+            .map(subcatalog => {
+                const { createdAt, deletedAt, categories, ...subcatalogData } = subcatalog;
+                return subcatalogData;
+            });
+
+        if (!formattedSubcatalogs.length) {
+            res.json({
+                data: null,
+                error: 'No subcatalogs without categories found for this catalog',
+                status: 404
+            });
+            return;
+        }
 
         res.json({
             data: formattedSubcatalogs,
