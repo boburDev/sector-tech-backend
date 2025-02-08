@@ -50,7 +50,8 @@ export const login = async (req: Request, res: Response) => {
 export const createAdmin = async (req: Request, res: Response) => {
     try {
         const { username, password, role, status } = req.body;
-
+        console.log(req.admin);
+        
         const existingAdmin = await adminRepository.findOne({ where: { username } });
         
         if (existingAdmin) {
