@@ -224,6 +224,11 @@ export const deleteUser = async (req: Request, res: Response) => {
             return;
         }
 
+        if (user.role === 'super') {
+            res.status(400).json({ message: 'Cannot delete super admin account' });
+            return;
+        }
+
         user.deletedAt = new Date();
         await adminRepository.save(user);
 
