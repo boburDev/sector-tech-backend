@@ -3,6 +3,7 @@ import { verify } from '../utils/jwt';
 import AppDataSource from '../config/ormconfig';
 import { Admin } from '../entities/admin.entity';
 import { IsNull } from 'typeorm';
+
 declare global {
     namespace Express {
         interface Request {
