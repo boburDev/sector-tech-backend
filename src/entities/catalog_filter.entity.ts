@@ -6,13 +6,13 @@ export class CatalogFilter {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column()
+    @Column({ nullable: true })
     subcatalogId: string;
 
-    @Column()
+    @Column({ nullable: true })
     categoryId: string;
 
-    @Column('jsonb')
+    @Column('jsonb', { nullable: true })
     data: object;
 
     @ManyToOne(() => Subcatalog, { onDelete: 'CASCADE' })

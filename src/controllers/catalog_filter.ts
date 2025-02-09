@@ -7,10 +7,12 @@ const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 export const getCatalogFilterById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const filter = await catalogFilterRepository.findOne({
-            where: { id },
-            relations: ['subcatalog', 'category']
-        });
+        const filter = await catalogFilterRepository
+            .createQueryBuilder('filter')
+            .leftJoinAndSelect('filter.subcatalog', 'subcatalog')
+            .leftJoinAndSelect('filter.category', 'category')
+            .where('filter.subcatalogId = :id OR filter.categoryId = :id', { id })
+            .getOne();
 
         if (!filter) {
             res.status(404).json({ message: 'Catalog filter not found' })
@@ -27,7 +29,7 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
 
 export const createCatalogFilter = async (req: Request, res: Response) => {
     try {
-        const { subcatalogId, categoryId, data } = req.body;
+        const { subcatalogId = '', categoryId = '', data = null } = req.body;
 
         const newFilter = catalogFilterRepository.create({
             subcatalogId,
