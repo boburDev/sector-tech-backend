@@ -100,13 +100,13 @@ export const createBrand = async (req: Request, res: Response) => {
             });
             return;
         }
-
+        const newPath = file.destination.split('./public')[1] + '/' + file.filename
         const brand = new Brand();
         brand.title = title;
-        brand.path = file.filename;
+        brand.path = newPath;
 
         const savedBrand = await brandRepository.save(brand);
-
+        
         const { createdAt, deletedAt, ...brandData } = savedBrand;
 
         res.json({
@@ -169,11 +169,12 @@ export const updateBrand = async (req: Request, res: Response) => {
 
         if (file) {
             // Delete old file if exists
-            const oldPath = `./public/brands/${brand.path}`;
+            const oldPath = `./public/${brand.path}`;
             if (fs.existsSync(oldPath)) {
                 fs.unlinkSync(oldPath);
             }
-            brand.path = file.filename;
+            const newPath = file.destination.split('./public')[1] + '/' + file.filename
+            brand.path = newPath;
         }
 
         brand.title = title;
