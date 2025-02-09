@@ -213,10 +213,18 @@ export const deleteBrand = async (req: Request, res: Response) => {
         if (!brand) {
             res.json({
                 data: null,
-                error: 'Brand not found',
+                error: 'Brand not found', 
                 status: 404
             });
             return;
+        }
+
+        // Delete brand image file if exists
+        if (brand.path) {
+            const filePath = `./public/${brand.path}`;
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
         }
 
         await brandRepository.softDelete(id);
