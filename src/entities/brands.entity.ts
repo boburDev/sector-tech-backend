@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, UpdateDateColumn } from "typeorm";
-import { Catalog, Subcatalog, Category } from "./catalog.entity";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn } from "typeorm";
 
 @Entity()
 export class Brand {
