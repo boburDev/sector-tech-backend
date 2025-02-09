@@ -1,9 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { CatalogFilter } from "./catalog_filter.entity";
 
 @Entity()
 export class Catalog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
+
 
     @Column({ unique: true, length: 255 })
     title: string;
@@ -36,6 +38,9 @@ export class Subcatalog {
     @OneToMany(() => Category, category => category.subCatalog)
     categories: Category[];
 
+    @OneToMany(() => CatalogFilter, filter => filter.subcatalog)
+    filters: CatalogFilter[];
+
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
@@ -60,6 +65,9 @@ export class Category {
     @ManyToOne(() => Subcatalog, subcatalog => subcatalog.categories, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'subCatalogId' })
     subCatalog: Subcatalog;
+
+    @OneToMany(() => CatalogFilter, filter => filter.category)
+    filters: CatalogFilter[];
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

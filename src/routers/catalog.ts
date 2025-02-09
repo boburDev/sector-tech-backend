@@ -18,15 +18,10 @@ router.post('/subcatalog/create', validateAdminToken, Catalog.createSubcatalog);
 router.put('/subcatalog/update/:id', validateAdminToken, Catalog.updateSubcatalog);
 router.delete('/subcatalog/delete/:id', validateAdminToken, Catalog.deleteSubcatalog);
 
-
-
 // Category routes 
 router.get('/category/by-subcatalog/:id', validateAdminToken, Catalog.getCategoriesBySubcatalogId);
 router.post('/category/create', validateAdminToken, Catalog.createCategory);
 router.put('/category/update/:id', validateAdminToken, Catalog.updateCategory);
 router.delete('/category/delete/:id', validateAdminToken, Catalog.deleteCategory);
 
-
 export default router
-
-
