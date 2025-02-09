@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, DeleteDateColumn } from "typeorm";
 import * as bcrypt from "bcrypt";
 
 @Entity()
@@ -18,6 +18,14 @@ export class Admin {
     @Column({ default: 'active' })
     status: string;
 
+    @CreateDateColumn()
+    createdAt: Date;
+
+
+    @DeleteDateColumn()
+    deletedAt: Date;
+
+
     @BeforeInsert()
     async hashPassword() {
         const salt = await bcrypt.genSalt(10);
@@ -28,7 +36,3 @@ export class Admin {
         return bcrypt.compare(password, this.password);
     }
 }
-
-
-
-

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { verify } from '../utils/jwt';
 import AppDataSource from '../config/ormconfig';
 import { Admin } from '../entities/admin.entity';
-
+import { IsNull } from 'typeorm';
 declare global {
     namespace Express {
         interface Request {
@@ -31,7 +31,7 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
         return;
     }
 
-    const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username, id: decoded.id } });
+    const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username, id: decoded.id, deletedAt: IsNull() } });
 	
     if (!existingAdmin) {
         res.status(401).json({ message: 'Admin not found' })
