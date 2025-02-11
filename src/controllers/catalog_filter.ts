@@ -30,7 +30,8 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
 export const createCatalogFilter = async (req: Request, res: Response) => {
     try {
         const { subcatalogId = '', categoryId = '', data = null } = req.body;
-
+        console.log(subcatalogId, categoryId, data);
+        
         const newFilter = catalogFilterRepository.create({
             subcatalogId,
             categoryId,
