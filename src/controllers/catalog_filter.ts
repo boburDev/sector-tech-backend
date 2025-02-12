@@ -29,7 +29,7 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
 
 export const createCatalogFilter = async (req: Request, res: Response) => {
     try {
-        let { subcatalogId = null, categoryId = null, data = null } = req.body;
+        let { subcatalogId = null, categoryId = null, data = [] } = req.body;
 
         // data = [
         //     {

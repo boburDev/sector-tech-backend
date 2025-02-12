@@ -13,7 +13,7 @@ export class CatalogFilter {
     categoryId: string;
 
     @Column('jsonb', { nullable: true })
-    data: object;
+    data: Record<string, any>;
 
     @ManyToOne(() => Subcatalog, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'subcatalogId' })
