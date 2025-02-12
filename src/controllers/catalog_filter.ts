@@ -29,7 +29,48 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
 
 export const createCatalogFilter = async (req: Request, res: Response) => {
     try {
-        const { subcatalogId = null, categoryId = null, data = null } = req.body;
+        let { subcatalogId = null, categoryId = null, data = null } = req.body;
+
+        // data = [
+        //     {
+        //         name: "collection",
+        //         title: "Популярные подборки",
+        //         icon: "collection.png",
+        //         withSearch: true,
+        //         type: "link",
+        //         options: [
+        //             {
+        //                 name: "cisco-2-urovnya-l2-",
+        //                 title: "Cisco 2 уровня (L2)"
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         name: "brand",
+        //         title: "Бренд",
+        //         icon: "brand.png",
+        //         type: "import-checkbox",
+        //         url: "/brands"
+        //     },
+        //     {
+        //         name: "price",
+        //         title: "Цена",
+        //         icon: "price.png",
+        //         type: "radio",
+        //     },
+        //     {   
+        //         name: "accommodation",
+        //         title: "Размещение",
+        //         icon: "accommodation.png",
+        //         type: "checkbox",
+        //         options: [
+        //             {
+        //                 name: "montiruemye-v-stoyku",
+        //                 title: "Монтируемые в стойку"
+        //             }
+        //         ]
+        //     }
+        // ]
         
         const newFilter = catalogFilterRepository.create({
             subcatalogId,
