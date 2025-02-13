@@ -7,6 +7,7 @@ const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 export const getCatalogFilterById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+
         const filter = await catalogFilterRepository
             .createQueryBuilder('filter')
             .leftJoinAndSelect('filter.subcatalog', 'subcatalog')
@@ -15,14 +16,25 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
             .getOne();
 
         if (!filter) {
-            res.status(404).json({ message: 'Catalog filter not found' })
+            res.status(404).json({ message: "Catalog filter not found" });
             return;
         }
 
-        res.json(filter)
+        filter.data = filter.data.map((item: any) => {
+            const { productsId, ...rest } = item;
+            return rest;
+        });
+        const result = {
+            message: "Catalog filter retrieved successfully.",
+            id: filter.id,
+            subcatalog: filter.subcatalogId,
+            category: filter.categoryId,
+            data: filter.data,
+        }
+        res.status(200).json(result);
         return;
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching catalog filter', error })
+        res.status(500).json({ message: "Error fetching catalog filter", error });
         return;
     }
 };
@@ -31,58 +43,77 @@ export const createCatalogFilter = async (req: Request, res: Response) => {
     try {
         let { subcatalogId = null, categoryId = null, data = [] } = req.body;
 
-        // data = [
-        //     {
-        //         name: "collection",
-        //         title: "Популярные подборки",
-        //         icon: "collection.png",
-        //         withSearch: true,
-        //         type: "link",
-        //         options: [
-        //             {
-        //                 name: "cisco-2-urovnya-l2-",
-        //                 title: "Cisco 2 уровня (L2)"
-        //             }
-        //         ]
-        //     },
-        //     {
-        //         name: "brand",
-        //         title: "Бренд",
-        //         icon: "brand.png",
-        //         type: "import-checkbox",
-        //         url: "/brands"
-        //     },
-        //     {
-        //         name: "price",
-        //         title: "Цена",
-        //         icon: "price.png",
-        //         type: "radio",
-        //     },
-        //     {   
-        //         name: "accommodation",
-        //         title: "Размещение",
-        //         icon: "accommodation.png",
-        //         type: "checkbox",
-        //         options: [
-        //             {
-        //                 name: "montiruemye-v-stoyku",
-        //                 title: "Монтируемые в стойку"
-        //             }
-        //         ]
-        //     }
-        // ]
-        
-        const newFilter = catalogFilterRepository.create({
-            subcatalogId,
-            categoryId,
-            data
-        });
+        if (!subcatalogId && !categoryId) {
+            res.status(400).json({ message: "Either subcatalogId or categoryId must be provided." });
+            return;
+        }
 
-        await catalogFilterRepository.save(newFilter);
-        res.status(201).json(newFilter)
-        return;
+        const existingFilter:any = await catalogFilterRepository.findOne({
+            where: [{ subcatalogId }, { categoryId }]
+        });
+        
+        if (existingFilter) {
+            const existingNames = new Set(existingFilter.data.map((item: any) => item.name));
+            
+            for (const item of data) {
+                if (existingNames.has(item.name)) {
+                    res.status(400).json({ message: `You can't create the same element: ${item.name}` });
+                    return;
+                }
+            }
+
+            existingFilter.data = [...existingFilter.data, ...data];
+
+            existingFilter.data = existingFilter.data.map((item: any) => ({
+                ...item,
+                productsId: item.productsId ?? []
+            }));
+
+            const result = await catalogFilterRepository.save(existingFilter); 
+            result.data = result.data.map((item: any) => {
+                const { productsId, ...rest } = item;
+                return rest;
+            });
+
+            const filterResult = {
+                message: "New filter updated successfully.",
+                id: result.id,
+                subcatalog: result.subcatalogId,
+                category: result.categoryId,
+                data: result.data,
+            }
+            res.status(201).json(filterResult);
+            return;
+        } else {
+            const updatedData = data.map((item: any) => ({
+                ...item,
+                productsId: item.productsId ?? []
+            }));
+
+            const newFilter = catalogFilterRepository.create({
+                subcatalogId,
+                categoryId,
+                data: updatedData
+            });
+
+            const result = await catalogFilterRepository.save(newFilter);
+            result.data = result.data.map((item: any) => {
+                const { productsId, ...rest } = item;
+                return rest;
+            });
+
+            const filterResult = {
+                message: "New filter created successfully.",
+                id: result.id,
+                subcatalog: result.subcatalogId,
+                category: result.categoryId,
+                data: result.data,
+            }
+            res.status(201).json(filterResult);
+            return;
+        }
     } catch (error) {
-        res.status(500).json({ message: 'Error creating catalog filter', error })
+        res.status(500).json({ message: "Error creating catalog filter", error });
         return;
     }
 };
@@ -90,24 +121,45 @@ export const createCatalogFilter = async (req: Request, res: Response) => {
 export const updateCatalogFilter = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { subcatalogId, categoryId, data } = req.body;
+        const { name, data } = req.body;
 
-        const filter = await catalogFilterRepository.findOneBy({ id });
+        const filter: any = await catalogFilterRepository.findOneBy({ id });
 
         if (!filter) {
-            res.status(404).json({ message: 'Catalog filter not found' })
+            res.status(404).json({ message: "Catalog filter not found" });
             return;
         }
 
-        filter.subcatalogId = subcatalogId;
-        filter.categoryId = categoryId;
-        filter.data = data;
+        const itemIndex = filter.data.findIndex((item: any) => item.name === name);
 
-        await catalogFilterRepository.save(filter);
-        res.json(filter)
+        if (itemIndex === -1) {
+            res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
+            return;
+        }
+        
+        filter.data[itemIndex] = {
+            ...data,
+            productsId: filter.data[itemIndex].productsId
+        };
+        
+        const result = await catalogFilterRepository.save(filter);
+
+        result.data = result.data.map((item: any) => {
+            const { productsId, ...rest } = item;
+            return rest;
+        });
+
+        const filterResult = {
+            message: "Catalog filter item updated successfully.",
+            data: result.data,
+            subcatalog: result.subcatalogId,
+            category: result.categoryId,
+            id: result.id,
+        }
+        res.status(200).json(filterResult);
         return;
     } catch (error) {
-        res.status(500).json({ message: 'Error updating catalog filter', error })
+        res.status(500).json({ message: "Error updating catalog filter", error });
         return;
     }
 };
@@ -115,18 +167,49 @@ export const updateCatalogFilter = async (req: Request, res: Response) => {
 export const deleteCatalogFilter = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const filter = await catalogFilterRepository.findOneBy({ id });
+        const { name, deleteFilter = false } = req.body;
+
+        const filter: any = await catalogFilterRepository.findOneBy({ id });
 
         if (!filter) {
-            res.status(404).json({ message: 'Catalog filter not found' })
+            res.status(404).json({ message: "Catalog filter not found" });
             return;
         }
 
-        await catalogFilterRepository.softDelete(id);
-        res.json({ message: 'Catalog filter deleted successfully' })
+        if (deleteFilter) {
+            await catalogFilterRepository.remove(filter);
+            res.status(200).json({ message: "Catalog filter deleted successfully." });
+            return;
+        }
+
+        if (!name) {
+            res.status(400).json({ message: "Name is required to delete a specific item." });
+            return;
+        }
+
+        const itemIndex = filter.data.findIndex((item: any) => item.name === name);
+
+        if (itemIndex === -1) {
+            res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
+            return;
+        }
+
+        filter.data.splice(itemIndex, 1);
+
+        const result = await catalogFilterRepository.save(filter);
+
+        const filterResult = {
+            message: "Catalog filter item deleted successfully.",
+            id: result.id,
+            subcatalog: result.subcatalogId,
+            category: result.categoryId,
+            data: result.data
+        }
+        res.status(200).json(filterResult);
         return;
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting catalog filter', error })
+        res.status(500).json({ message: "Error deleting catalog filter", error });
         return;
     }
 };
+
