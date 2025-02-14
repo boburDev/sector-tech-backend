@@ -6,7 +6,6 @@ export class Catalog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-
     @Column({ unique: true, length: 255 })
     title: string;
 

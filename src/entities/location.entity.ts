@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, DeleteDateColumn, CreateDateColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, DeleteDateColumn, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 
 @Entity()
 export class Country {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({ type: "varchar", length: 255, unique: true })
     name: string;
@@ -20,13 +20,17 @@ export class Country {
 
 @Entity()
 export class Region {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({ type: "varchar", length: 255 })
     name: string;
 
+    @Column()
+    countryId: string;
+
     @ManyToOne(() => Country, (country) => country.regions, { nullable: false, onDelete: "CASCADE" })
+    @JoinColumn({ name: 'countryId' })
     country: Country;
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })

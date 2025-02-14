@@ -1,10 +1,76 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Product } from "./products.entity";
 
 @Entity()
-export class Condition {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class ProductCondition {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-    @Column({ type: "varchar", length: 255 })
-    name: string;
+    @Column()
+    title: string;
+
+    @OneToMany(() => Product, (product) => product.conditions)
+    products: Product[];
+}
+
+@Entity()
+export class ProductQuestion {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+    @Column()
+    body: string;
+
+    @Column()
+    userId: string;
+
+    @Column()
+    productId: string;
+
+    @ManyToOne(() => User, (user) => user.questions)
+    @JoinColumn({ name: 'userId' })
+    user: User;
+
+    @ManyToOne(() => Product, (products) => products.questions)
+    @JoinColumn({ name: 'productId' })
+    products: Product;
+}
+
+@Entity()
+export class ProductComment {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+    @Column()
+    commentBody: string;
+
+    @Column()
+    star: number;
+
+    @Column()
+    productId: string;
+
+    @Column()
+    userId: string;
+
+    @ManyToOne(() => User, (user) => user.comments)
+    @JoinColumn({ name: 'userId' })
+    user: User;
+
+    @ManyToOne(() => Product, (products) => products.comments)
+    @JoinColumn({ name: 'productId' })
+    products: Product;
+}
+
+@Entity()
+export class PopularProduct {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+    @Column()
+    productId: string;
+
+    @ManyToOne(() => Product, (product) => product.populars)
+    @JoinColumn({ name: 'productId' })
+    products: Product;
 }
