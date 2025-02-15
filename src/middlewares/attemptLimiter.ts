@@ -14,9 +14,9 @@ let loginAttempts: LoginAttempts = {};
 export async function loginAttemptLimiter(req: Request, res: Response, next: NextFunction) {
     const ip = req.ip || '';
     const currentTime = Date.now();
-    const loginLimit = 5;
-    const blockDuration = 5 * 60 * 1000;
-    const attemptWindow = 60 * 1000;
+    const loginLimit = 5; // 5 attempts
+    const blockDuration = 5 * 60 * 1000; // 5 minutes
+    const attemptWindow = 60 * 1000; // 1 minute
 
     if (!loginAttempts[ip]) {
         loginAttempts[ip] = {

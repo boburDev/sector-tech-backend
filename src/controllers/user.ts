@@ -5,7 +5,7 @@ import { sign } from '../utils/jwt';
 
 const userRepository = AppDataSource.getRepository(User);
 
-export const signup = async (req: Request, res: Response): Promise<Response> => {
+export const signup = async (req: Request, res: Response): Promise<any> => {
     try {
         const { name, email, password } = req.body;
         const existingUser = await userRepository.findOne({ where: { email } });
@@ -32,7 +32,7 @@ export const signup = async (req: Request, res: Response): Promise<Response> => 
     }
 };
 
-export const login = async (req: Request, res: Response): Promise<Response> => {
+export const login = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, password } = req.body;
         const user = await userRepository.findOne({ where: { email } });
@@ -59,7 +59,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     }
 };
 
-export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
+export const updateProfile = async (req: Request, res: Response): Promise<any> => {
     try {
         const userId = req.user.id;
         const { name, email } = req.body;
@@ -88,3 +88,4 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
         return res.status(500).json({ message: "Error updating profile", error });
     }
 };
+

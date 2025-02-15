@@ -6,7 +6,7 @@ export class Catalog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ unique: true, length: 255 })
+    @Column({ length: 255 })
     title: string;
 
     @OneToMany(() => Subcatalog, subcatalog => subcatalog.catalog)
