@@ -1,6 +1,7 @@
 import express from 'express'
 import * as Catalog from '../controllers/catalog';
 import { validateAdminToken } from '../middlewares/adminValidator';
+import { uploadPhoto } from '../middlewares/multer';
 
 const router = express.Router();
 
@@ -20,8 +21,8 @@ router.delete('/subcatalog/delete/:id', validateAdminToken, Catalog.deleteSubcat
 
 // Category routes 
 router.get('/category/by-subcatalog/:id', validateAdminToken, Catalog.getCategoriesBySubcatalogId);
-router.post('/category/create', validateAdminToken, Catalog.createCategory);
-router.put('/category/update/:id', validateAdminToken, Catalog.updateCategory);
+router.post('/category/create', validateAdminToken, uploadPhoto.single('categoryImage'), Catalog.createCategory);
+router.put('/category/update/:id', validateAdminToken, uploadPhoto.single('categoryImage'), Catalog.updateCategory);
 router.delete('/category/delete/:id', validateAdminToken, Catalog.deleteCategory);
 
 export default router

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import AppDataSource from '../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../entities/catalog.entity';
 import { IsNull } from 'typeorm';
+import fs from 'fs';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -496,7 +497,17 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
 
 export const createCategory = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { title, path, subCatalogId } = req.body;
+        const { title, subCatalogId } = req.body;
+
+        const file = req.file as Express.Multer.File;
+
+        if (!title || !file || !subCatalogId) {
+            return res.json({
+                data: null,
+                error: 'Title, logo file and subCatalogId are required',
+                status: 400
+            });
+        }
 
         const existingCategory = await categoryRepository.findOne({
             where: {
@@ -507,6 +518,7 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
                 createdAt: 'DESC'
             }
         });
+
         if (existingCategory) {
             return res.json({
                 data: null,
@@ -531,10 +543,11 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
                 status: 400
             });
         }
+        const newPath = file.destination.split('./public')[1] + '/' + file.filename
 
         const category = new Category();
         category.title = title;
-        category.path = path;
+        category.path = newPath;
         category.subCatalogId = subCatalogId;
 
         const savedCategory = await categoryRepository.save(category);
@@ -554,7 +567,16 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
 export const updateCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-        const { title, path, subCatalogId } = req.body;
+        const { title, subCatalogId } = req.body;
+        const file = req.file as Express.Multer.File;
+
+        if (!title || !file || !subCatalogId) {
+            return res.json({
+                data: null,
+                error: 'Title, logo file and subCatalogId are required',
+                status: 400
+            });
+        }
 
         const category = await categoryRepository.findOne({
             where: {
@@ -593,8 +615,15 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
             category.subCatalogId = subCatalogId;
         }
 
+        if (file) {
+            const oldPath = `./public/${category.path}`;
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+            const newPath = file.destination.split('./public')[1] + '/' + file.filename
+            category.path = newPath;
+        }
         if (title) category.title = title;
-        if (path) category.path = path;
 
         const updatedCategory = await categoryRepository.save(category);
 

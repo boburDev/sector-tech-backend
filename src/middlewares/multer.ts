@@ -11,6 +11,8 @@ const storage: StorageEngine = multer.diskStorage({
 
             if (file.fieldname == 'logo') {
                 uploadPath += '/brands'
+            } else if (file.fieldname == 'categoryImage') {
+                uploadPath += '/categories'
             } else {
                 throw new Error("Invalid Type or fieldName");
             }
@@ -38,7 +40,7 @@ export const uploadPhoto = multer({
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
         try {
             const isValidType = photo.includes(file.mimetype);
-            const isValidField = ['logo'].includes(file.fieldname);
+            const isValidField = ['logo', 'categoryImage'].includes(file.fieldname);
 
             if (isValidType && isValidField) {
                 cb(null, true);
