@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { Product } from "./products.entity";
-
+import { User } from "./user.entity";
 @Entity()
 export class ProductCondition {
     @PrimaryGeneratedColumn('uuid')

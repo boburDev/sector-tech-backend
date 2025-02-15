@@ -4,7 +4,7 @@ import AppDataSource from '../config/ormconfig';
 
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
-export const getCatalogFilterById = async (req: Request, res: Response) => {
+export const getCatalogFilterById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -16,8 +16,7 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
             .getOne();
 
         if (!filter) {
-            res.status(404).json({ message: "Catalog filter not found" });
-            return;
+            return res.status(404).json({ message: "Catalog filter not found" });
         }
 
         filter.data = filter.data.map((item: any) => {
@@ -31,21 +30,18 @@ export const getCatalogFilterById = async (req: Request, res: Response) => {
             category: filter.categoryId,
             data: filter.data,
         }
-        res.status(200).json(result);
-        return;
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching catalog filter", error });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const createCatalogFilter = async (req: Request, res: Response) => {
+export const createCatalogFilter = async (req: Request, res: Response): Promise<any> => {
     try {
         let { subcatalogId = null, categoryId = null, data = [] } = req.body;
 
         if (!subcatalogId && !categoryId) {
-            res.status(400).json({ message: "Either subcatalogId or categoryId must be provided." });
-            return;
+            return res.status(400).json({ message: "Either subcatalogId or categoryId must be provided." });
         }
 
         const existingFilter:any = await catalogFilterRepository.findOne({
@@ -57,8 +53,7 @@ export const createCatalogFilter = async (req: Request, res: Response) => {
             
             for (const item of data) {
                 if (existingNames.has(item.name)) {
-                    res.status(400).json({ message: `You can't create the same element: ${item.name}` });
-                    return;
+                    return res.status(400).json({ message: `You can't create the same element: ${item.name}` });
                 }
             }
 
@@ -82,8 +77,7 @@ export const createCatalogFilter = async (req: Request, res: Response) => {
                 category: result.categoryId,
                 data: result.data,
             }
-            res.status(201).json(filterResult);
-            return;
+            return res.status(201).json(filterResult);
         } else {
             const updatedData = data.map((item: any) => ({
                 ...item,
@@ -109,16 +103,14 @@ export const createCatalogFilter = async (req: Request, res: Response) => {
                 category: result.categoryId,
                 data: result.data,
             }
-            res.status(201).json(filterResult);
-            return;
+            return res.status(201).json(filterResult);
         }
     } catch (error) {
-        res.status(500).json({ message: "Error creating catalog filter", error });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const updateCatalogFilter = async (req: Request, res: Response) => {
+export const updateCatalogFilter = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const { name, data } = req.body;
@@ -126,15 +118,13 @@ export const updateCatalogFilter = async (req: Request, res: Response) => {
         const filter: any = await catalogFilterRepository.findOneBy({ id });
 
         if (!filter) {
-            res.status(404).json({ message: "Catalog filter not found" });
-            return;
+            return res.status(404).json({ message: "Catalog filter not found" });
         }
 
         const itemIndex = filter.data.findIndex((item: any) => item.name === name);
 
         if (itemIndex === -1) {
-            res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
-            return;
+            return res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
         }
         
         filter.data[itemIndex] = {
@@ -156,15 +146,13 @@ export const updateCatalogFilter = async (req: Request, res: Response) => {
             category: result.categoryId,
             id: result.id,
         }
-        res.status(200).json(filterResult);
-        return;
+        return res.status(200).json(filterResult);
     } catch (error) {
-        res.status(500).json({ message: "Error updating catalog filter", error });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const deleteCatalogFilter = async (req: Request, res: Response) => {
+export const deleteCatalogFilter = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const { name, deleteFilter = false } = req.body;
@@ -172,26 +160,22 @@ export const deleteCatalogFilter = async (req: Request, res: Response) => {
         const filter: any = await catalogFilterRepository.findOneBy({ id });
 
         if (!filter) {
-            res.status(404).json({ message: "Catalog filter not found" });
-            return;
+            return res.status(404).json({ message: "Catalog filter not found" });
         }
 
         if (deleteFilter) {
             await catalogFilterRepository.remove(filter);
-            res.status(200).json({ message: "Catalog filter deleted successfully." });
-            return;
+            return res.status(200).json({ message: "Catalog filter deleted successfully." });
         }
 
         if (!name) {
-            res.status(400).json({ message: "Name is required to delete a specific item." });
-            return;
+            return res.status(400).json({ message: "Name is required to delete a specific item." });
         }
 
         const itemIndex = filter.data.findIndex((item: any) => item.name === name);
 
         if (itemIndex === -1) {
-            res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
-            return;
+            return res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
         }
 
         filter.data.splice(itemIndex, 1);
@@ -205,11 +189,9 @@ export const deleteCatalogFilter = async (req: Request, res: Response) => {
             category: result.categoryId,
             data: result.data
         }
-        res.status(200).json(filterResult);
-        return;
+        return res.status(200).json(filterResult);
     } catch (error) {
-        res.status(500).json({ message: "Error deleting catalog filter", error });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 

@@ -8,7 +8,7 @@ const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
 
 // Catalog Controllers
-export const getCatalogById = async (req: Request, res: Response) => {
+export const getCatalogById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -23,33 +23,26 @@ export const getCatalogById = async (req: Request, res: Response) => {
         });
 
         if (!catalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Catalog not found',
                 status: 400
             });
-            return;
         }
 
         const { createdAt, deletedAt, ...catalogData } = catalog;
 
-        res.json({
+        return res.json({
             data: catalogData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const getAllCatalogs = async (req: Request, res: Response) => {
+export const getAllCatalogs = async (req: Request, res: Response): Promise<any> => {
     try {
         const catalogs = await catalogRepository
             .createQueryBuilder('catalog')
@@ -63,23 +56,17 @@ export const getAllCatalogs = async (req: Request, res: Response) => {
             return catalogData;
         });
 
-        res.json({
+        return res.json({
             data: catalogsWithoutDates,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const createCatalog = async (req: Request, res: Response) => {
+export const createCatalog = async (req: Request, res: Response): Promise<any> => {
     try {
         const { title } = req.body;
 
@@ -93,12 +80,11 @@ export const createCatalog = async (req: Request, res: Response) => {
             }
         });
         if (existingCatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Catalog with this title already exists',
                 status: 400
             });
-            return;
         }
 
         const catalog = new Catalog();
@@ -108,23 +94,17 @@ export const createCatalog = async (req: Request, res: Response) => {
 
         const { createdAt, deletedAt, ...catalogData } = savedCatalog;
 
-        res.json({
+        return res.json({
             data: catalogData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const updateCatalog = async (req: Request, res: Response) => {
+export const updateCatalog = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const { title } = req.body;
@@ -139,12 +119,11 @@ export const updateCatalog = async (req: Request, res: Response) => {
             }
         });
         if (!catalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Catalog not found',
                 status: 400
             });
-            return;
         }
 
         catalog.title = title;
@@ -152,23 +131,17 @@ export const updateCatalog = async (req: Request, res: Response) => {
 
         const { createdAt, deletedAt, ...catalogData } = updatedCatalog;
 
-        res.json({
+        return res.json({
             data: catalogData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const deleteCatalog = async (req: Request, res: Response) => {
+export const deleteCatalog = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -182,35 +155,28 @@ export const deleteCatalog = async (req: Request, res: Response) => {
             }
         });
         if (!catalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Catalog not found',
                 status: 400
             });
-            return;
         }
 
         catalog.deletedAt = new Date();
         await catalogRepository.save(catalog);
 
-        res.json({
+        return res.json({
             data: { message: 'Catalog deleted successfully' },
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
 // Subcatalog Controllers
-export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response) => {
+export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -223,12 +189,11 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
         });
 
         if (!catalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Catalog not found',
                 status: 404
             });
-            return;
         }
         
         // Get subcatalogs with categories for this catalog
@@ -242,12 +207,11 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
         const subcatalogs = await queryBuilder.getMany();
 
         if (!subcatalogs.length) {
-            res.json({
+            return res.json({
                 data: [],
                 error: null,
                 status: 200
             });
-            return;
         }
 
         // Format response by removing timestamps
@@ -262,23 +226,17 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             };
         });
 
-        res.json({
+        return res.json({
             data: formattedSubcatalogs,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const getSubcatalogById = async (req: Request, res: Response) => {
+export const getSubcatalogById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -293,12 +251,11 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
         });
 
         if (!subcatalogs.length) {
-            res.json({
+            return res.json({
                 data: [],
                 error: null,
                 status: 200
             });
-            return;
         }
 
         const formattedSubcatalogs = subcatalogs.map(subcatalog => {
@@ -306,23 +263,17 @@ export const getSubcatalogById = async (req: Request, res: Response) => {
             return subcatalogData;
         });
 
-        res.json({
+        return res.json({
             data: formattedSubcatalogs,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const createSubcatalog = async (req: Request, res: Response) => {
+export const createSubcatalog = async (req: Request, res: Response): Promise<any> => {
     try {
         const { title, catalogId } = req.body;
         console.log(req.body);
@@ -330,12 +281,11 @@ export const createSubcatalog = async (req: Request, res: Response) => {
 
         // Validate required fields
         if (!title || !catalogId) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Title and catalogId are required',
                 status: 400
             });
-            return;
         }
 
         // Check if subcatalog already exists
@@ -347,12 +297,11 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             .getOne();
 
         if (existingSubcatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Subcatalog with this title already exists in this catalog',
                 status: 400
             });
-            return;
         }
 
         // Verify parent catalog exists
@@ -363,12 +312,11 @@ export const createSubcatalog = async (req: Request, res: Response) => {
             .getOne();
 
         if (!catalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Parent catalog not found',
                 status: 404
             });
-            return;
         }
 
         // Create and save new subcatalog
@@ -381,36 +329,28 @@ export const createSubcatalog = async (req: Request, res: Response) => {
         const savedSubcatalog = await subcatalogRepository.save(subcatalog);
 
         if (!savedSubcatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Failed to create subcatalog',
                 status: 500
             });
-            return;
         }
 
         // Format response data
         const { createdAt, deletedAt, ...subcatalogData } = savedSubcatalog;
 
-        res.json({
+        return res.json({
             data: subcatalogData,
             error: null,
             status: 200
         });
-        return;
 
-    } catch (error: unknown) {
-        console.error('Error creating subcatalog:', error);
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const updateSubcatalog = async (req: Request, res: Response) => {
+export const updateSubcatalog = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, catalogId } = req.body;
@@ -423,12 +363,11 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
         });
 
         if (!subcatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Subcatalog not found',
                 status: 404
             });
-            return;
         }
 
         if (catalogId) {
@@ -440,12 +379,11 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
             });
 
             if (!catalog) {
-                res.json({
+                return res.json({
                     data: null,
                     error: 'Parent catalog not found',
                     status: 404
                 });
-                return;
             }
             subcatalog.catalogId = catalogId;
         }
@@ -458,23 +396,17 @@ export const updateSubcatalog = async (req: Request, res: Response) => {
 
         const { createdAt, deletedAt, ...subcatalogData } = updatedSubcatalog;
 
-        res.json({
+        return res.json({
             data: subcatalogData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const deleteSubcatalog = async (req: Request, res: Response) => {
+export const deleteSubcatalog = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -486,35 +418,28 @@ export const deleteSubcatalog = async (req: Request, res: Response) => {
         });
 
         if (!subcatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Subcatalog not found',
                 status: 404
             });
-            return;
         }
 
         subcatalog.deletedAt = new Date();
         await subcatalogRepository.save(subcatalog);
 
-        res.json({
+        return res.json({
             data: { message: 'Subcatalog deleted successfully' },
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
 // Category Controllers
-export const getCategoriesBySubcatalogId = async (req: Request, res: Response) => {
+export const getCategoriesBySubcatalogId = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -527,12 +452,11 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response) =
         });
 
         if (!subcatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Subcatalog not found',
                 status: 404
             });
-            return;
         }
 
         // Get categories for this subcatalog
@@ -547,12 +471,11 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response) =
         });
 
         if (!categories.length) {
-            res.json({
+            return res.json({
                 data: [],
                 error: null,
                 status: 200
             });
-            return;
         }
 
         // Format response by removing timestamps
@@ -561,23 +484,17 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response) =
             return categoryData;
         });
 
-        res.json({
+        return res.json({
             data: formattedCategories,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const createCategory = async (req: Request, res: Response) => {
+export const createCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         const { title, path, subCatalogId } = req.body;
 
@@ -591,12 +508,11 @@ export const createCategory = async (req: Request, res: Response) => {
             }
         });
         if (existingCategory) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Category with this title already exists',
                 status: 400
             });
-            return;
         }
 
         const subcatalog = await subcatalogRepository.findOne({
@@ -609,12 +525,11 @@ export const createCategory = async (req: Request, res: Response) => {
             }
         });
         if (!subcatalog) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Parent subcatalog not found',
                 status: 400
             });
-            return;
         }
 
         const category = new Category();
@@ -626,23 +541,17 @@ export const createCategory = async (req: Request, res: Response) => {
 
         const { createdAt, deletedAt, ...categoryData } = savedCategory;
 
-        res.json({
+        return res.json({
             data: categoryData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const updateCategory = async (req: Request, res: Response) => {
+export const updateCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, path, subCatalogId } = req.body;
@@ -657,12 +566,11 @@ export const updateCategory = async (req: Request, res: Response) => {
             }
         });
         if (!category) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Category not found',
                 status: 400
             });
-            return;
         }
 
         if (subCatalogId) {
@@ -676,12 +584,11 @@ export const updateCategory = async (req: Request, res: Response) => {
                 }
             });
             if (!subcatalog) {
-                res.json({
+                return res.json({
                     data: null,
                     error: 'Parent subcatalog not found',
                     status: 400
                 });
-                return;
             }
             category.subCatalogId = subCatalogId;
         }
@@ -693,23 +600,17 @@ export const updateCategory = async (req: Request, res: Response) => {
 
         const { createdAt, deletedAt, ...categoryData } = updatedCategory;
 
-        res.json({
+        return res.json({
             data: categoryData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -723,29 +624,22 @@ export const deleteCategory = async (req: Request, res: Response) => {
             }
         });
         if (!category) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Category not found',
                 status: 400
             });
-            return;
         }
 
         category.deletedAt = new Date();
         await categoryRepository.save(category);
 
-        res.json({
+        return res.json({
             data: { message: 'Category deleted successfully' },
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };

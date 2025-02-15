@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { Brand } from "./brands.entity";
-import { PopularProduct, ProductCondition } from "./product_details.entity";
+import { PopularProduct, ProductComment, ProductCondition, ProductQuestion } from "./product_details.entity";
 
 @Entity()
 export class Product {
@@ -41,4 +41,10 @@ export class Product {
 
     @OneToMany(() => PopularProduct, (popular) => popular.products)
     populars: PopularProduct[];
+
+    @OneToMany(() => ProductQuestion, (question) => question.products)
+    questions: ProductQuestion[];
+
+    @OneToMany(() => ProductComment, (comment) => comment.products)
+    comments: ProductComment[];
 }

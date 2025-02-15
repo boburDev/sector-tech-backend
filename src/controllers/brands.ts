@@ -5,7 +5,7 @@ import { Brand } from '../entities/brands.entity';
 import fs from 'fs';
 const brandRepository = AppDataSource.getRepository(Brand);
 
-export const getBrandById = async (req: Request, res: Response) => {
+export const getBrandById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const brand = await brandRepository.findOne({
@@ -16,33 +16,26 @@ export const getBrandById = async (req: Request, res: Response) => {
         });
 
         if (!brand) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Brand not found',
                 status: 404
             });
-            return;
         }
 
         const { createdAt, deletedAt, ...brandData } = brand;
 
-        res.json({
+        return res.json({
             data: brandData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const getAllBrands = async (req: Request, res: Response) => {
+export const getAllBrands = async (req: Request, res: Response): Promise<any> => {
     try {
         const brands = await brandRepository
             .createQueryBuilder('brand')
@@ -55,34 +48,27 @@ export const getAllBrands = async (req: Request, res: Response) => {
             return brandData;
         });
 
-        res.json({
+        return res.json({
             data: brandsWithoutDates,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const createBrand = async (req: Request, res: Response) => {
+export const createBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         const { title } = req.body;
         const file = req.file as Express.Multer.File;
 
         if (!title || !file) {
-            res.json({
+            return res.json({
                 data: null, 
                 error: 'Title and logo file are required',
                 status: 400
             });
-            return;
         }
 
         const existingBrand = await brandRepository.findOne({
@@ -93,12 +79,11 @@ export const createBrand = async (req: Request, res: Response) => {
         });
 
         if (existingBrand) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Brand with this title already exists',
                 status: 400
             });
-            return;
         }
         const newPath = file.destination.split('./public')[1] + '/' + file.filename
         const brand = new Brand();
@@ -109,25 +94,17 @@ export const createBrand = async (req: Request, res: Response) => {
         
         const { createdAt, deletedAt, ...brandData } = savedBrand;
 
-        res.json({
+        return res.json({
             data: brandData,
             error: null,
             status: 201
         });
-        return;
-    } catch (error: unknown) {
-        console.error('Error creating brand:', error);
-        
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 500
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const updateBrand = async (req: Request, res: Response) => {
+export const updateBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const { title } = req.body;
@@ -141,12 +118,11 @@ export const updateBrand = async (req: Request, res: Response) => {
         });
 
         if (!brand) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Brand not found',
                 status: 404
             });
-            return;
         }
 
         if (title !== brand.title) {
@@ -158,12 +134,11 @@ export const updateBrand = async (req: Request, res: Response) => {
             });
 
             if (existingBrand) {
-                res.json({
+                return res.json({
                     data: null,
                     error: 'Brand with this title already exists',
                     status: 400
                 });
-                return;
             }
         }
 
@@ -183,23 +158,17 @@ export const updateBrand = async (req: Request, res: Response) => {
 
         const { createdAt, deletedAt, ...brandData } = updatedBrand;
 
-        res.json({
+        return res.json({
             data: brandData,
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const deleteBrand = async (req: Request, res: Response) => {
+export const deleteBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -211,12 +180,11 @@ export const deleteBrand = async (req: Request, res: Response) => {
         });
 
         if (!brand) {
-            res.json({
+            return res.json({
                 data: null,
                 error: 'Brand not found', 
                 status: 404
             });
-            return;
         }
 
         // Delete brand image file if exists
@@ -229,18 +197,12 @@ export const deleteBrand = async (req: Request, res: Response) => {
 
         await brandRepository.softDelete(id);
 
-        res.json({
+        return res.json({
             data: { message: 'Brand deleted successfully' },
             error: null,
             status: 200
         });
-        return;
-    } catch (error: unknown) {
-        res.json({
-            data: null,
-            error: error instanceof Error ? error.message : 'An unknown error occurred',
-            status: 400
-        });
-        return;
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };

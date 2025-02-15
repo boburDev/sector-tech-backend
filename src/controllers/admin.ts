@@ -3,30 +3,29 @@ import AppDataSource from '../config/ormconfig';
 import { Admin } from '../entities/admin.entity';
 import { sign } from '../utils/jwt';
 import { IsNull } from 'typeorm';
+import { User } from '../entities/user.entity';
 
 const adminRepository = AppDataSource.getRepository(Admin);
+const userRepository = AppDataSource.getRepository(User);
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<any> => {
     try {
         const { username, password } = req.body;
 
         const admin = await adminRepository.findOne({ where: { username } });
         
         if (!admin) {
-            res.status(401).json({ message: 'Invalid credentials' });
-            return;
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
         if (admin.status === 'inactive') {
-            res.status(401).json({ message: 'Account is inactive' });
-            return;
+            return res.status(401).json({ message: 'Account is inactive' });
         }
 
         const isValidPassword = await admin.validatePassword(password);
 
         if (!isValidPassword) {
-            res.status(401).json({ message: 'Invalid credentials' });
-            return;
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
         const token = sign(
@@ -34,33 +33,29 @@ export const login = async (req: Request, res: Response) => {
             86400000 // 1 day in milliseconds
         );
 
-        res.json({ 
+        return res.json({ 
             id: admin.id,
             username: admin.username,
             status: admin.status,
             role: admin.role,
             token 
         });
-        return;
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const createAdmin = async (req: Request, res: Response) => {
+export const createAdmin = async (req: Request, res: Response): Promise<any> => {
     try {
         const { username, password, role, status } = req.body;
                
         if (req.admin.role !== 'super') {
-            res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-            return;
+            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
         if (req.admin.username === username) {
-            res.status(400).json({ message: 'Username already exists' });
-            return;
+            return res.status(400).json({ message: 'Username already exists' });
         }
 
         const admin = new Admin();
@@ -71,24 +66,21 @@ export const createAdmin = async (req: Request, res: Response) => {
 
         const savedAdmin = await adminRepository.save(admin);
 
-        res.status(201).json({ 
+        return res.status(201).json({ 
             username: savedAdmin.username,
             role: savedAdmin.role,
             status: savedAdmin.status
         });
-        return;
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
-            res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-            return;
+            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
         const users = await adminRepository.find({
@@ -102,24 +94,21 @@ export const getUsers = async (req: Request, res: Response) => {
             status: user.status
         }));
 
-        res.json({
+        return res.json({
             data: sanitizedUsers,
             error: null,
             status: 200
         });
-        return;
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
-            res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-            return;
+            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
         const { id } = req.params;
@@ -131,11 +120,10 @@ export const getUserById = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json({
+        return res.json({
             data: {
                 id: user.id,
                 username: user.username,
@@ -145,19 +133,16 @@ export const getUserById = async (req: Request, res: Response) => {
             error: null,
             status: 200
         });
-        return;
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
-            res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-            return;
+            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
         const { id } = req.params;
@@ -171,8 +156,7 @@ export const updateUser = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
+            return res.status(404).json({ message: 'User not found' });
         }
 
         if (username) user.username = username;
@@ -181,7 +165,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
         const updatedUser = await adminRepository.save(user);
 
-        res.json({
+        return res.json({
             data: {
                 id: updatedUser.id,
                 username: updatedUser.username,
@@ -191,19 +175,16 @@ export const updateUser = async (req: Request, res: Response) => {
             error: null,
             status: 200
         });
-        return;
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
-            res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-            return;
+            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
         const { id } = req.params;
@@ -215,32 +196,40 @@ export const deleteUser = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
+            return res.status(404).json({ message: 'User not found' });
         }
 
         if (user.id === req.admin.id) {
-            res.status(400).json({ message: 'Cannot delete your own account' });
-            return;
+            return res.status(400).json({ message: 'Cannot delete your own account' });
         }
 
         if (user.role === 'super') {
-            res.status(400).json({ message: 'Cannot delete super admin account' });
-            return;
+            return res.status(400).json({ message: 'Cannot delete super admin account' });
         }
 
         user.deletedAt = new Date();
         await adminRepository.save(user);
 
-        res.json({
+        return res.json({
             data: 'User deleted successfully',
             error: null,
             status: 200
         });
-        return;
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-        return;
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const getAllUsers = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const users = await userRepository.find();
+        return res.json({
+            data: users,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };

@@ -25,7 +25,6 @@ export class Admin {
     @DeleteDateColumn()
     deletedAt: Date;
 
-
     @BeforeInsert()
     async hashPassword() {
         const salt = await bcrypt.genSalt(10);
