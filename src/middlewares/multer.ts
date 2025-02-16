@@ -1,5 +1,4 @@
 import multer, { FileFilterCallback, StorageEngine } from 'multer';
-import path from 'path';
 import fs from 'fs';
 
 const photo = ["image/jpeg", "image/png", "image/gif"];
@@ -24,14 +23,18 @@ const storage: StorageEngine = multer.diskStorage({
             }
             cb(null, uploadPath);
         } catch (error) {
-            console.log(error);
+            console.error("Destination Error:", error);
+            cb(error as Error, "");
         }
     },
     filename: (req, file, cb) => {
         try {
-            cb(null, Date.now() + path.extname(file.originalname));
+            const safeOriginalName = file.originalname.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_.-]/g, "");
+
+            cb(null, `${Date.now()}-${safeOriginalName}`);
         } catch (error) {
-            console.log(error);
+            console.error("Filename Error:", error);
+            cb(error as Error, "");
         }
     },
 });
@@ -40,8 +43,8 @@ export const uploadPhoto = multer({
     storage: storage,
     limits: {
         files: 5,
-        fileSize: 10 * 1024 * 1024
-    }, // 10MB limits
+        fileSize: 30 * 1024 * 1024
+    }, // 30MB limits
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
         try {
             const isValidType = photo.includes(file.mimetype);
@@ -50,10 +53,12 @@ export const uploadPhoto = multer({
             if (isValidType && isValidField) {
                 cb(null, true);
             } else {
+                console.error("Invalid File Type or Field Name:", file.mimetype, file.fieldname);
                 cb(new Error("Only image files are allowed."));
             }
         } catch (error) {
-            console.error(error);
+            console.error("File Filter Error:", error);
+            cb(error as Error);
         }
     },
 });

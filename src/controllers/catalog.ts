@@ -543,7 +543,7 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
                 status: 400
             });
         }
-        const newPath = file.destination.split('./public')[1] + '/' + file.filename
+        const newPath = file.path.replace(/\\/g, "/");
 
         const category = new Category();
         category.title = title;
@@ -626,11 +626,11 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         }
 
         if (file) {
-            const oldPath = `./public/${category.path}`;
+            const oldPath = category.path;
             if (fs.existsSync(oldPath)) {
                 fs.unlinkSync(oldPath);
             }
-            const newPath = file.destination.split('./public')[1] + '/' + file.filename
+            const newPath = file.path.replace(/\\/g, "/");
             category.path = newPath;
         }
         if (title) category.title = title;
@@ -662,6 +662,7 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
                 createdAt: 'DESC'
             }
         });
+        
         if (!category) {
             return res.json({
                 data: null,

@@ -164,7 +164,8 @@ export const deleteCatalogFilter = async (req: Request, res: Response): Promise<
         }
 
         if (deleteFilter) {
-            await catalogFilterRepository.remove(filter);
+            filter.deletedAt = new Date();
+            await catalogFilterRepository.save(filter);
             return res.status(200).json({ message: "Catalog filter deleted successfully." });
         }
 

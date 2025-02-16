@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { CatalogFilter } from "./catalog_filter.entity";
+import { Product } from "./products.entity";
 
 @Entity()
 export class Catalog {
@@ -11,6 +12,9 @@ export class Catalog {
 
     @OneToMany(() => Subcatalog, subcatalog => subcatalog.catalog)
     subcatalogs: Subcatalog[];
+
+    @OneToMany(() => Product, product => product.category)
+    products: Product[];
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
@@ -36,6 +40,9 @@ export class Subcatalog {
 
     @OneToMany(() => Category, category => category.subCatalog)
     categories: Category[];
+
+    @OneToMany(() => Product, product => product.category)
+    products: Product[];
 
     @OneToMany(() => CatalogFilter, filter => filter.subcatalog)
     filters: CatalogFilter[];
@@ -67,6 +74,9 @@ export class Category {
 
     @OneToMany(() => CatalogFilter, filter => filter.category)
     filters: CatalogFilter[];
+
+    @OneToMany(() => Product, product => product.category)
+    products: Product[];
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

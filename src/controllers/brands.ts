@@ -85,7 +85,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
                 status: 400
             });
         }
-        const newPath = file.destination.split('./public')[1] + '/' + file.filename
+        const newPath = file.path.replace(/\\/g, "/");
         const brand = new Brand();
         brand.title = title;
         brand.path = newPath;
@@ -144,11 +144,11 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
 
         if (file) {
             // Delete old file if exists
-            const oldPath = `./public/${brand.path}`;
+            const oldPath = brand.path;
             if (fs.existsSync(oldPath)) {
                 fs.unlinkSync(oldPath);
             }
-            const newPath = file.destination.split('./public')[1] + '/' + file.filename
+            const newPath = file.path.replace(/\\/g, "/");
             brand.path = newPath;
         }
 
@@ -187,15 +187,8 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
             });
         }
 
-        // Delete brand image file if exists
-        if (brand.path) {
-            const filePath = `./public/${brand.path}`;
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
-        }
-
-        await brandRepository.softDelete(id);
+        brand.deletedAt = new Date();
+        await brandRepository.save(brand);
 
         return res.json({
             data: { message: 'Brand deleted successfully' },
