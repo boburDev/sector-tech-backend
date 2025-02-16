@@ -482,6 +482,7 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
         // Format response by removing timestamps
         const formattedCategories = categories.map(category => {
             const { createdAt, deletedAt, ...categoryData } = category;
+            categoryData.path = categoryData.path.replace(/^public\//, "")
             return categoryData;
         });
 

@@ -24,7 +24,7 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
         }
 
         const { createdAt, deletedAt, ...brandData } = brand;
-
+        brandData.path = brandData.path.replace(/^public\//, "")
         return res.json({
             data: brandData,
             error: null,
@@ -45,6 +45,7 @@ export const getAllBrands = async (req: Request, res: Response): Promise<any> =>
 
         const brandsWithoutDates = brands.map(brand => {
             const { createdAt, deletedAt, ...brandData } = brand;
+            brandData.path = brandData.path.replace(/^public\//, "")
             return brandData;
         });
 
