@@ -551,9 +551,9 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
         category.subCatalogId = subCatalogId;
 
         const savedCategory = await categoryRepository.save(category);
-
         const { createdAt, deletedAt, ...categoryData } = savedCategory;
 
+        categoryData.path = categoryData.path.replace(/^public\//, "")
         return res.json({
             data: categoryData,
             error: null,
@@ -639,6 +639,7 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
 
         const { createdAt, deletedAt, ...categoryData } = updatedCategory;
 
+        categoryData.path = categoryData.path.replace(/^public\//, "")
         return res.json({
             data: categoryData,
             error: null,
@@ -662,7 +663,7 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
                 createdAt: 'DESC'
             }
         });
-        
+
         if (!category) {
             return res.json({
                 data: null,

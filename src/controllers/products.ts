@@ -76,8 +76,10 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
             title: savedProduct.title,
             articul: savedProduct.articul,
             price: savedProduct.price,
-            images: savedProduct.images[0]
+            image: savedProduct.images[0]
         };
+
+        sortedData.image = sortedData.image.replace(/^public\//, "")
 
         res.json({ message: "Files received", data: sortedData });
     } catch (error) {

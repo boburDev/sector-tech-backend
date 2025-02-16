@@ -94,6 +94,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
         
         const { createdAt, deletedAt, ...brandData } = savedBrand;
 
+        brandData.path = brandData.path.replace(/^public\//, "")
         return res.json({
             data: brandData,
             error: null,
@@ -158,6 +159,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
 
         const { createdAt, deletedAt, ...brandData } = updatedBrand;
 
+        brandData.path = brandData.path.replace(/^public\//, "")
         return res.json({
             data: brandData,
             error: null,
