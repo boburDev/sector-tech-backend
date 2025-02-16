@@ -39,27 +39,9 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
 };
 
 export const createProduct = async (req: Request, res: Response): Promise<any> => {
-    const { title, articul, productCode, description, fullDescription, characteristics, brandId, conditionId } = req.body;
+    if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
+        return res.status(400).json({ error: "No files uploaded." });
+    }
 
-    const files = req.files as Express.Multer.File[];
-
-    console.log(files);
-    
-
-    const product = new Product();
-    product.title = title;
-    product.articul = articul;
-    product.productCode = productCode;
-    product.description = description;
-    product.fullDescription = fullDescription;
-    product.characteristics = characteristics;
-    product.brandId = brandId;
-    product.conditionId = conditionId;
-
-    // await productRepository.save(product);
-
-    res.json(product);
+    res.json({ message: "Files received", files: req.files });
 };
-
-
-

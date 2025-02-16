@@ -38,7 +38,10 @@ const storage: StorageEngine = multer.diskStorage({
 
 export const uploadPhoto = multer({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limits
+    limits: {
+        files: 5,
+        fileSize: 10 * 1024 * 1024
+    }, // 10MB limits
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
         try {
             const isValidType = photo.includes(file.mimetype);
