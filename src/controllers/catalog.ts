@@ -570,14 +570,6 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         const { title, subCatalogId } = req.body;
         const file = req.file as Express.Multer.File;
 
-        if (!title || !file || !subCatalogId) {
-            return res.json({
-                data: null,
-                error: 'Title, logo file and subCatalogId are required',
-                status: 400
-            });
-        }
-
         const category = await categoryRepository.findOne({
             where: {
                 id,
@@ -587,12 +579,30 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
                 createdAt: 'DESC'
             }
         });
+
         if (!category) {
             return res.json({
                 data: null,
                 error: 'Category not found',
                 status: 400
             });
+        }
+
+        if (title !== category.title) {
+            const existingCategory = await categoryRepository.findOne({
+                where: {
+                    title,
+                    deletedAt: IsNull()
+                }
+            });
+
+            if (existingCategory) {
+                return res.json({
+                    data: null,
+                    error: 'Category with this title already exists',
+                    status: 400
+                });
+            }
         }
 
         if (subCatalogId) {
