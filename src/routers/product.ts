@@ -7,7 +7,6 @@ const router = express.Router();
 router
     .get('/', validateAdminToken, Product.getProducts)
     .get('/:id', validateAdminToken, Product.getProductById)
-    .post('/create', uploadPhoto.array("productImages", 5), Product.createProduct)
-// validateAdminToken,
+    .post('/create', validateAdminToken, uploadPhoto.array("productImages", 5), Product.createProduct)
 
 export default router

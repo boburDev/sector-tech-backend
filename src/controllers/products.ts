@@ -70,13 +70,13 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
         product.categoryId = value.categoryId;
         product.images = files.map(file => file.path.replace(/\\/g, "/"));
         
-        // let savedProduct = await productRepository.save(product);
+        let savedProduct = await productRepository.save(product);
 
         const sortedData = {
-            title: product.title,
-            articul: product.articul,
-            price: product.price,
-            images: product.images[0]
+            title: savedProduct.title,
+            articul: savedProduct.articul,
+            price: savedProduct.price,
+            images: savedProduct.images[0]
         };
 
         res.json({ message: "Files received", data: sortedData });
