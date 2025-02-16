@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
 import { Brand } from "./brands.entity";
 import { PopularProduct, ProductComment, ProductCondition, ProductQuestion } from "./product_details.entity";
 
@@ -25,6 +25,9 @@ export class Product {
     @Column("json")
     characteristics: Record<string, any>;
 
+    @Column("json", { nullable: true })
+    images: string[];
+
     @Column()
     brandId: string;
 
@@ -47,4 +50,10 @@ export class Product {
 
     @OneToMany(() => ProductComment, (comment) => comment.products)
     comments: ProductComment[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }
