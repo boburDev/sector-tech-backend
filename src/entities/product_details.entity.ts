@@ -24,6 +24,28 @@ export class ProductCondition {
 }
 
 @Entity()
+export class ProductRelevance {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+    @Column()
+    title: string;
+
+    @Column()
+    name: string;
+
+    @OneToMany(() => Product, (product) => product.relevances)
+    products: Product[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
+}
+
+
+@Entity()
 export class ProductQuestion {
     @PrimaryGeneratedColumn('uuid')
     id: string;

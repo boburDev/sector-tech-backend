@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../config/ormconfig';
-import { ProductCondition, ProductQuestion, ProductComment, PopularProduct } from '../entities/product_details.entity';
+import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../entities/product_details.entity';
 import { In, IsNull } from 'typeorm';
 import { Product } from '../entities/products.entity';
 
 const productRepository = AppDataSource.getRepository(Product);
 const productConditionRepository = AppDataSource.getRepository(ProductCondition);
+const productRelevanceRepository = AppDataSource.getRepository(ProductRelevance);
 const productQuestionRepository = AppDataSource.getRepository(ProductQuestion);
 const productCommentRepository = AppDataSource.getRepository(ProductComment);
 const popularProductRepository = AppDataSource.getRepository(PopularProduct);
@@ -22,6 +23,20 @@ export const getAllProductConditions = async (req: Request, res: Response): Prom
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+export const getProductConditionById = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const productCondition = await productConditionRepository.findOne({ where: { id } });
+        return res.json({
+            data: productCondition,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 export const createProductCondition = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -116,3 +131,123 @@ export const deleteProductCondition = async (req: Request, res: Response): Promi
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+export const getAllProductRelevances = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const productRelevances = await productRelevanceRepository.find({ relations: ['products'] });
+        return res.json({
+            data: productRelevances,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getProductRelevanceById = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const productRelevance = await productRelevanceRepository.findOne({ where: { id } });
+        return res.json({
+            data: productRelevance,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const createProductRelevance = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { title, name } = req.body;
+        const newProductRelevance = productRelevanceRepository.create({ title, name });
+        await productRelevanceRepository.save(newProductRelevance);
+        return res.json({
+            data: newProductRelevance,
+            error: null,
+            status: 201
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getProductRelevanceByName = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const relevanceIds = req.params.name.split(',');
+        const productRelevances = await productRelevanceRepository.find({
+            where: { id: In(relevanceIds) },
+            relations: ['products'],
+        });
+        
+        const result = await Promise.all(
+            productRelevances.map(async (relevance: any) => {
+                const productCount = await productRepository.count({
+                    where: { relevanceId: relevance.id },
+                });
+
+                return {
+                    title: relevance.title,
+                    name: relevance.name,
+                    productCount,
+                };
+            })
+        );
+
+        return res.json({
+            data: result,
+            error: null,
+            status: 200,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}   
+
+export const updateProductRelevance = async (req: Request, res: Response): Promise<any> => {
+    const { id } = req.params;
+    const { title, name } = req.body;
+
+    try {
+        const productRelevance = await productRelevanceRepository.findOne({ where: { id } });
+        if (!productRelevance) {
+            return res.status(404).json({ message: 'Product relevance not found' });
+        }
+
+        productRelevance.title = title;
+        productRelevance.name = name;
+        await productRelevanceRepository.save(productRelevance);
+        return res.json({
+            data: productRelevance,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const deleteProductRelevance = async (req: Request, res: Response): Promise<any> => {
+    const { id } = req.params;
+
+    try {
+        const productRelevance = await productRelevanceRepository.findOne({ where: { id } });
+        if (!productRelevance) {
+            return res.status(404).json({ message: 'Product relevance not found' });
+        }
+
+        productRelevance.deletedAt = new Date();    
+        await productRelevanceRepository.save(productRelevance);    
+        return res.json({
+            message: 'Product relevance deleted successfully',
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+

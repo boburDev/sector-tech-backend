@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
 import { Brand } from "./brands.entity";
-import { PopularProduct, ProductComment, ProductCondition, ProductQuestion } from "./product_details.entity";
+import { PopularProduct, ProductComment, ProductCondition, ProductQuestion, ProductRelevance } from "./product_details.entity";
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
 
 @Entity()
@@ -49,6 +49,13 @@ export class Product {
 
     @Column()
     categoryId: string;
+
+    @Column()
+    relevanceId: string;
+
+    @ManyToOne(() => ProductRelevance, (relevance) => relevance.products)
+    @JoinColumn({ name: 'relevanceId' })
+    relevances: ProductRelevance;
 
     @ManyToOne(() => Catalog, (catalog) => catalog.products)
     @JoinColumn({ name: 'catalogId' })
