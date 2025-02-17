@@ -132,7 +132,9 @@ export const deleteProductCondition = async (req: Request, res: Response): Promi
     }
 };
 
-export const getAllProductRelevances = async (req: Request, res: Response): Promise<any> => {
+
+
+export const getAllProductRelavances = async (req: Request, res: Response): Promise<any> => {
     try {
         const productRelevances = await productRelevanceRepository.find({ relations: ['products'] });
         return res.json({
@@ -145,7 +147,7 @@ export const getAllProductRelevances = async (req: Request, res: Response): Prom
     }
 }
 
-export const getProductRelevanceById = async (req: Request, res: Response): Promise<any> => {
+export const getProductRelavanceById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
         const productRelevance = await productRelevanceRepository.findOne({ where: { id } });
@@ -159,7 +161,7 @@ export const getProductRelevanceById = async (req: Request, res: Response): Prom
     }
 }
 
-export const createProductRelevance = async (req: Request, res: Response): Promise<any> => {
+export const createProductRelavance = async (req: Request, res: Response): Promise<any> => {
     try {
         const { title, name } = req.body;
         const newProductRelevance = productRelevanceRepository.create({ title, name });
@@ -174,7 +176,7 @@ export const createProductRelevance = async (req: Request, res: Response): Promi
     }
 }
 
-export const getProductRelevanceByName = async (req: Request, res: Response): Promise<any> => {
+export const getProductRelavanceByName = async (req: Request, res: Response): Promise<any> => {
     try {
         const relevanceIds = req.params.name.split(',');
         const productRelevances = await productRelevanceRepository.find({
@@ -206,7 +208,7 @@ export const getProductRelevanceByName = async (req: Request, res: Response): Pr
     }
 }   
 
-export const updateProductRelevance = async (req: Request, res: Response): Promise<any> => {
+export const updateProductRelavance = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
     const { title, name } = req.body;
 
@@ -229,7 +231,7 @@ export const updateProductRelevance = async (req: Request, res: Response): Promi
     }
 }
 
-export const deleteProductRelevance = async (req: Request, res: Response): Promise<any> => {
+export const deleteProductRelavance = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
 
     try {

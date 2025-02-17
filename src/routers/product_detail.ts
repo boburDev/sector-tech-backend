@@ -12,12 +12,12 @@ router
  .delete('/condition/delete/:id', validateAdminToken, ProductCondition.deleteProductCondition);
 
 router
- .get('/relevance/all', validateAdminToken, ProductCondition.getAllProductRelevances)
- .get('/relevance/:id', validateAdminToken, ProductCondition.getProductRelevanceById)
- .post('/relevance/create', validateAdminToken, ProductCondition.createProductRelevance)
- .get('/relevance/by-name/:name', validateAdminToken, ProductCondition.getProductRelevanceByName)
- .put('/relevance/update/:id', validateAdminToken, ProductCondition.updateProductRelevance)
- .delete('/relevance/delete/:id', validateAdminToken, ProductCondition.deleteProductRelevance);
- 
+ .get('/relavance/all', validateAdminToken, ProductCondition.getAllProductRelavances)
+ .get('/relavance/:id', validateAdminToken, ProductCondition.getProductRelavanceById)
+ .post('/relavance/create', validateAdminToken, ProductCondition.createProductRelavance)
+ .get('/relavance/by-name/:name', validateAdminToken, ProductCondition.getProductRelavanceByName)
+ .put('/relavance/update/:id', validateAdminToken, ProductCondition.updateProductRelavance)
+ .delete('/relavance/delete/:id', validateAdminToken, ProductCondition.deleteProductRelavance);
+
 export default router;
  
