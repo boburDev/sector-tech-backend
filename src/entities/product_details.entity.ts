@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
 import { Product } from "./products.entity";
 import { User } from "./user.entity";
+
 @Entity()
 export class ProductCondition {
     @PrimaryGeneratedColumn('uuid')
@@ -9,8 +10,17 @@ export class ProductCondition {
     @Column()
     title: string;
 
+    @Column()
+    name: string;
+
     @OneToMany(() => Product, (product) => product.conditions)
     products: Product[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }
 
 @Entity()
