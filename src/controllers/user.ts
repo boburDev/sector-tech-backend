@@ -9,10 +9,17 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
     try {
         const { name, email, password } = req.body;
         const existingUser = await userRepository.findOne({ where: { email } });
+
+        console.log(existingUser);
+        
         if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-        const user = userRepository.create({ name, email, password });
-        const savedUser = await userRepository.save(user);
+
+        const newUser = new User()
+        newUser.name = name
+        newUser.email = email
+        newUser.password = password
+        const savedUser = await userRepository.save(newUser);
 
         const token = sign(
             { id: savedUser.id, name: savedUser.name, email: savedUser.email },

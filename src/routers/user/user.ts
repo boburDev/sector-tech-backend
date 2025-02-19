@@ -44,7 +44,7 @@ router.post("/login", loginAttemptLimiter, User.login);
 
 /**
  * @swagger
- * /user/create:
+ * /user/sign-up:
  *   post:
  *     summary: Create a new user
  *     tags: [User]
@@ -73,7 +73,7 @@ router.post("/login", loginAttemptLimiter, User.login);
  *       400:
  *         description: Invalid data
  */
-router.post("/create", loginAttemptLimiter, User.signup);
+router.post("/sign-up", loginAttemptLimiter, User.signup);
 
 /**
  * @swagger
