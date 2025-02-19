@@ -16,27 +16,32 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
         shell: bash
+
       - name: Deploy to server
         env:
           HOST: ${{ secrets.HOST }}
           USER: ${{ secrets.USERNAME }}
           APP_DIR: /sector_tech
           PORT: ${{ secrets.PORT }}
+          G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
           ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
           ssh $USER@$HOST "
             if [ ! -d $APP_DIR ]; then
               mkdir -p $APP_DIR
-              git clone https://github.com/boburDev/sector-tech-backend.git $APP_DIR
+              git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
               cd $APP_DIR
-               echo 'PORT=${PORT}
-               DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-               DB_NAME=${{ secrets.DB_NAME }}
-               JWT_SECRET=${{ secrets.JWT_SECRET }}
-               JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}' > .env
+              echo 'PORT=${PORT}
+              DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+              DB_NAME=${{ secrets.DB_NAME }}
+              JWT_SECRET=${{ secrets.JWT_SECRET }}
+              JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}' > .env
             else 
               cd $APP_DIR
-              git pull origin main 
+              git config --global credential.helper 'cache --timeout=3600'
+              git config --global user.email "github-actions@github.com"
+              git config --global user.name "GitHub Actions"
+              git pull https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git main
             fi
             npm install
             npm run build
