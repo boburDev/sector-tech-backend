@@ -6,8 +6,11 @@ export class Brand {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ unique: true, length: 255 })
+    @Column({ length: 255 })
     title: string;
+
+    @Column({ length: 255 })
+    slug: string;
 
     @Column({ length: 500 })
     path: string;

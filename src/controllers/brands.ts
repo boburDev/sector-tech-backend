@@ -3,6 +3,7 @@ import { IsNull } from 'typeorm';
 import AppDataSource from '../config/ormconfig';
 import { Brand } from '../entities/brands.entity';
 import fs from 'fs';
+import { createSlug } from '../utils/slug';
 const brandRepository = AppDataSource.getRepository(Brand);
 
 export const getBrandById = async (req: Request, res: Response): Promise<any> => {
@@ -89,6 +90,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
         const newPath = file.path.replace(/\\/g, "/");
         const brand = new Brand();
         brand.title = title;
+        brand.slug = createSlug(title);
         brand.path = newPath;
 
         const savedBrand = await brandRepository.save(brand);
@@ -155,6 +157,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
         }
 
         brand.title = title;
+        brand.slug = createSlug(title);
 
         const updatedBrand = await brandRepository.save(brand);
 
