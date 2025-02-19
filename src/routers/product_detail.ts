@@ -5,13 +5,12 @@ const router = Router();
 
 router
  .get('/condition/all', validateAdminToken, ProductCondition.getAllProductConditions)
- .get('/condition/:id', validateAdminToken, ProductCondition.getProductConditionById)
- .post('/condition/create', validateAdminToken, ProductCondition.createProductCondition)
+ .get('/condition/by-id/:id', validateAdminToken, ProductCondition.getProductConditionById)
  .get('/condition/by-name/:name', validateAdminToken, ProductCondition.getProductConditionByName)
+ .post('/condition/create', validateAdminToken, ProductCondition.createProductCondition)
  .put('/condition/update/:id', validateAdminToken, ProductCondition.updateProductCondition)
- .delete('/condition/delete/:id', validateAdminToken, ProductCondition.deleteProductCondition);
-
-router
+ .delete('/condition/delete/:id', validateAdminToken, ProductCondition.deleteProductCondition)
+ 
  .get('/relavance/all', validateAdminToken, ProductCondition.getAllProductRelavances)
  .get('/relavance/:id', validateAdminToken, ProductCondition.getProductRelavanceById)
  .post('/relavance/create', validateAdminToken, ProductCondition.createProductRelavance)

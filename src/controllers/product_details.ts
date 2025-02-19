@@ -133,7 +133,6 @@ export const deleteProductCondition = async (req: Request, res: Response): Promi
 };
 
 
-
 export const getAllProductRelavances = async (req: Request, res: Response): Promise<any> => {
     try {
         const productRelevances = await productRelevanceRepository.find({ relations: ['products'] });

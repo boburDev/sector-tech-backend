@@ -27,7 +27,7 @@ export class Product {
     fullDescription: string;
 
     @Column("json")
-    characteristics: Record<string, any>;
+    characteristics: object[];
 
     @Column()
     price: number;
