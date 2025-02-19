@@ -6,7 +6,7 @@ const options: swaggerJsdoc.Options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'SECTOR TECH API',
+            title: 'SECTOR TECH ADMIN API',
             version: '1.0.0',
             description: 'SECTOR TECH API documentation',
         },
@@ -17,7 +17,7 @@ const options: swaggerJsdoc.Options = {
             },
         ],
     },
-    apis: ['./src/routers/*.ts'] // Specify the path to your router files
+    apis: ['./src/routers/admin/*.ts'] // Specify the path to your router files
 };
 
 const swaggerSpec = swaggerJsdoc(options);

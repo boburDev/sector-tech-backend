@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as ProductCondition from '../controllers/product_details';
-import { validateAdminToken } from '../middlewares/adminValidator';
+import * as ProductCondition from '../../controllers/product_details';
+import { validateAdminToken } from '../../middlewares/adminValidator';
 const router = Router();
 
 router

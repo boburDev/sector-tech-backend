@@ -11,6 +11,7 @@ export const productSchema = Joi.object({
     inStock: Joi.string().required(),
     brandId: Joi.string().uuid().required(),
     conditionId: Joi.string().uuid().required(),
+    relevanceId: Joi.string().uuid().required(),
     catalogId: Joi.string().uuid().required(),
     subcatalogId: Joi.string().uuid().required(),
     categoryId: Joi.string().uuid().required(),

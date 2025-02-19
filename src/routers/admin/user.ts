@@ -1,7 +1,7 @@
 import express from 'express'
-import * as User from '../controllers/user';
-import { loginAttemptLimiter } from '../middlewares/attemptLimiter';
-import { validateUserToken } from '../middlewares/userValidator';
+import * as User from '../../controllers/user';
+import { loginAttemptLimiter } from '../../middlewares/attemptLimiter';
+import { validateUserToken } from '../../middlewares/userValidator';
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import * as Brands from '../controllers/brands';
-import { uploadPhoto } from '../middlewares/multer';
-import { validateAdminToken } from '../middlewares/adminValidator';
+import * as Brands from '../../controllers/brands';
+import { uploadPhoto } from '../../middlewares/multer';
+import { validateAdminToken } from '../../middlewares/adminValidator';
 
 const router = Router();
 

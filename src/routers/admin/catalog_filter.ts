@@ -1,6 +1,6 @@
 import express from 'express'
-import * as CatalogFilter from '../controllers/catalog_filter';
-import { validateAdminToken } from '../middlewares/adminValidator';
+import * as CatalogFilter from '../../controllers/catalog_filter';
+import { validateAdminToken } from '../../middlewares/adminValidator';
 
 const router = express.Router();
 

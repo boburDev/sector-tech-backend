@@ -1,7 +1,7 @@
 import express from 'express'
-import * as Catalog from '../controllers/catalog';
-import { validateAdminToken } from '../middlewares/adminValidator';
-import { uploadPhoto } from '../middlewares/multer';
+import * as Catalog from '../../controllers/catalog';
+import { validateAdminToken } from '../../middlewares/adminValidator';
+import { uploadPhoto } from '../../middlewares/multer';
 
 const router = express.Router();
 

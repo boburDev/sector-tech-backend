@@ -6,8 +6,6 @@ import fs from 'fs';
 import { createSlug } from '../utils/slug';
 const brandRepository = AppDataSource.getRepository(Brand);
 
-
-
 export const getBrandById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;

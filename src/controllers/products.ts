@@ -58,7 +58,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
         const product = new Product();
         product.title = value.title;
         product.slug = createSlug(value.title);
-        product.articul = value.articul;
+        product.articul = value.articul || product.articul;
         product.productCode = value.productCode;
         product.characteristics = JSON.parse(value.characteristics);
         product.description = value.description;
