@@ -16,7 +16,23 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         }
     });
 
-    res.json(products);
+    const formattedData = products.map((item) => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        articul: item.articul,
+        productCode: item.productCode,
+        description: item.description,
+        inStock: item.inStock,
+        price: item.price,
+        images: item.images[0], // Take only the first image
+    }));
+
+    res.json({
+        data: formattedData,
+        error: null,
+        status: 200
+    });
 };
 
 export const getProductById = async (req: Request, res: Response): Promise<any> => {
@@ -26,6 +42,26 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
             id,
             deletedAt: IsNull()
         }
+    });
+
+    if (!product) res.json({ data: '', error: null, status: 200 })
+
+    const formattedData = {
+        id: product?.id,
+        title: product?.title,
+        slug: product?.slug,
+        articul: product?.articul,
+        productCode: product?.productCode,
+        description: product?.description,
+        inStock: product?.inStock,
+        price: product?.price,
+        images: product?.images[0], // Take only the first image
+    }
+
+    res.json({
+        data: formattedData,
+        error: null,
+        status: 200
     });
 
     if (!product) {
@@ -84,7 +120,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
 
         sortedData.image = sortedData.image.replace(/^public\//, "")
 
-        res.json({ message: "Files received", data: sortedData });
+        res.json({ message: "Product created", data: sortedData });
     } catch (error) {
         console.error("Error creating product:", error);
         files.forEach(file => {
