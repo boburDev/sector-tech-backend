@@ -1,7 +1,7 @@
-import express from 'express'
-import * as Admin from '../../controllers/admin';
-import { loginAttemptLimiter } from '../../middlewares/attemptLimiter';
-import { validateAdminToken } from '../../middlewares/adminValidator';
+import express from "express";
+import * as Admin from "../../controllers/admin";
+import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
+import { validateAdminToken } from "../../middlewares/adminValidator";
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               username:
  *                 type: string
  *               password:
  *                 type: string
@@ -33,7 +33,7 @@ const router = express.Router();
  *       200:
  *         description: Successful login
  */
-router.post('/login', loginAttemptLimiter, Admin.login);
+router.post("/login", loginAttemptLimiter, Admin.login);
 
 /**
  * @swagger
@@ -50,24 +50,19 @@ router.post('/login', loginAttemptLimiter, Admin.login);
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *               email:
+ *               username:
  *                 type: string
  *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               status:
  *                 type: string
  *     responses:
  *       201:
  *         description: Admin created successfully
  */
-router.post('/create', validateAdminToken, Admin.createAdmin);
-
-/**
- * @swagger
- * tags:
- *   name: Admin
- *   description: Admin management APIs
- */
+router.post("/create", validateAdminToken, Admin.createAdmin);
 
 /**
  * @swagger
@@ -81,7 +76,7 @@ router.post('/create', validateAdminToken, Admin.createAdmin);
  *       200:
  *         description: List of all admins
  */
-router.get('/all', validateAdminToken, Admin.getUsers);
+router.get("/all", validateAdminToken, Admin.getUsers);
 
 /**
  * @swagger
@@ -104,7 +99,7 @@ router.get('/all', validateAdminToken, Admin.getUsers);
  *       404:
  *         description: Admin not found
  */
-router.get('/by-id/:id', validateAdminToken, Admin.getUserById);
+router.get("/by-id/:id", validateAdminToken, Admin.getUserById);
 
 /**
  * @swagger
@@ -128,9 +123,11 @@ router.get('/by-id/:id', validateAdminToken, Admin.getUserById);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               username:
  *                 type: string
- *               email:
+ *               role:
+ *                 type: string
+ *               status:
  *                 type: string
  *     responses:
  *       200:
@@ -138,7 +135,7 @@ router.get('/by-id/:id', validateAdminToken, Admin.getUserById);
  *       404:
  *         description: Admin not found
  */
-router.put('/update/:id', validateAdminToken, Admin.updateUser);
+router.put("/update/:id", validateAdminToken, Admin.updateUser);
 
 /**
  * @swagger
@@ -161,7 +158,6 @@ router.put('/update/:id', validateAdminToken, Admin.updateUser);
  *       404:
  *         description: Admin not found
  */
-router.delete('/delete/:id', validateAdminToken, Admin.deleteUser);
+router.delete("/delete/:id", validateAdminToken, Admin.deleteUser);
 
-
-export default router
+export default router;

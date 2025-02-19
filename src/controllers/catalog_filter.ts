@@ -106,6 +106,8 @@ export const createCatalogFilter = async (req: Request, res: Response): Promise<
             return res.status(201).json(filterResult);
         }
     } catch (error) {
+        console.log(error);
+        
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
