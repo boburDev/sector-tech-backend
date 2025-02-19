@@ -1,99 +1,169 @@
-import { Request, Response } from 'express';
-import AppDataSource from '../config/ormconfig';
+import { Request, Response } from "express";
+import AppDataSource from "../config/ormconfig";
 import { User } from "../entities/user.entity";
-import { sign } from '../utils/jwt';
+import { sign } from "../utils/jwt";
 
 const userRepository = AppDataSource.getRepository(User);
 
 export const signup = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const { name, email, password } = req.body;
-        const existingUser = await userRepository.findOne({ where: { email } });
+  try {
+    const { name, email, password } = req.body;
+    const existingUser = await userRepository.findOne({ where: { email } });
 
-        console.log(existingUser);
-        
-        if (existingUser) return res.status(400).json({ message: "User already exists" });
+    console.log(existingUser);
 
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
 
-        const newUser = new User()
-        newUser.name = name
-        newUser.email = email
-        newUser.password = password
-        const savedUser = await userRepository.save(newUser);
+    const newUser = new User();
+    newUser.name = name;
+    newUser.email = email;
+    newUser.password = password;
+    const savedUser = await userRepository.save(newUser);
 
-        const token = sign(
-            { id: savedUser.id, name: savedUser.name, email: savedUser.email },
-            86400000, // 1 day in milliseconds
-            'user'
-        );
+    const token = sign(
+      { id: savedUser.id, name: savedUser.name, email: savedUser.email },
+      86400000, // 1 day in milliseconds
+      "user"
+    );
 
-        const userData = {
-            id: savedUser.id,
-            name: savedUser.name,
-            email: savedUser.email
-        };
+    const userData = {
+      id: savedUser.id,
+      name: savedUser.name,
+      email: savedUser.email,
+    };
 
-        return res.status(201).json({ message: "User created successfully", token, user: userData });
-    } catch (error: any) {
-        console.log(error?.message);
-        
-        return res.status(500).json({ message: "Error creating user", error });
-    }
+    return res
+      .status(201)
+      .json({ message: "User created successfully", token, user: userData });
+  } catch (error: any) {
+    console.log(error?.message);
+
+    return res.status(500).json({ message: "Error creating user", error });
+  }
 };
 
 export const login = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const { email, password } = req.body;
-        const user = await userRepository.findOne({ where: { email } });
-        if (!user) return res.status(400).json({ message: "Invalid credentials" });
+  try {
+    const { email, password } = req.body;
+    const user = await userRepository.findOne({ where: { email } });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-        const isValidPassword = await user.validatePassword(password);
-        if (!isValidPassword) return res.status(400).json({ message: "Invalid credentials" });
+    const isValidPassword = await user.validatePassword(password);
+    if (!isValidPassword)
+      return res.status(400).json({ message: "Invalid credentials" });
 
-        const token = sign(
-            { id: user.id, name: user.name, email: user.email },
-            86400000, // 1 day in milliseconds
-            'user'
-        );
+    const token = sign(
+      { id: user.id, name: user.name, email: user.email },
+      86400000, // 1 day in milliseconds
+      "user"
+    );
 
-        const userData = {
-            id: user.id,
-            name: user.name,
-            email: user.email
-        };
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
 
-        return res.json({ message: "User logged in successfully", token, user: userData });
-    } catch (error) {
-        return res.status(500).json({ message: "Error logging in", error });
-    }
+    return res.json({
+      message: "User logged in successfully",
+      token,
+      user: userData,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error logging in", error });
+  }
 };
 
-export const updateProfile = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const userId = req.user.id;
-        const { name, email } = req.body;
+export const updateProfile = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const userId = req.user.id;
+    const { name, email } = req.body;
 
-        const user = await userRepository.findOne({ where: { id: userId } });
-        if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await userRepository.findOne({ where: { id: userId } });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-        user.name = name || user.name;
-        user.email = email || user.email;
-        await userRepository.save(user);
+    user.name = name || user.name;
+    user.email = email || user.email;
+    await userRepository.save(user);
 
-        const token = sign(
-            { id: user.id, name: user.name, email: user.email },
-            86400000, // 1 day in milliseconds
-            'user'
-        );
+    const token = sign(
+      { id: user.id, name: user.name, email: user.email },
+      86400000, // 1 day in milliseconds
+      "user"
+    );
 
-        const userData = {
-            id: user.id,
-            name: user.name,
-            email: user.email
-        };
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
 
-        return res.json({ message: "Profile updated successfully", token, user: userData });
-    } catch (error) {
-        return res.status(500).json({ message: "Error updating profile", error });
+    return res.json({
+      message: "Profile updated successfully",
+      token,
+      user: userData,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating profile", error });
+  }
+};
+
+export const googleCallback = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const { email, name } = req.user as { email: string; name: string };
+
+    let user = await userRepository.findOne({ where: { email } });
+
+    if (user) {
+      const accessToken = sign(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+        86400000, // 1 kun (24 soat)
+        "user"
+      );
+      const user_data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.email,
+      };
+      return res.json({message: "User logged in successfully", accessToken, user_data });
+    } else {
+      const newUser = new User();
+      newUser.name = name;
+      newUser.email = email;
+      newUser.password = "";
+      newUser.phone = "";
+      const savedUser = await userRepository.save(newUser);
+
+      const token = sign(
+        { id: savedUser.id, name: savedUser.name, email: savedUser.email },
+        86400000, // 1 day in milliseconds
+        "user"
+      );
+
+      const userData = {
+        id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+      };
+
+      return res
+        .status(201)
+        .json({ message: "User created successfully", token, user: userData });
     }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };

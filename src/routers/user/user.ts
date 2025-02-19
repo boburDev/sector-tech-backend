@@ -1,9 +1,36 @@
-import express from 'express'
-import * as User from '../../controllers/user';
-import { loginAttemptLimiter } from '../../middlewares/attemptLimiter';
-import { validateUserToken } from '../../middlewares/userValidator';
+import express, { Request, Response } from "express";
+import * as User from "../../controllers/user";
+import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
+import { validateUserToken } from "../../middlewares/userValidator";
+import passport from "passport";
 
 const router = express.Router();
+
+router.get(
+  "/google/login",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  loginAttemptLimiter,
+  User.googleCallback
+);
+
+router.get(
+  "/facebook/login",
+  passport.authenticate("facebook", {
+    scope: ["email", "public_profile"],
+  })
+);
+
+router.get(
+  "/facebook/callback",
+  passport.authenticate("facebook", { failureRedirect: "/" }),
+  loginAttemptLimiter,
+  User.googleCallback
+);
 
 /**
  * @swagger
