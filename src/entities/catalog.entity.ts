@@ -34,7 +34,7 @@ export class Subcatalog {
     @Column({ length: 255 })
     title: string;
 
-    @Column({ length: 255 })
+    @Column({ length: 255, nullable: true })
     slug: string;
 
     @Column()
@@ -68,7 +68,7 @@ export class Category {
     @Column({ length: 255 })
     title: string;
 
-    @Column({ length: 255 })
+    @Column({ length: 255, nullable: true })
     slug: string;
 
     @Column({ length: 500 })
