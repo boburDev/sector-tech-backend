@@ -10,6 +10,9 @@ export class Catalog {
     @Column({ length: 255 })
     title: string;
 
+    @Column({ length: 255 })
+    slug: string;
+
     @OneToMany(() => Subcatalog, subcatalog => subcatalog.catalog)
     subcatalogs: Subcatalog[];
 
@@ -30,6 +33,9 @@ export class Subcatalog {
 
     @Column({ length: 255 })
     title: string;
+
+    @Column({ length: 255 })
+    slug: string;
 
     @Column()
     catalogId: string;
@@ -61,6 +67,9 @@ export class Category {
 
     @Column({ length: 255 })
     title: string;
+
+    @Column({ length: 255 })
+    slug: string;
 
     @Column({ length: 500 })
     path: string;

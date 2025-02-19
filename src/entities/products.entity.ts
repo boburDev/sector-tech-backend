@@ -12,6 +12,9 @@ export class Product {
     title: string;
 
     @Column()
+    slug: string;
+
+    @Column()
     articul: string;
 
     @Column()

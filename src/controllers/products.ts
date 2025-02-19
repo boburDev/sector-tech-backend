@@ -5,6 +5,7 @@ import { Product } from '../entities/products.entity';
 import { ProductCondition, PopularProduct } from '../entities/product_details.entity';
 import { IsNull } from 'typeorm';
 import { productSchema } from '../validators/product.validator';
+import { createSlug } from '../utils/slug';
 
 const productRepository = AppDataSource.getRepository(Product);
 
@@ -56,6 +57,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
 
         const product = new Product();
         product.title = value.title;
+        product.slug = createSlug(value.title);
         product.articul = value.articul;
         product.productCode = value.productCode;
         product.characteristics = JSON.parse(value.characteristics);
