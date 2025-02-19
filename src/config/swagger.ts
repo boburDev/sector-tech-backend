@@ -12,7 +12,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:4000",
+        url: "https://lumora.uz/",
         description: "Local server",
       },
     ],

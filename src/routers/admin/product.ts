@@ -27,7 +27,7 @@ router.get('/', validateAdminToken, Product.getProducts);
 
 /**
  * @swagger
- * /product/{id}:
+ * /product/by-id/{id}:
  *   get:
  *     summary: Get a product by ID
  *     tags: [Product]
@@ -46,7 +46,7 @@ router.get('/', validateAdminToken, Product.getProducts);
  *       404:
  *         description: Product not found
  */
-router.get('/:id', validateAdminToken, Product.getProductById);
+router.get('/by-id/:id', validateAdminToken, Product.getProductById);
 
 /**
  * @swagger
