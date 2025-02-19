@@ -6,9 +6,9 @@ const options: swaggerJsdoc.Options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Admin API',
+            title: 'SECTOR TECH API',
             version: '1.0.0',
-            description: 'Admin API documentation',
+            description: 'SECTOR TECH API documentation',
         },
         servers: [
             {

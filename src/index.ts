@@ -9,7 +9,7 @@ import { setupSwagger } from './config/swagger';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 AppDataSource.initialize().then(() => { }).catch((error) => console.log(error));
 const app = express();
