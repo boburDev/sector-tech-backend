@@ -10,7 +10,7 @@ export class Catalog {
     @Column({ length: 255 })
     title: string;
 
-    @Column({ length: 255 })
+    @Column({ length: 255, nullable: true })
     slug: string;
 
     @OneToMany(() => Subcatalog, subcatalog => subcatalog.catalog)

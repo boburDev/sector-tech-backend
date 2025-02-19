@@ -9,7 +9,7 @@ export class Brand {
     @Column({ length: 255 })
     title: string;
 
-    @Column({ length: 255 })
+    @Column({ length: 255, nullable: true })
     slug: string;
 
     @Column({ length: 500 })
