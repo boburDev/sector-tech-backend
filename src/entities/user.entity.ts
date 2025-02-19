@@ -19,11 +19,11 @@ export class User {
     @Column({ nullable: false})
     phone: string;
 
-    @OneToMany(() => ProductQuestion, (question) => question.user)
-    questions: ProductQuestion[];
+    // @OneToMany(() => ProductQuestion, (question) => question.user)
+    // questions: ProductQuestion[];
 
-    @OneToMany(() => ProductComment, (comment) => comment.user)
-    comments: ProductComment[];
+    // @OneToMany(() => ProductComment, (comment) => comment.user)
+    // comments: ProductComment[];
 
     @BeforeInsert()
     async hashPassword() {

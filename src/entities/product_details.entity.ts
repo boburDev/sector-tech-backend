@@ -56,11 +56,11 @@ export class ProductQuestion {
     @Column()
     userId: string;
 
-    @Column()
-    productId: string;
+    // @Column()
+    // productId: string;
 
-    @ManyToOne(() => User, (user) => user.questions)
-    @JoinColumn({ name: 'userId' })
+    // @ManyToOne(() => User, (user) => user.questions)
+    // @JoinColumn({ name: 'userId' })
     user: User;
 
     @ManyToOne(() => Product, (products) => products.questions)
@@ -82,12 +82,12 @@ export class ProductComment {
     @Column()
     productId: string;
 
-    @Column()
-    userId: string;
+    // @Column()
+    // userId: string;
 
-    @ManyToOne(() => User, (user) => user.comments)
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    // @ManyToOne(() => User, (user) => user.comments)
+    // @JoinColumn({ name: 'userId' })
+    // user: User;
 
     @ManyToOne(() => Product, (products) => products.comments)
     @JoinColumn({ name: 'productId' })
