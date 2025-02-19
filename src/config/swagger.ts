@@ -24,12 +24,7 @@ const options: swaggerJsdoc.Options = {
           bearerFormat: "JWT", // Token formati JWT ekanligini bildiradi
         },
       },
-    },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    }
   },
   apis: ["./src/routers/admin/*.ts"], // API yo‘nalishlarini aniqlash
 };
