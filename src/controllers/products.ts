@@ -67,6 +67,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
         product.inStock = value.inStock;
         product.brandId = value.brandId;
         product.conditionId = value.conditionId;
+        product.relevanceId = value.relevanceId;
         product.catalogId = value.catalogId;
         product.subcatalogId = value.subcatalogId;
         product.categoryId = value.categoryId;
