@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
-import { IsNull } from 'typeorm';
+import { ILike, IsNull } from 'typeorm';
 import AppDataSource from '../config/ormconfig';
 import { Brand } from '../entities/brands.entity';
 import fs from 'fs';
 import { createSlug } from '../utils/slug';
 const brandRepository = AppDataSource.getRepository(Brand);
+
+
 
 export const getBrandById = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -72,12 +74,12 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
                 status: 400
             });
         }
-
+        const lowerTitle = title.toLowerCase();
         const existingBrand = await brandRepository.findOne({
-            where: {
-                title,
-                deletedAt: IsNull()
-            }
+          where: {
+            title: ILike(lowerTitle),
+            deletedAt: IsNull(),
+          },
         });
 
         if (existingBrand) {
@@ -130,9 +132,11 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
         }
 
         if (title !== brand.title) {
+            const lowerTitle = title.toLowerCase();
+
             const existingBrand = await brandRepository.findOne({
                 where: {
-                    title,
+                    title:ILike(lowerTitle),
                     deletedAt: IsNull()
                 }
             });

@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../entities/catalog.entity';
-import { IsNull } from 'typeorm';
+import { ILike, IsNull } from 'typeorm';
 import fs from 'fs';
+import { createSlug } from '../utils/slug';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -71,9 +72,11 @@ export const createCatalog = async (req: Request, res: Response): Promise<any> =
     try {
         const { title } = req.body;
 
+          const lowerTitle = title.toLowerCase();
+
         const existingCatalog = await catalogRepository.findOne({
             where: {
-                title,
+                title: ILike(lowerTitle),
                 deletedAt: IsNull()
             },
             order: {
@@ -90,6 +93,7 @@ export const createCatalog = async (req: Request, res: Response): Promise<any> =
 
         const catalog = new Catalog();
         catalog.title = title;
+        catalog.slug = createSlug(title)
 
         const savedCatalog = await catalogRepository.save(catalog);
 
@@ -128,6 +132,8 @@ export const updateCatalog = async (req: Request, res: Response): Promise<any> =
         }
 
         catalog.title = title;
+        catalog.slug = createSlug(title);
+
         const updatedCatalog = await catalogRepository.save(catalog);
 
         const { createdAt, deletedAt, ...catalogData } = updatedCatalog;
@@ -323,6 +329,7 @@ export const createSubcatalog = async (req: Request, res: Response): Promise<any
         // Create and save new subcatalog
         const subcatalog = subcatalogRepository.create({
             title: title.trim(),
+            slug:createSlug(title.trim()),
             catalogId: catalogId,
             catalog: catalog
         });
@@ -391,6 +398,7 @@ export const updateSubcatalog = async (req: Request, res: Response): Promise<any
 
         if (title) {
             subcatalog.title = title;
+            subcatalog.slug = createSlug(title)
         }
 
         const updatedSubcatalog = await subcatalogRepository.save(subcatalog);
@@ -509,10 +517,11 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
                 status: 400
             });
         }
-
+          const lowerTitle = title.toLowerCase();
+        
         const existingCategory = await categoryRepository.findOne({
             where: {
-                title,
+                title:ILike(lowerTitle),
                 deletedAt: IsNull()
             },
             order: {
@@ -548,6 +557,8 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
 
         const category = new Category();
         category.title = title;
+        category.slug = createSlug(title);
+
         category.path = newPath;
         category.subCatalogId = subCatalogId;
 
@@ -590,9 +601,11 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         }
 
         if (title !== category.title) {
+          const lowerTitle = title.toLowerCase();
+
             const existingCategory = await categoryRepository.findOne({
                 where: {
-                    title,
+                    title: ILike(lowerTitle),
                     deletedAt: IsNull()
                 }
             });
@@ -634,8 +647,10 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
             const newPath = file.path.replace(/\\/g, "/");
             category.path = newPath;
         }
-        if (title) category.title = title;
-
+        if (title) {
+             category.title = title
+             category.title = createSlug(title)
+        }
         const updatedCategory = await categoryRepository.save(category);
 
         const { createdAt, deletedAt, ...categoryData } = updatedCategory;
