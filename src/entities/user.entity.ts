@@ -16,7 +16,7 @@ export class User {
     @Column()
     password: string;
 
-    @Column()
+    @Column({ nullable: false})
     phone: string;
 
     @OneToMany(() => ProductQuestion, (question) => question.user)
