@@ -38,10 +38,10 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
 export const getProductById = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
     const product = await productRepository.findOne({
-        where: {
-            id,
-            deletedAt: IsNull()
-        }
+        where: [
+            { id, deletedAt: IsNull() },
+            { slug: id, deletedAt: IsNull() }
+        ]
     });
 
     if (!product) res.json({ data: '', error: null, status: 200 })
