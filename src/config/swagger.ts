@@ -1,36 +1,51 @@
-import swaggerJsdoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUI from "swagger-ui-express";
 import { Express } from "express";
 
-const options: swaggerJsdoc.Options = {
+const createSwaggerConfig = (title: string, url: string, apis: string[]) => ({
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Admin API",
+      title,
       version: "1.0.0",
-      description: "Admin API documentation",
+      description: `API documentation for ${title}`,
     },
-    servers: [
-      {
-        url: "https://lumora.uz/",
-        description: "Local server",
-      },
-    ],
+    servers: [{ url }],
     components: {
       securitySchemes: {
         bearerAuth: {
           type: "http",
           scheme: "bearer",
-          bearerFormat: "JWT", // Token formati JWT ekanligini bildiradi
+          bearerFormat: "JWT",
         },
       },
-    }
+    },
   },
-  apis: ["./src/routers/admin/*.ts"], // API yo‘nalishlarini aniqlash
-};
+  apis,
+});
 
-const swaggerSpec = swaggerJsdoc(options);
+const userSwaggerSpec = swaggerJSDoc(
+  createSwaggerConfig("User API", "http://localhost:4000/users", [
+    "./src/routers/user/*.ts",
+  ])
+);
+
+const adminSwaggerSpec = swaggerJSDoc(
+  createSwaggerConfig("Admin API", "http://localhost:4000/admin", [
+    "./src/routers/admin/*.ts",
+  ])
+);
 
 export const setupSwagger = (app: Express) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    "/api-docs",
+    swaggerUI.serveFiles(userSwaggerSpec),
+    swaggerUI.setup(userSwaggerSpec)
+  );
+
+  app.use(
+    "/admin-docs",
+    swaggerUI.serveFiles(adminSwaggerSpec),
+    swaggerUI.setup(adminSwaggerSpec)
+  );
 };

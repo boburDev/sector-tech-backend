@@ -1,4 +1,4 @@
-import express, { Response } from "express";
+import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import AppDataSource from "./config/ormconfig";
@@ -39,13 +39,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.use("/", adminRouter);
 app.use("/", userRouter);
 
-setupSwagger(app); 
+setupSwagger(app);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  console.log(`User Swagger docs at http://localhost:${PORT}/api-docs`);
+  console.log(`Admin Swagger docs at http://localhost:${PORT}/admin-docs`);
 });
