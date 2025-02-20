@@ -32,6 +32,34 @@ router.get(
   User.googleCallback
 );
 
+router.get(
+  "/linkedin/login",
+  passport.authenticate("linkedin", {
+    scope: ["profile", "email"],
+  })
+);
+
+router.get(
+  "/linkedin/callback",
+  passport.authenticate("linkedin", { failureRedirect: "/" }),
+  loginAttemptLimiter,
+  User.googleCallback
+);
+
+router.get(
+  "/yandex/login",
+  passport.authenticate("yandex", {
+    scope: ["login:info", "login:email"],
+  })
+);
+
+router.get(
+  "/yandex/callback",
+  passport.authenticate("yandex", { failureRedirect: "/" }),
+  loginAttemptLimiter,
+  User.googleCallback
+);
+
 /**
  * @swagger
  * tags:

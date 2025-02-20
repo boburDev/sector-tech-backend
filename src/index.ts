@@ -8,6 +8,8 @@ import cors from "cors";
 import "dotenv/config";
 import "./common/strategy/google.strategy";
 import "./common/strategy/facebook.strategy";
+import "./common/strategy/linkiden.strategy";
+import "./common/strategy/yandex.strategy";
 import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";

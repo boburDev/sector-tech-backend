@@ -1,29 +1,44 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import passport from "passport";
-import { Strategy as LinkedInStrategy } from "passport-linkedin-oauth2";
+import {
+  Strategy as OpenIDConnectStrategy,
+  Profile,
+} from "passport-openidconnect";
 
 passport.use(
-  new LinkedInStrategy(
+  "linkedin",
+  new OpenIDConnectStrategy(
     {
-      clientID: process.env.LINKEDIN_CLIENT_ID as string,
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
-      callbackURL: process.env.LINKEDIN_CALLBACK_URL as string,
-      scope: ["r_liteprofile", "r_emailaddress"], // Kompaniya kerak emas
+      issuer: "https://www.linkedin.com/oauth",
+      authorizationURL: "https://www.linkedin.com/oauth/v2/authorization",
+      tokenURL: "https://www.linkedin.com/oauth/v2/accessToken",
+      userInfoURL: "https://api.linkedin.com/v2/userinfo",
+      clientID: process.env.LINKEDIN_ID || "",
+      clientSecret: process.env.LINKEDIN_SECRET || "",
+      callbackURL: process.env.LINKEDIN_CALLBACK_URL || "",
+      scope: ["openid", "profile", "email"],
     },
-    (accessToken: string, refreshToken: string, profile: any, done) => {
-      try {
-        console.log(profile);
+    (
+      issuer: string,
+      profile: Profile,
+      done: (error: any, user?: any) => void
+    ) => {
+      const user = {
+        name: profile.name?.givenName,
+        email: profile.emails?.[0].value,
+      };
 
-        const user = {
-          id: profile.id,
-          fullName: profile.displayName,
-          email: profile.emails?.[0]?.value,
-          photo: profile.photos?.[0]?.value,
-        };
-
-        return done(null, user);
-      } catch (error) {
-        return done(error, false);
-      }
+      return done(null, user);
     }
   )
 );
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user: Express.User, done) => {
+  done(null, user);
+});

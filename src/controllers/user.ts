@@ -117,7 +117,7 @@ export const googleCallback = async (
   res: Response
 ): Promise<any> => {
   try {
-    const { email, name } = req.user as { email: string; name: string };
+    const { name, email } = req.user as { email: string; name: string };
 
     let user = await userRepository.findOne({ where: { email } });
 
@@ -135,9 +135,12 @@ export const googleCallback = async (
         id: user.id,
         name: user.name,
         email: user.email,
-        phone: user.email,
       };
-      return res.json({message: "User logged in successfully", accessToken, user_data });
+      return res.json({
+        message: "User logged in successfully",
+        accessToken,
+        user_data,
+      });
     } else {
       const newUser = new User();
       newUser.name = name;
