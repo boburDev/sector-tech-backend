@@ -6,6 +6,31 @@ import passport from "passport";
 
 const router = express.Router();
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: User
+ *   description: User authentication and profile management
+ */
+/**
+ * @swagger
+ * /auth/google/login:
+ *   get:
+ *     summary: Login and sign-up with Google
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: Successfully created or logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token
+ */
 router.get(
   "/google/login",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -18,6 +43,25 @@ router.get(
   User.googleCallback
 );
 
+
+/**
+ * @swagger
+ * /auth/facebook/login:
+ *   get:
+ *     summary: Login and sign-up with Facebook
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: Successfully created or logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token
+ */
 router.get(
   "/facebook/login",
   passport.authenticate("facebook", {
@@ -32,6 +76,26 @@ router.get(
   User.googleCallback
 );
 
+
+
+/**
+ * @swagger
+ * /auth/linkedin/login:
+ *   get:
+ *     summary: Login and sign-up with LinkedIn
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: Successfully created or logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token
+ */
 router.get(
   "/linkedin/login",
   passport.authenticate("linkedin", {
@@ -46,6 +110,24 @@ router.get(
   User.googleCallback
 );
 
+/**
+ * @swagger
+ * /auth/yandex/login:
+ *   get:
+ *     summary: Login and sign-up with Yandex
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: Successfully created or logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token
+ */
 router.get(
   "/yandex/login",
   passport.authenticate("yandex", {
@@ -62,16 +144,9 @@ router.get(
 
 /**
  * @swagger
- * tags:
- *   name: User
- *   description: User authentication and profile management
- */
-
-/**
- * @swagger
- * /user/login:
+ * /auth/login:
  *   post:
- *     summary: User login
+ *     summary: User login with values
  *     tags: [User]
  *     security: []
  *     requestBody:
@@ -99,7 +174,7 @@ router.post("/login", loginAttemptLimiter, User.login);
 
 /**
  * @swagger
- * /user/sign-up:
+ * /auth/sign-up:
  *   post:
  *     summary: Create a new user
  *     tags: [User]
@@ -132,7 +207,7 @@ router.post("/sign-up", loginAttemptLimiter, User.signup);
 
 /**
  * @swagger
- * /user/update:
+ * /auth/update:
  *   put:
  *     summary: Update user profile
  *     tags: [User]

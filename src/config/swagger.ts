@@ -25,13 +25,13 @@ const createSwaggerConfig = (title: string, url: string, apis: string[]) => ({
 });
 
 const userSwaggerSpec = swaggerJSDoc(
-  createSwaggerConfig("User API", "http://localhost:4000/users", [
+  createSwaggerConfig("User API", "http://localhost:4000/", [
     "./src/routers/user/*.ts",
   ])
 );
 
 const adminSwaggerSpec = swaggerJSDoc(
-  createSwaggerConfig("Admin API", "http://localhost:4000/admin", [
+  createSwaggerConfig("Admin API", "http://localhost:4000/", [
     "./src/routers/admin/*.ts",
   ])
 );
