@@ -150,12 +150,23 @@ router.put('/condition/update/:id', validateAdminToken, ProductCondition.updateP
 router.delete('/condition/delete/:id', validateAdminToken, ProductCondition.deleteProductCondition)
  
 
+// ///////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * @swagger
+ * tags:
+ *   name: ProductRelavance
+ *   description: Product revalance management APIs
+ */
+
+
 /**
  * @swagger
  * /product-detail/relavance/all:
  *   get:
  *     summary: Get all product relevances
- *     tags: [ProductCondition]
+ *     tags: [ProductRelavance]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -170,7 +181,7 @@ router.get('/relavance/all', validateAdminToken, ProductCondition.getAllProductR
  * /product-detail/relavance/{id}:
  *   get:
  *     summary: Get a product relevance by ID
- *     tags: [ProductCondition]
+ *     tags: [ProductRelavance]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -192,7 +203,7 @@ router.get('/relavance/:id', validateAdminToken, ProductCondition.getProductRela
  * /product-detail/relavance/create:
  *   post:
  *     summary: Create a new product relevance
- *     tags: [ProductCondition]
+ *     tags: [ProductRelavance]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -216,7 +227,7 @@ router.post('/relavance/create', validateAdminToken, ProductCondition.createProd
  * /product-detail/relavance/by-name/{name}:
  *   get:
  *     summary: Get a product relevance by name
- *     tags: [ProductCondition]
+ *     tags: [ProductRelavance]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -241,7 +252,7 @@ router.get('/relavance/by-name/:name', validateAdminToken, ProductCondition.getP
  * /product-detail/relavance/update/{id}:
  *   put:
  *     summary: Update a product relevance
- *     tags: [ProductCondition]
+ *     tags: [ProductRelavance]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -274,7 +285,7 @@ router.put('/relavance/update/:id', validateAdminToken, ProductCondition.updateP
 //  * /product-detail/relavance/delete/{id}:
 //  *   delete:
 //  *     summary: Delete a product relevance
-//  *     tags: [ProductCondition]
+//  *     tags: [ProductRelavance]
 //  *     security:
 //  *       - bearerAuth: []
 //  *     parameters:
