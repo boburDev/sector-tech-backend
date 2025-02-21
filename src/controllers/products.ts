@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import fs from "fs";
+import { validate as isUuid } from "uuid";
+
 import AppDataSource from '../config/ormconfig';
-import { Product } from '../entities/products.entity';
+import { Product, SavedProduct } from '../entities/products.entity';
 import { ProductCondition, PopularProduct } from '../entities/product_details.entity';
 import { IsNull } from 'typeorm';
 import { productSchema } from '../validators/product.validator';
 import { createSlug } from '../utils/slug';
 
 const productRepository = AppDataSource.getRepository(Product);
+const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
     const products = await productRepository.find({
@@ -134,4 +137,39 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
 
         return res.status(500).json({ error: "Internal server error" });
     }
+};
+
+export const toggleSaved = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { userId, productId } = req.body;
+     if (!isUuid(productId) || !isUuid(userId)) {
+       return res.status(400).json({
+         error: "Invalid productId format",
+         status: 400,
+       });
+     }
+
+    const existingSaved = await savedProductRepository.findOne({
+      where: {
+        userId,
+        productId,
+      },
+    });
+
+    if (existingSaved) {
+      await savedProductRepository.remove(existingSaved);
+      return res.status(200).json({ message: "Product removed from saved." });
+    }
+
+    const newSavedProduct = savedProductRepository.create({
+      userId,
+      productId,
+    });
+
+    let savedProduct = await savedProductRepository.save(newSavedProduct);
+    return res.status(201).json({ message: "Product saved successfully." ,data:savedProduct});
+  } catch (error) {
+    console.error("Error in toggleSaved:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
