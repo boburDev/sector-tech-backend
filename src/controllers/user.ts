@@ -48,7 +48,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     const { email, password } = req.body;
     const user = await userRepository.findOne({ where: { email } });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
-
+    
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword)
       return res.status(400).json({ message: "Invalid credentials" });

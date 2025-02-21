@@ -280,26 +280,160 @@ router.get('/relavance/by-name/:name', validateAdminToken, ProductCondition.getP
 router.put('/relavance/update/:id', validateAdminToken, ProductCondition.updateProductRelavance)
 
 
-// /**
-//  * @swagger
-//  * /product-detail/relavance/delete/{id}:
-//  *   delete:
-//  *     summary: Delete a product relevance
-//  *     tags: [ProductRelavance]
-//  *     security:
-//  *       - bearerAuth: []
-//  *     parameters:
-//  *       - in: path
-//  *         name: id
-//  *         required: true
-//  *         schema:
-//  *           type: string
-//  *         description: Product relevance ID
-//  *     responses:
-//  *       200:
-//  *         description: Product relevance deleted
-//  */
+/**
+ * @swagger
+ * /product-detail/relavance/delete/{id}:
+ *   delete:
+ *     summary: Delete a product relevance
+ *     tags: [ProductRelavance]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product relevance ID
+ *     responses:
+ *       200:
+ *         description: Product relevance deleted
+ */
 router.delete('/relavance/delete/:id', validateAdminToken, ProductCondition.deleteProductRelavance);
+
+
+
+// ////////////////////////////////////////////////////////////////////
+
+/**
+ * @swagger
+ * tags:
+ *   name: PopularProduct
+ *   description: Popular product management APIs
+ */
+
+/**
+ * @swagger
+ * /product-detail/popular/create:
+ *   post:
+ *     summary: Create a new popular product
+ *     tags: [PopularProduct]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Popular product created successfully
+ *       404:
+ *         description: Product not found
+ */
+router.post('/popular/add',validateAdminToken,ProductCondition.addToPopularProduct)
+
+
+/**
+ * @swagger
+ * /product-detail/popular/all:
+ *   get:
+ *     summary: Get all popular products
+ *     tags: [PopularProduct]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all popular products
+ */
+router.get('/popular/all',validateAdminToken,ProductCondition.findAllPopularProducts)
+
+
+
+/**
+ * @swagger
+ * /product-detail/popular/{id}:
+ *   get:
+ *     summary: Get a popular product by ID
+ *     tags: [PopularProduct]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Popular product ID
+ *     responses:
+ *       200:
+ *         description: Popular product details
+ *       404:
+ *         description: Popular product not found
+ */
+router.get('/popular/:id',validateAdminToken,ProductCondition.findOnePopularProduct)
+
+
+/**
+ * @swagger
+ * /product-detail/popular/update/{id}:
+ *   put:
+ *     summary: Update a popular product
+ *     tags: [PopularProduct]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Popular product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Popular product updated successfully
+ *       404:
+ *         description: Popular product not found
+ */
+router.put('/popular/update/:id',validateAdminToken,ProductCondition.updatePopularProduct)
+
+/**
+ * @swagger
+ * /product-detail/popular/delete/{id}:
+ *   delete:
+ *     summary: Delete a popular product
+ *     tags: [PopularProduct]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Popular product ID
+ *     responses:
+ *       200:
+ *         description: Popular product deleted successfully
+ *       404:
+ *         description: Popular product not found
+ */
+router.delete('/popular/delete/:id',validateAdminToken,ProductCondition.deletePopularProduct)
+
+
 
 export default router;
  

@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { validate as isUuid } from "uuid";
+
 import AppDataSource from '../config/ormconfig';
 import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../entities/product_details.entity';
 import { In, IsNull } from 'typeorm';
@@ -7,9 +9,9 @@ import { Product } from '../entities/products.entity';
 const productRepository = AppDataSource.getRepository(Product);
 const productConditionRepository = AppDataSource.getRepository(ProductCondition);
 const productRelevanceRepository = AppDataSource.getRepository(ProductRelevance);
+const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 const productQuestionRepository = AppDataSource.getRepository(ProductQuestion);
 const productCommentRepository = AppDataSource.getRepository(ProductComment);
-const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
 export const getAllProductConditions = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -251,4 +253,186 @@ export const deleteProductRelavance = async (req: Request, res: Response): Promi
     }
 }
 
+
+// Popular product
+
+export const addToPopularProduct = async (req: Request,res: Response): Promise<any> => {
+    try {
+        const { productId } = req.body;
+        if (!isUuid(productId)) {
+          return res.status(400).json({
+            error: "Invalid productId format",
+            status: 400,
+          });
+        }
+        const product = await productRepository.findOne({ where: { id: productId } });
+        if (!product) {
+          return res.status(404).json({
+            data: null,
+            error: "Product not found",
+            status: 404,
+          });
+        }
+      
+        const popularProduct = popularProductRepository.create({ productId });
+      
+        await popularProductRepository.save(popularProduct);
+      
+        return res.status(201).json({
+          data: popularProduct,
+          message: "Popular product created successfully",
+          status: 201,
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const findAllPopularProducts = async (req: Request,res: Response): Promise<any> => {
+    try {
+        const popularProducts = await popularProductRepository.find({
+          relations: ["products"],
+          select: {
+            products: {
+                id: true,
+                title: true,
+                slug: true,
+                articul: true,
+                productCode: true,
+                description: true,
+                inStock: true,
+                price: true,
+                mainImage:true
+            },
+          },
+        });
+      
+        return res.status(200).json({
+          data: popularProducts,
+          status: 200,
+        });
+        
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
+export const findOnePopularProduct = async (req: Request,res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        if (!isUuid(id)) {
+          return res.status(400).json({
+            error: "Invalid productId format",
+            status: 400,
+          });
+        }
+      
+        const popularProduct = await popularProductRepository.findOne({
+          where: { id },
+          relations: ["products"],
+        });
+      
+        if (!popularProduct) {
+          return res.status(404).json({
+            data: null,
+            error: "Popular product not found",
+            status: 404,
+          });
+        }
+      
+        return res.status(200).json({
+          data: popularProduct,
+          status: 200,
+        });
+        
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+
+    }
+};
+
+
+export const updatePopularProduct = async ( req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const { productId } = req.body;
+        if (!isUuid(id) || !isUuid(productId)) {
+          return res.status(400).json({
+            error: "Invalid productId format",
+            status: 400,
+          });
+        }
+        const popularProduct = await popularProductRepository.findOne({
+            where: { id },
+        });
+
+        if (!popularProduct) {
+            return res.status(404).json({
+            data: null,
+            error: "Popular product not found",
+            status: 404,
+            });
+        }
+        const product = await productRepository.findOne({ where: { id: productId } });
+        if (!product) {
+            return res.status(404).json({
+            data: null,
+            error: "Product not found",
+            status: 404,
+            });
+        }
+
+        popularProduct.productId = productId;
+        await popularProductRepository.save(popularProduct);
+
+        return res.status(200).json({
+            data: popularProduct,
+            message: "Popular product updated successfully",
+            status: 200,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
+export const deletePopularProduct = async (req: Request,res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+       if (!isUuid(id)) {
+         return res.status(400).json({
+           error: "Invalid productId format",
+           status: 400,
+         });
+       }
+        const popularProduct = await popularProductRepository.findOne({
+          where: { id },
+        });
+      
+        if (!popularProduct) {
+          return res.status(404).json({
+            data: null,
+            error: "Popular product not found",
+            status: 404,
+          });
+        }
+      
+        await popularProductRepository.remove(popularProduct);
+      
+        return res.status(200).json({
+          message: "Popular product deleted successfully",
+          status: 200,
+        });
+        
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+        
+    }
+};
+
+
+// product Question Repository
 

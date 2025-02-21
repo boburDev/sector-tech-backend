@@ -1,97 +1,115 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
+} from "typeorm";
 import { Brand } from "./brands.entity";
-import { PopularProduct, ProductComment, ProductCondition, ProductQuestion, ProductRelevance } from "./product_details.entity";
+import {
+  PopularProduct,
+  ProductComment,
+  ProductCondition,
+  ProductQuestion,
+  ProductRelevance,
+} from "./product_details.entity";
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
 
 @Entity()
 export class Product {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column()
-    slug: string;
+  @Column()
+  slug: string;
 
-    @Column()
-    articul: string;
+  @Column()
+  articul: string;
 
-    @Column()
-    productCode: string;
+  @Column()
+  productCode: string;
 
-    @Column()
-    description: string;
+  @Column()
+  description: string;
 
-    @Column()
-    inStock: string;
+  @Column()
+  inStock: string;
 
-    @Column()
-    fullDescription: string;
+  @Column()
+  fullDescription: string;
 
-    @Column("json")
-    characteristics: object[];
+  @Column("json")
+  characteristics: object[];
 
-    @Column()
-    price: number;
+  @Column()
+  price: number;
 
-    @Column("json", { nullable: true })
-    images: string[];
+  @Column({ default: "" })
+  mainImage: string;
 
-    @Column()
-    brandId: string;
+  @Column("json", { nullable: true })
+  images: string[];
 
-    @Column()
-    conditionId: string;
+  @Column()
+  brandId: string;
 
-    @Column()
-    catalogId: string;
+  @Column()
+  conditionId: string;
 
-    @Column()
-    subcatalogId: string;
+  @Column()
+  catalogId: string;
 
-    @Column()
-    categoryId: string;
+  @Column()
+  subcatalogId: string;
 
-    @Column()
-    relevanceId: string;
+  @Column()
+  categoryId: string;
 
-    @ManyToOne(() => ProductRelevance, (relevance) => relevance.products)
-    @JoinColumn({ name: 'relevanceId' })
-    relevances: ProductRelevance;
+  @Column()
+  relevanceId: string;
 
-    @ManyToOne(() => Catalog, (catalog) => catalog.products)
-    @JoinColumn({ name: 'catalogId' })
-    catalog: Catalog;
+  @ManyToOne(() => ProductRelevance, (relevance) => relevance.products)
+  @JoinColumn({ name: "relevanceId" })
+  relevances: ProductRelevance;
 
-    @ManyToOne(() => Subcatalog, (subcatalog) => subcatalog.products)
-    @JoinColumn({ name: 'subcatalogId' })
-    subcatalog: Subcatalog;
+  @ManyToOne(() => Catalog, (catalog) => catalog.products)
+  @JoinColumn({ name: "catalogId" })
+  catalog: Catalog;
 
-    @ManyToOne(() => Category, (category) => category.products)
-    @JoinColumn({ name: 'categoryId' })
-    category: Category;
+  @ManyToOne(() => Subcatalog, (subcatalog) => subcatalog.products)
+  @JoinColumn({ name: "subcatalogId" })
+  subcatalog: Subcatalog;
 
-    @ManyToOne(() => Brand, (brand) => brand.products)
-    @JoinColumn({ name: 'brandId' })
-    brand: Brand;
+  @ManyToOne(() => Category, (category) => category.products)
+  @JoinColumn({ name: "categoryId" })
+  category: Category;
 
-    @ManyToOne(() => ProductCondition, (condition) => condition.products)
-    @JoinColumn({ name: 'conditionId' })
-    conditions: ProductCondition;
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  @JoinColumn({ name: "brandId" })
+  brand: Brand;
 
-    @OneToMany(() => PopularProduct, (popular) => popular.products)
-    populars: PopularProduct[];
+  @ManyToOne(() => ProductCondition, (condition) => condition.products)
+  @JoinColumn({ name: "conditionId" })
+  conditions: ProductCondition;
 
-    @OneToMany(() => ProductQuestion, (question) => question.products)
-    questions: ProductQuestion[];
+  @OneToMany(() => PopularProduct, (popular) => popular.products)
+  populars: PopularProduct[];
 
-    @OneToMany(() => ProductComment, (comment) => comment.products)
-    comments: ProductComment[];
+  @OneToMany(() => ProductQuestion, (question) => question.products)
+  questions: ProductQuestion[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @OneToMany(() => ProductComment, (comment) => comment.products)
+  comments: ProductComment[];
 
-    @DeleteDateColumn()
-    deletedAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
