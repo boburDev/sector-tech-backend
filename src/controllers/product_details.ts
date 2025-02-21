@@ -6,7 +6,7 @@ import AppDataSource from '../config/ormconfig';
 import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../entities/product_details.entity';
 import { In, IsNull } from 'typeorm';
 import { Product } from '../entities/products.entity';
-import { productCommentSchema } from '../validators/product-comment.validate';
+import { productCommentSchema, productQuestionSchema } from '../validators/product-comment.validate';
 
 const productRepository = AppDataSource.getRepository(Product);
 const productConditionRepository = AppDataSource.getRepository(ProductCondition);
@@ -660,5 +660,178 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
 
 // product Question Repository
 
+export const addProductQuestion = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { error, value } = productQuestionSchema.validate(req.body);
 
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+    const { body, productId, userId } = value;
+    const newQuestion = new ProductQuestion();
+    newQuestion.body = body;
+    newQuestion.productId = productId;
+    newQuestion.userId = userId;
+    newQuestion.reply = [];
+
+    let savedQuestion = await productQuestionRepository.save(newQuestion);
+    return res.status(201).json(savedQuestion);
+  } catch (error) {
+    console.error("Error creating product question:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const addReplyToQuestion = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { questionId, adminId, message } = req.body;
+    
+    const question = await productQuestionRepository.findOneBy({ id: questionId });
+
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    const newReply = {
+      id: uuidv4(),
+      adminId,
+      message,
+      createdAt: new Date()
+    };
+
+    question.reply = [...question.reply, newReply];
+    let savedQuestion = await productQuestionRepository.save(question);
+
+    return res.status(200).json(savedQuestion);
+  } catch (error) {
+    console.error("Error adding reply to question:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export const getAllProductQuestions = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const questions = await productQuestionRepository.find({
+      relations: ["user", "products"],
+      select: {
+        user: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+        },
+        products: {
+          id: true,
+          title: true,
+          slug: true,
+          articul: true,
+          productCode: true,
+          description: true,
+          inStock: true,
+          price: true,
+          mainImage: true,
+        },
+      },
+    });
+
+    return res.status(200).json(questions);
+  } catch (error) {
+    console.error("Error fetching questions:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export const getProductQuestionById = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const question = await productQuestionRepository.findOne({
+      where: { id },
+      relations: ["user", "products"],
+      select: {
+        user: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+        },
+        products: {
+          id: true,
+          title: true,
+          slug: true,
+          articul: true,
+          productCode: true,
+          description: true,
+          inStock: true,
+          price: true,
+          mainImage: true,
+        },
+      },
+    });
+
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    return res.status(200).json(question);
+  } catch (error) {
+    console.error("Error fetching question:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export const deleteProductQuestion = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const question = await productQuestionRepository.findOneBy({ id });
+
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    await productQuestionRepository.remove(question);
+    return res.status(200).json({ message: "Question deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting question:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+export const getQuestionByProductId = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { productId } = req.params;
+    const questions = await productQuestionRepository.find({
+      where: { productId },
+      relations: ["user", "products"],
+      select: {
+        user: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+        },
+        products: {
+          id: true,
+          title: true,
+          slug: true,
+          articul: true,
+          productCode: true,
+          description: true,
+          inStock: true,
+          price: true,
+          mainImage: true,
+        },
+      },
+    });
+
+    return res.status(200).json(questions);
+  } catch (error) {
+    console.error("Error fetching questions for product:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 

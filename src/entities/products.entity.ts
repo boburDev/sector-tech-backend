@@ -17,6 +17,7 @@ import {
   ProductRelevance,
 } from "./product_details.entity";
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
+import { User } from "./user.entity";
 
 @Entity()
 export class Product {
@@ -107,9 +108,32 @@ export class Product {
   @OneToMany(() => ProductComment, (comment) => comment.products)
   comments: ProductComment[];
 
+  @OneToMany(() => SavedProduct, (saved_products) => saved_products.product)
+  saved_products: SavedProduct[];
+
   @CreateDateColumn()
   createdAt: Date;
 
   @DeleteDateColumn()
   deletedAt: Date;
+}
+
+@Entity("saved_product")
+export class SavedProduct {
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @Column()
+  productId: string;
+
+  @Column()
+  userId: string;
+
+  @ManyToOne(() => Product, (product) => product.saved_products)
+  @JoinColumn({ name: "productId" })
+  product: Product;
+
+  @ManyToOne(() => User, (user) => user.saved_products)
+  @JoinColumn({ name: "userId" })
+  user: User;
 }

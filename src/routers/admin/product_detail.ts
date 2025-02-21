@@ -606,5 +606,177 @@ router.delete("/comments/:id", validateAdminToken,ProductCondition.deleteProduct
 router.get("/comment/product/:productId", validateAdminToken,ProductCondition.getCommentByProductId);
 
 
+//////////////////////////////////////////////////////////////////
+
+
+/**
+ * @swagger
+ * tags:
+ *   name: productQuestion
+ *   description: Product question management APIs
+ */
+
+/**
+ * @swagger
+ * /product-detail/question/add:
+ *   post:
+ *     summary: Add a new product question
+ *     tags: [productQuestion]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               body:
+ *                 type: string
+ *                 example: "Is this product suitable for outdoor use?"
+ *               productId:
+ *                 type: string
+ *                 example: "product-uuid"
+ *               userId:
+ *                 type: string
+ *                 example: "user-uuid"
+ *     responses:
+ *       201:
+ *         description: Product question created successfully
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/question/add", validateAdminToken, ProductCondition.addProductQuestion);
+
+
+/**
+ * @swagger
+ * /product-detail/question/reply:
+ *   post:
+ *     summary: Add a reply to a product question
+ *     tags: [productQuestion]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               questionId:
+ *                 type: string
+ *                 example: "question-uuid"
+ *               adminId:
+ *                 type: string
+ *                 example: "admin-uuid"
+ *               message:
+ *                 type: string
+ *                 example: "Yes, it is suitable for outdoor use."
+ *     responses:
+ *       200:
+ *         description: Reply added successfully
+ *       404:
+ *         description: Question not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/question/reply", validateAdminToken, ProductCondition.addReplyToQuestion);
+
+
+/**
+ * @swagger
+ * /product-detail/question/all:
+ *   get:
+ *     summary: Get all product questions
+ *     tags: [productQuestion]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all product questions
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/question/all", validateAdminToken, ProductCondition.getAllProductQuestions);
+
+
+/**
+ * @swagger
+ * /product-detail/question/{id}:
+ *   get:
+ *     summary: Get a product question by ID
+ *     tags: [productQuestion]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product question ID
+ *         example: "question-uuid"
+ *     responses:
+ *       200:
+ *         description: Product question details
+ *       404:
+ *         description: Question not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/question/:id", validateAdminToken, ProductCondition.getProductQuestionById);
+
+
+/**
+ * @swagger
+ * /product-detail/question/{id}:
+ *   delete:
+ *     summary: Delete a product question
+ *     tags: [productQuestion]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product question ID
+ *         example: "question-uuid"
+ *     responses:
+ *       200:
+ *         description: Product question deleted successfully
+ *       404:
+ *         description: Question not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/question/:id", validateAdminToken, ProductCondition.deleteProductQuestion);
+
+
+/**
+ * @swagger
+ * /product-detail/question/product/{productId}:
+ *   get:
+ *     summary: Get questions by product ID
+ *     tags: [productQuestion]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *         example: "product-uuid"
+ *     responses:
+ *       200:
+ *         description: List of questions for the product
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/question/product/:productId", validateAdminToken, ProductCondition.getQuestionByProductId);
+
 export default router;
- 

@@ -64,6 +64,14 @@ export class ProductQuestion {
   @Column()
   userId: string;
 
+  @Column("jsonb", { default: [] })
+  reply: {
+    id: string;
+    adminId: string;
+    message: string;
+    createdAt: Date;
+  }[];
+
   @Column()
   productId: string;
 
@@ -74,6 +82,7 @@ export class ProductQuestion {
   @ManyToOne(() => Product, (products) => products.questions)
   @JoinColumn({ name: "productId" })
   products: Product;
+  
 }
 
 @Entity()
