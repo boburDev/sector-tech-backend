@@ -68,7 +68,7 @@ export class ProductQuestion {
   productId: string;
 
   @ManyToOne(() => User, (user) => user.questions)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: "userId" })
   user: User;
 
   @ManyToOne(() => Product, (products) => products.questions)
@@ -90,14 +90,19 @@ export class ProductComment {
   @Column()
   productId: string;
 
-  @Column("jsonb")
-  reply: object[];
+  @Column("jsonb", { default: [] })
+  reply: {
+    id: string;
+    adminId: string;
+    message: string;
+    createdAt: Date;
+  }[];
 
   @Column()
   userId: string;
 
   @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: "userId" })
   user: User;
 
   @ManyToOne(() => Product, (products) => products.comments)

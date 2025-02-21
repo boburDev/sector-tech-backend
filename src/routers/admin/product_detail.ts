@@ -435,5 +435,176 @@ router.delete('/popular/delete/:id',validateAdminToken,ProductCondition.deletePo
 
 
 
+/// ///////////////////////////////////////////////////
+
+/**
+ * @swagger
+ * tags:
+ *   name: productComment
+ *   description: Popular product management APIs
+ */
+
+/**
+ * @swagger
+ * /product-detail/comment/add:
+ *   post:
+ *     summary: Add a new product comment
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               commentBody:
+ *                 type: string
+ *                 example: "Great product!"
+ *               star:
+ *                 type: integer
+ *                 example: 5
+ *               productId:
+ *                 type: string
+ *                 example: "product-uuid"
+ *               userId:
+ *                 type: string
+ *                 example: "user-uuid"
+ *     responses:
+ *       201:
+ *         description: Product comment created successfully
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/comment/add',validateAdminToken,ProductCondition.addProductComment)
+
+/**
+ * @swagger
+ * /product-detail/comment/reply:
+ *   post:
+ *     summary: Add a reply to a product comment
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               commentId:
+ *                 type: string
+ *                 example: "comment-uuid"
+ *               adminId:
+ *                 type: string
+ *                 example: "admin-uuid"
+ *               message:
+ *                 type: string
+ *                 example: "Thank you for your feedback!"
+ *     responses:
+ *       200:
+ *         description: Reply added successfully
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/comment/reply", validateAdminToken,ProductCondition.addReplyToComment);
+
+/**
+ * @swagger
+ * /product-detail/comment/all:
+ *   get:
+ *     summary: Get all product comments
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of product comments
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/comment/all", validateAdminToken,ProductCondition.getAllProductComments);
+
+
+/**
+ * @swagger
+ * /product-detail/comment/{id}:
+ *   get:
+ *     summary: Get a product comment by ID
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product Comment ID
+ *     responses:
+ *       200:
+ *         description: Product comment data
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/comment/:id", validateAdminToken,ProductCondition.getProductCommentById);
+
+/**
+ * @swagger
+ * /product-detail/comments/{id}:
+ *   delete:
+ *     summary: Delete a product comment
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product Comment ID
+ *     responses:
+ *       200:
+ *         description: Comment deleted successfully
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/comments/:id", validateAdminToken,ProductCondition.deleteProductComment);
+
+/**
+ * @swagger
+ * /product-detail/comment/product/{productId}:
+ *   get:
+ *     summary: Get comments by product ID
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: List of comments for the product
+ *       404:
+ *         description: No comments found for this product
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/comment/product/:productId", validateAdminToken,ProductCondition.getCommentByProductId);
+
+
 export default router;
  
