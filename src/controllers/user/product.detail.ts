@@ -3,7 +3,6 @@ import AppDataSource from '../../config/ormconfig';
 import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../../entities/product_details.entity';
 import { In } from 'typeorm';
 import { Product } from '../../entities/products.entity';
-import { productCommentSchema, productQuestionSchema } from '../../validators/product-comment.validate';
 
 const productRepository = AppDataSource.getRepository(Product);
 const productConditionRepository = AppDataSource.getRepository(ProductCondition);
@@ -219,11 +218,7 @@ export const findOnePopularProduct = async (req: Request,res: Response): Promise
 
 export const addProductComment = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { error,value } = productCommentSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-    const { commentBody, star, productId, userId } = value;
+    const { commentBody, star, productId, userId } = req.body;
     const newComment = new ProductComment();
     newComment.commentBody = commentBody;
     newComment.star = star;
@@ -361,12 +356,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
 
 export const addProductQuestion = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { error, value } = productQuestionSchema.validate(req.body);
-
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message });
-    }
-    const { body, productId, userId } = value;
+    const { body, productId, userId } = req.body;
     const newQuestion = new ProductQuestion();
     newQuestion.body = body;
     newQuestion.productId = productId;

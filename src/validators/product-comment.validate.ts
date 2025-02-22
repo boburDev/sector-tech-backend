@@ -52,7 +52,7 @@ export const productQuestionSchema = Joi.object({
 });
 
 
-export const savedProductSchema = Joi.object({
+export const productIdParamsSchema = Joi.object({
   productId: Joi.string().uuid().required().messages({
     "string.base": "Product ID must be a string",
     "string.guid": "Product ID must be a valid UUID",

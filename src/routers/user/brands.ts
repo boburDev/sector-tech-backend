@@ -1,5 +1,7 @@
 import { Router } from "express";
 import * as Brands from "../../controllers/user/brand";
+import { validateParams } from "../../middlewares/validate";
+import { uuidSchema } from "../../validators/admin.validate";
 
 const router = Router();
 
@@ -29,7 +31,7 @@ const router = Router();
  *       404:
  *         description: Brand not found
  */
-router.get("/by-id/:id", Brands.getBrandById);
+router.get("/by-id/:id", validateParams(uuidSchema), Brands.getBrandById);
 
 /**
  * @swagger

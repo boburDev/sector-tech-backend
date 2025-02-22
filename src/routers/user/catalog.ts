@@ -1,5 +1,7 @@
 import express from "express";
 import * as Catalog from "../../controllers/user/catalog";
+import { validateParams } from "../../middlewares/validate";
+import { uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
 
@@ -42,7 +44,7 @@ router.get("/with-subcatalogs", Catalog.getAllCatalogs);
  *       404:
  *         description: Catalog not found
  */
-router.get("/by/:id", Catalog.getCatalogById);
+router.get("/by/:id", validateParams(uuidSchema), Catalog.getCatalogById);
 
 // Subcatalog routes
 /**
@@ -69,7 +71,7 @@ router.get("/by/:id", Catalog.getCatalogById);
  *       200:
  *         description: Subcatalog with categories retrieved successfully
  */
-router.get("/subcatalog/with-categories/:id",Catalog.getSubcatalogWithCategoryByCatalogId);
+router.get("/subcatalog/with-categories/:id", validateParams(uuidSchema), Catalog.getSubcatalogWithCategoryByCatalogId);
 
 /**
  * @swagger
@@ -90,7 +92,7 @@ router.get("/subcatalog/with-categories/:id",Catalog.getSubcatalogWithCategoryBy
  *       404:
  *         description: Subcatalog not found
  */
-router.get("/subcatalog/by-id/:id", Catalog.getSubcatalogById);
+router.get("/subcatalog/by-id/:id", validateParams(uuidSchema), Catalog.getSubcatalogById);
 
 /**
  * @swagger
@@ -120,7 +122,7 @@ router.get("/subcatalog/by-id/:id", Catalog.getSubcatalogById);
  *       404:
  *         description: Categories not found
  */
-router.get("/category/by-subcatalog/:id", Catalog.getCategoriesBySubcatalogId);
+router.get("/category/by-subcatalog/:id", validateParams(uuidSchema), Catalog.getCategoriesBySubcatalogId);
 
 /**
  * @swagger

@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import * as User from "../../controllers/user/user";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateUserToken } from "../../middlewares/userValidator";
@@ -233,46 +233,48 @@ router.put("/update", validateUserToken, User.updateProfile);
 
 
 
-/**
- * @swagger
- * /user/auth/all:
- *   get:
- *     summary: Get all users
- *     tags: [User]
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: Successfully retrieved all users
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         example: "1"
- *                       name:
- *                         type: string
- *                         example: "John Doe"
- *                       phone:
- *                         type: string
- *                         example: "+998901234567"
- *                       email:
- *                         type: string
- *                         example: "john@example.com"
- *       401:
- *         description: Unauthorized
- */
-router.get('/all', validateUserToken, User.getAllUsers);
+// /**
+//  * @swagger
+//  * /user/auth/all:
+//  *   get:
+//  *     summary: Get all users
+//  *     tags: [User]
+//  *     security:
+//  *       - BearerAuth: []
+//  *     responses:
+//  *       200:
+//  *         description: Successfully retrieved all users
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 status:
+//  *                   type: integer
+//  *                   example: 200
+//  *                 data:
+//  *                   type: array
+//  *                   items:
+//  *                     type: object
+//  *                     properties:
+//  *                       id:
+//  *                         type: string
+//  *                         example: "1"
+//  *                       name:
+//  *                         type: string
+//  *                         example: "John Doe"
+//  *                       phone:
+//  *                         type: string
+//  *                         example: "+998901234567"
+//  *                       email:
+//  *                         type: string
+//  *                         example: "john@example.com"
+//  *       401:
+//  *         description: Unauthorized
+//  */
+// router.get('/all', validateUserToken, User.getAllUsers);
+
+
 
 /**
  * @swagger

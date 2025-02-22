@@ -1,5 +1,7 @@
 import express from "express";
 import * as CatalogFilter from "../../controllers/user/catalog_filter";
+import { validateParams } from "../../middlewares/validate";
+import { uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
 
@@ -29,7 +31,7 @@ const router = express.Router();
  *       404:
  *         description: Catalog Filter not found
  */
-router.get("/by/:id", CatalogFilter.getCatalogFilterById);
+router.get("/by/:id", validateParams(uuidSchema), CatalogFilter.getCatalogFilterById);
 
 
 

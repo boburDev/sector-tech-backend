@@ -2,6 +2,8 @@ import express from "express";
 import * as Admin from "../../controllers/admin/admin";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateAdminToken } from "../../middlewares/adminValidator";
+import { validate, validateParams } from "../../middlewares/validate";
+import {  adminLoginValidateSchema, adminUpdateValidateSchema, adminValidateSchema, uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
 
@@ -33,7 +35,7 @@ const router = express.Router();
  *       200:
  *         description: Successful login
  */
-router.post("/login", loginAttemptLimiter, Admin.login);
+router.post("/login", validate(adminLoginValidateSchema), loginAttemptLimiter, Admin.login);
 
 /**
  * @swagger
@@ -62,7 +64,7 @@ router.post("/login", loginAttemptLimiter, Admin.login);
  *       201:
  *         description: Admin created successfully
  */
-router.post("/create", validateAdminToken, Admin.createAdmin);
+router.post("/create", validateAdminToken,validate(adminValidateSchema), Admin.createAdmin);
 
 /**
  * @swagger
@@ -99,7 +101,7 @@ router.get("/all", validateAdminToken, Admin.getUsers);
  *       404:
  *         description: Admin not found
  */
-router.get("/by-id/:id", validateAdminToken, Admin.getUserById);
+router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.getUserById);
 
 /**
  * @swagger
@@ -135,7 +137,7 @@ router.get("/by-id/:id", validateAdminToken, Admin.getUserById);
  *       404:
  *         description: Admin not found
  */
-router.put("/update/:id", validateAdminToken, Admin.updateUser);
+router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema), validateParams(uuidSchema), Admin.updateUser);
 
 /**
  * @swagger
@@ -158,6 +160,6 @@ router.put("/update/:id", validateAdminToken, Admin.updateUser);
  *       404:
  *         description: Admin not found
  */
-router.delete("/delete/:id", validateAdminToken, Admin.deleteUser);
+router.delete("/delete/:id", validateAdminToken,  validateParams(uuidSchema), Admin.deleteUser);
 
 export default router;

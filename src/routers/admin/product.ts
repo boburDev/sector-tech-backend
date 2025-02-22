@@ -2,6 +2,8 @@ import express from 'express'
 import * as Product from '../../controllers/admin/products';
 import { validateAdminToken } from '../../middlewares/adminValidator';
 import { uploadPhoto } from '../../middlewares/multer';
+import { validateParams } from '../../middlewares/validate';
+import { uuidSchema } from '../../validators/admin.validate';
 const router = express.Router();
 
 /**
@@ -46,7 +48,7 @@ router.get('/', validateAdminToken, Product.getProducts);
  *       404:
  *         description: Product not found
  */
-router.get('/by-id/:id', validateAdminToken, Product.getProductById);
+router.get('/by-id/:id', validateAdminToken,  validateParams(uuidSchema), Product.getProductById);
 
 /**
  * @swagger

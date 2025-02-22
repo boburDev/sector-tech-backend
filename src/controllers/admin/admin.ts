@@ -212,7 +212,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<any> => {
         await adminRepository.save(user);
 
         return res.json({
-            data: 'User deleted successfully',
+            data: 'Admin deleted successfully',
             error: null,
             status: 200
         });

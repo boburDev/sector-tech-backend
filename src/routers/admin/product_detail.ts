@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import * as ProductCondition from '../../controllers/admin/product_details';
 import { validateAdminToken } from '../../middlewares/adminValidator';
+import { validate, validateParams } from '../../middlewares/validate';
+import { uuidSchema } from '../../validators/admin.validate';
+import { productConditionSchema, replyToCommentSchema, replyToQuestionSchema } from '../../validators/product-detail';
+import { productIdParamsSchema } from '../../validators/product-comment.validate';
 const router = Router();
 
 /**
@@ -45,7 +49,7 @@ router.get('/condition/all', validateAdminToken, ProductCondition.getAllProductC
  *         description: Product condition details
  */
 
-router.get('/condition/by-id/:id', validateAdminToken, ProductCondition.getProductConditionById)
+router.get('/condition/by-id/:id', validateAdminToken,  validateParams(uuidSchema), ProductCondition.getProductConditionById)
 
 
 /**
@@ -92,7 +96,7 @@ router.get('/condition/by-name/:name', validateAdminToken, ProductCondition.getP
  *       201:
  *         description: Product condition created successfully
  */
-router.post('/condition/create', validateAdminToken, ProductCondition.createProductCondition)
+router.post('/condition/create', validateAdminToken, validate(productConditionSchema), ProductCondition.createProductCondition)
 
 
 /**
@@ -125,7 +129,7 @@ router.post('/condition/create', validateAdminToken, ProductCondition.createProd
  *       200:
  *         description: Product condition updated successfully
  */
-router.put('/condition/update/:id', validateAdminToken, ProductCondition.updateProductCondition)
+router.put('/condition/update/:id', validateAdminToken, validateParams(uuidSchema), ProductCondition.updateProductCondition)
 
 
 /**
@@ -147,7 +151,7 @@ router.put('/condition/update/:id', validateAdminToken, ProductCondition.updateP
  *       200:
  *         description: Product condition deleted successfully
  */
-router.delete('/condition/delete/:id', validateAdminToken, ProductCondition.deleteProductCondition)
+router.delete('/condition/delete/:id', validateAdminToken, validateParams(uuidSchema), ProductCondition.deleteProductCondition)
  
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -195,7 +199,7 @@ router.get('/relavance/all', validateAdminToken, ProductCondition.getAllProductR
  *       200:
  *         description: Product relevance details
  */
-router.get('/relavance/:id', validateAdminToken, ProductCondition.getProductRelavanceById)
+router.get('/relavance/:id', validateAdminToken, validateParams(uuidSchema),  ProductCondition.getProductRelavanceById)
 
 
 /**
@@ -221,7 +225,7 @@ router.get('/relavance/:id', validateAdminToken, ProductCondition.getProductRela
  *       201:
  *         description: Product relevance created
  */
-router.post('/relavance/create', validateAdminToken, ProductCondition.createProductRelavance)
+router.post('/relavance/create', validateAdminToken, validate(productConditionSchema), ProductCondition.createProductRelavance)
 /**
  * @swagger
  * /product-detail/relavance/by-name/{name}:
@@ -277,7 +281,7 @@ router.get('/relavance/by-name/:name', validateAdminToken, ProductCondition.getP
  *       200:
  *         description: Product relevance updated
  */
-router.put('/relavance/update/:id', validateAdminToken, ProductCondition.updateProductRelavance)
+router.put('/relavance/update/:id', validateAdminToken, validateParams(uuidSchema), ProductCondition.updateProductRelavance)
 
 
 /**
@@ -299,7 +303,7 @@ router.put('/relavance/update/:id', validateAdminToken, ProductCondition.updateP
  *       200:
  *         description: Product relevance deleted
  */
-router.delete('/relavance/delete/:id', validateAdminToken, ProductCondition.deleteProductRelavance);
+router.delete('/relavance/delete/:id', validateAdminToken,  validateParams(uuidSchema), ProductCondition.deleteProductRelavance);
 
 
 
@@ -335,7 +339,7 @@ router.delete('/relavance/delete/:id', validateAdminToken, ProductCondition.dele
  *       404:
  *         description: Product not found
  */
-router.post('/popular/add',validateAdminToken,ProductCondition.addToPopularProduct)
+router.post('/popular/add',validateAdminToken, validate(productIdParamsSchema), ProductCondition.addToPopularProduct)
 
 
 /**
@@ -375,7 +379,7 @@ router.get('/popular/all',validateAdminToken,ProductCondition.findAllPopularProd
  *       404:
  *         description: Popular product not found
  */
-router.get('/popular/:id',validateAdminToken,ProductCondition.findOnePopularProduct)
+router.get('/popular/:id',validateAdminToken, validateParams(uuidSchema), ProductCondition.findOnePopularProduct)
 
 
 /**
@@ -408,7 +412,7 @@ router.get('/popular/:id',validateAdminToken,ProductCondition.findOnePopularProd
  *       404:
  *         description: Popular product not found
  */
-router.put('/popular/update/:id',validateAdminToken,ProductCondition.updatePopularProduct)
+router.put('/popular/update/:id',validateAdminToken, validateParams(uuidSchema), ProductCondition.updatePopularProduct)
 
 /**
  * @swagger
@@ -431,7 +435,7 @@ router.put('/popular/update/:id',validateAdminToken,ProductCondition.updatePopul
  *       404:
  *         description: Popular product not found
  */
-router.delete('/popular/delete/:id',validateAdminToken,ProductCondition.deletePopularProduct)
+router.delete('/popular/delete/:id',validateAdminToken, validateParams(uuidSchema), ProductCondition.deletePopularProduct)
 
 
 
@@ -478,7 +482,7 @@ router.delete('/popular/delete/:id',validateAdminToken,ProductCondition.deletePo
  *       500:
  *         description: Internal server error
  */
-router.post("/comment/reply", validateAdminToken,ProductCondition.addReplyToComment);
+router.post("/comment/reply", validateAdminToken, validate(replyToCommentSchema), ProductCondition.addReplyToComment);
 
 /**
  * @swagger
@@ -520,7 +524,7 @@ router.get("/comment/all", validateAdminToken,ProductCondition.getAllProductComm
  *       500:
  *         description: Internal server error
  */
-router.get("/comment/:id", validateAdminToken,ProductCondition.getProductCommentById);
+router.get("/comment/:id", validateAdminToken, validateParams(uuidSchema), ProductCondition.getProductCommentById);
 
 /**
  * @swagger
@@ -545,7 +549,7 @@ router.get("/comment/:id", validateAdminToken,ProductCondition.getProductComment
  *       500:
  *         description: Internal server error
  */
-router.delete("/comments/:id", validateAdminToken,ProductCondition.deleteProductComment);
+router.delete("/comments/:id", validateAdminToken, validateParams(uuidSchema), ProductCondition.deleteProductComment);
 
 /**
  * @swagger
@@ -570,7 +574,7 @@ router.delete("/comments/:id", validateAdminToken,ProductCondition.deleteProduct
  *       500:
  *         description: Internal server error
  */
-router.get("/comment/product/:productId", validateAdminToken,ProductCondition.getCommentByProductId);
+router.get("/comment/product/:productId", validateAdminToken,validateParams(productIdParamsSchema), ProductCondition.getCommentByProductId);
 
 
 //////////////////////////////////////////////////////////////////
@@ -615,7 +619,7 @@ router.get("/comment/product/:productId", validateAdminToken,ProductCondition.ge
  *       500:
  *         description: Internal server error
  */
-router.post("/question/reply", validateAdminToken, ProductCondition.addReplyToQuestion);
+router.post("/question/reply", validateAdminToken, validate(replyToQuestionSchema),  ProductCondition.addReplyToQuestion);
 
 
 /**
@@ -659,7 +663,7 @@ router.get("/question/all", validateAdminToken, ProductCondition.getAllProductQu
  *       500:
  *         description: Internal server error
  */
-router.get("/question/:id", validateAdminToken, ProductCondition.getProductQuestionById);
+router.get("/question/:id", validateAdminToken, validateParams(uuidSchema), ProductCondition.getProductQuestionById);
 
 
 /**
@@ -686,7 +690,7 @@ router.get("/question/:id", validateAdminToken, ProductCondition.getProductQuest
  *       500:
  *         description: Internal server error
  */
-router.delete("/question/:id", validateAdminToken, ProductCondition.deleteProductQuestion);
+router.delete("/question/:id", validateAdminToken, validateParams(uuidSchema), ProductCondition.deleteProductQuestion);
 
 
 /**
@@ -711,6 +715,6 @@ router.delete("/question/:id", validateAdminToken, ProductCondition.deleteProduc
  *       500:
  *         description: Internal server error
  */
-router.get("/question/product/:productId", validateAdminToken, ProductCondition.getQuestionByProductId);
+router.get("/question/product/:productId", validateAdminToken, validateParams(productIdParamsSchema), ProductCondition.getQuestionByProductId);
 
 export default router;

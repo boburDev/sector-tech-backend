@@ -2,6 +2,8 @@ import { Router } from "express";
 import * as Brands from "../../controllers/admin/brands";
 import { uploadPhoto } from "../../middlewares/multer";
 import { validateAdminToken } from "../../middlewares/adminValidator";
+import { validateParams } from "../../middlewares/validate";
+import { uuidSchema } from "../../validators/admin.validate";
 
 const router = Router();
 
@@ -33,7 +35,7 @@ const router = Router();
  *       404:
  *         description: Brand not found
  */
-router.get("/by-id/:id", validateAdminToken, Brands.getBrandById);
+router.get("/by-id/:id", validateAdminToken,validateParams(uuidSchema), Brands.getBrandById);
 
 /**
  * @swagger
@@ -73,12 +75,7 @@ router.get("/all", validateAdminToken, Brands.getAllBrands);
  *       201:
  *         description: Brand created successfully
  */
-router.post(
-  "/create",
-  validateAdminToken,
-  uploadPhoto.single("logo"),
-  Brands.createBrand
-);
+router.post( "/create", validateAdminToken, uploadPhoto.single("logo"), Brands.createBrand);
 
 /**
  * @swagger
@@ -113,12 +110,7 @@ router.post(
  *       404:
  *         description: Brand not found
  */
-router.put(
-  "/update/:id",
-  validateAdminToken,
-  uploadPhoto.single("logo"),
-  Brands.updateBrand
-);
+router.put("/update/:id",validateAdminToken, uploadPhoto.single("logo"), validateParams(uuidSchema), Brands.updateBrand);
 
 /**
  * @swagger
@@ -141,6 +133,6 @@ router.put(
  *       404:
  *         description: Brand not found
  */
-router.delete("/delete/:id", validateAdminToken, Brands.deleteBrand);
+router.delete("/delete/:id", validateAdminToken, validateParams(uuidSchema), Brands.deleteBrand);
 
 export default router;

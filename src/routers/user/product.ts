@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as Product from "../../controllers/user/product";
 import { validateUserToken } from "../../middlewares/userValidator";
 import { validate } from "../../middlewares/validate";
-import { savedProductSchema } from "../../validators/product-comment.validate";
+import { productIdParamsSchema } from "../../validators/product-comment.validate";
 
 const router = Router();
 
@@ -77,7 +77,7 @@ router.get('/by-id/:id', Product.getProductById);
  *       500:
  *         description: Internal server error
  */
-router.post('/toggle-saved', validateUserToken,validate(savedProductSchema), Product.toggleSaved);
+router.post('/toggle-saved', validateUserToken,validate(productIdParamsSchema), Product.toggleSaved);
 
 
 /**
@@ -114,6 +114,6 @@ router.post('/toggle-saved', validateUserToken,validate(savedProductSchema), Pro
  *       500:
  *         description: Internal server error
  */
-router.get('/saved-product/:productId', validateUserToken, validate(savedProductSchema), Product.getUserSavedProducts);
+router.get('/saved-product/:productId', validateUserToken, validate(productIdParamsSchema), Product.getUserSavedProducts);
 
 export default router;

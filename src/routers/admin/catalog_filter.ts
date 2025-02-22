@@ -1,6 +1,8 @@
 import express from "express";
 import * as CatalogFilter from "../../controllers/admin/catalog_filter";
 import { validateAdminToken } from "../../middlewares/adminValidator";
+import { validateParams } from "../../middlewares/validate";
+import { uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
 
@@ -32,7 +34,7 @@ const router = express.Router();
  *       404:
  *         description: Catalog Filter not found
  */
-router.get("/by/:id", validateAdminToken, CatalogFilter.getCatalogFilterById);
+router.get("/by/:id", validateAdminToken, validateParams(uuidSchema), CatalogFilter.getCatalogFilterById);
 
 /**
  * @swagger
@@ -99,11 +101,7 @@ router.post("/create", validateAdminToken, CatalogFilter.createCatalogFilter);
  *       404:
  *         description: Catalog Filter not found
  */
-router.put(
-  "/update/:id",
-  validateAdminToken,
-  CatalogFilter.updateCatalogFilter
-);
+router.put("/update/:id",validateAdminToken,validateParams(uuidSchema), CatalogFilter.updateCatalogFilter);
 
 /**
  * @swagger
@@ -138,10 +136,6 @@ router.put(
  *       404:
  *         description: Catalog Filter not found
  */
-router.delete(
-  "/delete/:id",
-  validateAdminToken,
-  CatalogFilter.deleteCatalogFilter
-);
+router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), CatalogFilter.deleteCatalogFilter);
 
 export default router;

@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import * as ProductCondition from '../../controllers/user/product.detail';
 import { validateUserToken } from '../../middlewares/userValidator';
+import { validate, validateParams } from '../../middlewares/validate';
+import { uuidSchema } from '../../validators/admin.validate';
+import { productCommentSchema, productIdParamsSchema, productQuestionSchema } from '../../validators/product-comment.validate';
 const router = Router();
 
 /**
@@ -41,7 +44,7 @@ router.get('/condition/all', ProductCondition.getAllProductConditions)
  *         description: Product condition details
  */
 
-router.get('/condition/by-id/:id', ProductCondition.getProductConditionById)
+router.get('/condition/by-id/:id', validateParams(uuidSchema), ProductCondition.getProductConditionById)
 
 
 /**
@@ -106,7 +109,7 @@ router.get('/relavance/all', ProductCondition.getAllProductRelavances)
  *       200:
  *         description: Product relevance details
  */
-router.get('/relavance/:id', ProductCondition.getProductRelavanceById)
+router.get('/relavance/:id', validateParams(uuidSchema), ProductCondition.getProductRelavanceById)
 
 
 
@@ -177,7 +180,7 @@ router.get('/popular/all',ProductCondition.findAllPopularProducts)
  *       404:
  *         description: Popular product not found
  */
-router.get('/popular/:id',ProductCondition.findOnePopularProduct)
+router.get('/popular/:id', validateParams(uuidSchema), ProductCondition.findOnePopularProduct)
 
 
 
@@ -224,7 +227,7 @@ router.get('/popular/:id',ProductCondition.findOnePopularProduct)
  *       500:
  *         description: Internal server error
  */
-router.post('/comment/add',validateUserToken,ProductCondition.addProductComment)
+router.post('/comment/add',validateUserToken, validate(productCommentSchema), ProductCondition.addProductComment)
 
 
 
@@ -265,7 +268,7 @@ router.get("/comment/all",ProductCondition.getAllProductComments);
  *       500:
  *         description: Internal server error
  */
-router.get("/comment/:id",ProductCondition.getProductCommentById);
+router.get("/comment/:id", validateParams(uuidSchema), ProductCondition.getProductCommentById);
 
 
 
@@ -290,7 +293,7 @@ router.get("/comment/:id",ProductCondition.getProductCommentById);
  *       500:
  *         description: Internal server error
  */
-router.get("/comment/product/:productId", ProductCondition.getCommentByProductId);
+router.get("/comment/product/:productId", validateParams(productIdParamsSchema), ProductCondition.getCommentByProductId);
 
 
 //////////////////////////////////////////////////////////////////
@@ -333,7 +336,7 @@ router.get("/comment/product/:productId", ProductCondition.getCommentByProductId
  *       500:
  *         description: Internal server error
  */
-router.post("/question/add", validateUserToken, ProductCondition.addProductQuestion);
+router.post("/question/add", validateUserToken,validate(productQuestionSchema), ProductCondition.addProductQuestion);
 
 
 
@@ -374,7 +377,7 @@ router.get("/question/all", ProductCondition.getAllProductQuestions);
  *       500:
  *         description: Internal server error
  */
-router.get("/question/:id", ProductCondition.getProductQuestionById);
+router.get("/question/:id", validateParams(uuidSchema), ProductCondition.getProductQuestionById);
 
 
 
@@ -399,6 +402,6 @@ router.get("/question/:id", ProductCondition.getProductQuestionById);
  *       500:
  *         description: Internal server error
  */
-router.get("/question/product/:productId", ProductCondition.getQuestionByProductId);
+router.get("/question/product/:productId",validateParams(productIdParamsSchema), ProductCondition.getQuestionByProductId);
 
 export default router;
