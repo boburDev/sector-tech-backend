@@ -468,9 +468,6 @@ router.delete('/popular/delete/:id',validateAdminToken, validateParams(uuidSchem
  *               commentId:
  *                 type: string
  *                 example: "comment-uuid"
- *               adminId:
- *                 type: string
- *                 example: "admin-uuid"
  *               message:
  *                 type: string
  *                 example: "Thank you for your feedback!"
@@ -605,9 +602,6 @@ router.get("/comment/product/:productId", validateAdminToken,validateParams(prod
  *               questionId:
  *                 type: string
  *                 example: "question-uuid"
- *               adminId:
- *                 type: string
- *                 example: "admin-uuid"
  *               message:
  *                 type: string
  *                 example: "Yes, it is suitable for outdoor use."
