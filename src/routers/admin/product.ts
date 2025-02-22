@@ -1,7 +1,9 @@
 import express from 'express'
-import * as Product from '../../controllers/products';
+import * as Product from '../../controllers/admin/products';
 import { validateAdminToken } from '../../middlewares/adminValidator';
 import { uploadPhoto } from '../../middlewares/multer';
+import { validate } from '../../middlewares/validate';
+import { savedProductSchema } from '../../validators/product-comment.validate';
 const router = express.Router();
 
 /**
@@ -110,7 +112,7 @@ router.post('/create', validateAdminToken, uploadPhoto.array("productImages", 5)
  *       500:
  *         description: Internal server error
  */
-router.post('/toggle-saved', validateAdminToken, Product.toggleSaved);
+router.post('/toggle-saved', validateAdminToken,validate(savedProductSchema), Product.toggleSaved);
 
 
 export default router;

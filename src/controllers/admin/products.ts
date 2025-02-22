@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
 import fs from "fs";
-import { validate as isUuid } from "uuid";
 
-import AppDataSource from '../config/ormconfig';
-import { Product, SavedProduct } from '../entities/products.entity';
-import { ProductCondition, PopularProduct } from '../entities/product_details.entity';
+import AppDataSource from '../../config/ormconfig';
+import { Product, SavedProduct } from '../../entities/products.entity';
 import { IsNull } from 'typeorm';
-import { productSchema } from '../validators/product.validator';
-import { createSlug } from '../utils/slug';
+import { productSchema } from '../../validators/product.validator';
+import { createSlug } from '../../utils/slug';
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
@@ -141,13 +139,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
 
 export const toggleSaved = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { userId, productId } = req.body;
-     if (!isUuid(productId) || !isUuid(userId)) {
-       return res.status(400).json({
-         error: "Invalid productId format",
-         status: 400,
-       });
-     }
+    const { userId, productId } =  req.body;
 
     const existingSaved = await savedProductRepository.findOne({
       where: {
@@ -166,10 +158,13 @@ export const toggleSaved = async (req: Request, res: Response): Promise<any> => 
       productId,
     });
 
-    let savedProduct = await savedProductRepository.save(newSavedProduct);
-    return res.status(201).json({ message: "Product saved successfully." ,data:savedProduct});
+    await savedProductRepository.save(newSavedProduct);
+    return res.status(201).json({ message: "Product saved successfully."});
   } catch (error) {
     console.error("Error in toggleSaved:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+

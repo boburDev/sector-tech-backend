@@ -1,5 +1,5 @@
 import express from "express";
-import * as Admin from "../../controllers/admin";
+import * as Admin from "../../controllers/admin/admin";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateAdminToken } from "../../middlewares/adminValidator";
 

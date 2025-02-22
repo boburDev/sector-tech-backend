@@ -1,6 +1,6 @@
-import express from 'express'
-import * as CatalogFilter from '../../controllers/catalog_filter';
-import { validateAdminToken } from '../../middlewares/adminValidator';
+import express from "express";
+import * as CatalogFilter from "../../controllers/admin/catalog_filter";
+import { validateAdminToken } from "../../middlewares/adminValidator";
 
 const router = express.Router();
 
@@ -138,6 +138,10 @@ router.put(
  *       404:
  *         description: Catalog Filter not found
  */
-router.delete("/delete/:id",validateAdminToken, CatalogFilter.deleteCatalogFilter);
+router.delete(
+  "/delete/:id",
+  validateAdminToken,
+  CatalogFilter.deleteCatalogFilter
+);
 
 export default router;

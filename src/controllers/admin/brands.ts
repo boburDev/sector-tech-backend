@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { ILike, IsNull } from 'typeorm';
-import AppDataSource from '../config/ormconfig';
-import { Brand } from '../entities/brands.entity';
+import AppDataSource from '../../config/ormconfig';
+import { Brand } from '../../entities/brands.entity';
 import fs from 'fs';
-import { createSlug } from '../utils/slug';
+import { createSlug } from '../../utils/slug';
 const brandRepository = AppDataSource.getRepository(Brand);
 
 export const getBrandById = async (req: Request, res: Response): Promise<any> => {

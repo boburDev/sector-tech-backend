@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import * as Brands from '../../controllers/brands';
-import { uploadPhoto } from '../../middlewares/multer';
-import { validateAdminToken } from '../../middlewares/adminValidator';
+import { Router } from "express";
+import * as Brands from "../../controllers/admin/brands";
+import { uploadPhoto } from "../../middlewares/multer";
+import { validateAdminToken } from "../../middlewares/adminValidator";
 
 const router = Router();
 
@@ -33,8 +33,7 @@ const router = Router();
  *       404:
  *         description: Brand not found
  */
-router.get('/by-id/:id', validateAdminToken, Brands.getBrandById);
-
+router.get("/by-id/:id", validateAdminToken, Brands.getBrandById);
 
 /**
  * @swagger
@@ -48,8 +47,7 @@ router.get('/by-id/:id', validateAdminToken, Brands.getBrandById);
  *       200:
  *         description: List of all brands
  */
-router.get('/all', validateAdminToken, Brands.getAllBrands);
-
+router.get("/all", validateAdminToken, Brands.getAllBrands);
 
 /**
  * @swagger
@@ -75,8 +73,12 @@ router.get('/all', validateAdminToken, Brands.getAllBrands);
  *       201:
  *         description: Brand created successfully
  */
-router.post('/create', validateAdminToken, uploadPhoto.single('logo'), Brands.createBrand);
-
+router.post(
+  "/create",
+  validateAdminToken,
+  uploadPhoto.single("logo"),
+  Brands.createBrand
+);
 
 /**
  * @swagger
@@ -111,8 +113,12 @@ router.post('/create', validateAdminToken, uploadPhoto.single('logo'), Brands.cr
  *       404:
  *         description: Brand not found
  */
-router.put('/update/:id', validateAdminToken, uploadPhoto.single('logo'), Brands.updateBrand);
-
+router.put(
+  "/update/:id",
+  validateAdminToken,
+  uploadPhoto.single("logo"),
+  Brands.updateBrand
+);
 
 /**
  * @swagger
@@ -135,9 +141,6 @@ router.put('/update/:id', validateAdminToken, uploadPhoto.single('logo'), Brands
  *       404:
  *         description: Brand not found
  */
-router.delete('/delete/:id', validateAdminToken, Brands.deleteBrand);
-
-
-
+router.delete("/delete/:id", validateAdminToken, Brands.deleteBrand);
 
 export default router;

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CatalogFilter } from '../entities/catalog_filter.entity';
-import AppDataSource from '../config/ormconfig';
+import { CatalogFilter } from '../../entities/catalog_filter.entity';
+import AppDataSource from '../../config/ormconfig';
 
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 

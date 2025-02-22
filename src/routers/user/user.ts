@@ -1,11 +1,10 @@
 import express, { Request, Response } from "express";
-import * as User from "../../controllers/user";
+import * as User from "../../controllers/user/user";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateUserToken } from "../../middlewares/userValidator";
 import passport from "passport";
 
 const router = express.Router();
-
 
 /**
  * @swagger
@@ -43,10 +42,9 @@ router.get(
   User.googleCallback
 );
 
-
 /**
  * @swagger
- * /auth/facebook/login:
+ * /user/auth/facebook/login:
  *   get:
  *     summary: Login and sign-up with Facebook
  *     tags: [User]
@@ -76,11 +74,9 @@ router.get(
   User.googleCallback
 );
 
-
-
 /**
  * @swagger
- * /auth/linkedin/login:
+ * /user/auth/linkedin/login:
  *   get:
  *     summary: Login and sign-up with LinkedIn
  *     tags: [User]
@@ -112,7 +108,7 @@ router.get(
 
 /**
  * @swagger
- * /auth/yandex/login:
+ * /user/auth/yandex/login:
  *   get:
  *     summary: Login and sign-up with Yandex
  *     tags: [User]
@@ -144,7 +140,7 @@ router.get(
 
 /**
  * @swagger
- * /auth/login:
+ * /user/auth/login:
  *   post:
  *     summary: User login with values
  *     tags: [User]
@@ -174,7 +170,7 @@ router.post("/login", loginAttemptLimiter, User.login);
 
 /**
  * @swagger
- * /auth/sign-up:
+ * /user/auth/sign-up:
  *   post:
  *     summary: Create a new user
  *     tags: [User]
@@ -207,7 +203,7 @@ router.post("/sign-up", loginAttemptLimiter, User.signup);
 
 /**
  * @swagger
- * /auth/update:
+ * /user/auth/update:
  *   put:
  *     summary: Update user profile
  *     tags: [User]
@@ -234,5 +230,96 @@ router.post("/sign-up", loginAttemptLimiter, User.signup);
  *         description: Unauthorized
  */
 router.put("/update", validateUserToken, User.updateProfile);
+
+
+
+/**
+ * @swagger
+ * /user/auth/all:
+ *   get:
+ *     summary: Get all users
+ *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "1"
+ *                       name:
+ *                         type: string
+ *                         example: "John Doe"
+ *                       phone:
+ *                         type: string
+ *                         example: "+998901234567"
+ *                       email:
+ *                         type: string
+ *                         example: "john@example.com"
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/all', validateUserToken, User.getAllUsers);
+
+/**
+ * @swagger
+ * /user/auth/get/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "1"
+ *                     name:
+ *                       type: string
+ *                       example: "John Doe"
+ *                     phone:
+ *                       type: string
+ *                       example: "+998901234567"
+ *                     email:
+ *                       type: string
+ *                       example: "john@example.com"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.get('/get/:id', validateUserToken, User.getUserById);
 
 export default router;

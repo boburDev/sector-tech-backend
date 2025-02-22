@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
-import { validate as isUuid } from "uuid";
-import { v4 as uuidv4 } from "uuid";
-
-import AppDataSource from '../config/ormconfig';
-import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../entities/product_details.entity';
+import AppDataSource from '../../config/ormconfig';
+import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../../entities/product_details.entity';
 import { In, IsNull } from 'typeorm';
-import { Product } from '../entities/products.entity';
-import { productCommentSchema, productQuestionSchema } from '../validators/product-comment.validate';
+import { Product } from '../../entities/products.entity';
+import { productCommentSchema, productQuestionSchema } from '../../validators/product-comment.validate';
+import { v4 } from '../../utils/uuid';
 
 const productRepository = AppDataSource.getRepository(Product);
 const productConditionRepository = AppDataSource.getRepository(ProductCondition);
@@ -261,12 +259,6 @@ export const deleteProductRelavance = async (req: Request, res: Response): Promi
 export const addToPopularProduct = async (req: Request,res: Response): Promise<any> => {
     try {
         const { productId } = req.body;
-        if (!isUuid(productId)) {
-          return res.status(400).json({
-            error: "Invalid productId format",
-            status: 400,
-          });
-        }
         const product = await productRepository.findOne({ where: { id: productId } });
         if (!product) {
           return res.status(404).json({
@@ -325,12 +317,6 @@ export const findAllPopularProducts = async (req: Request,res: Response): Promis
 export const findOnePopularProduct = async (req: Request,res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-        if (!isUuid(id)) {
-          return res.status(400).json({
-            error: "Invalid productId format",
-            status: 400,
-          });
-        }
       
         const popularProduct = await popularProductRepository.findOne({
           where: { id },
@@ -374,12 +360,7 @@ export const updatePopularProduct = async ( req: Request, res: Response): Promis
     try {
         const { id } = req.params;
         const { productId } = req.body;
-        if (!isUuid(id) || !isUuid(productId)) {
-          return res.status(400).json({
-            error: "Invalid productId format",
-            status: 400,
-          });
-        }
+      
         const popularProduct = await popularProductRepository.findOne({
             where: { id },
         });
@@ -417,12 +398,7 @@ export const updatePopularProduct = async ( req: Request, res: Response): Promis
 export const deletePopularProduct = async (req: Request,res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-       if (!isUuid(id)) {
-         return res.status(400).json({
-           error: "Invalid productId format",
-           status: 400,
-         });
-       }
+    
         const popularProduct = await popularProductRepository.findOne({
           where: { id },
         });
@@ -488,7 +464,7 @@ export const addReplyToComment = async (req:Request, res:Response):Promise<any> 
         }
 
         const newReply = {
-            id: uuidv4(),
+            id: v4(),
             adminId,
             message,
             createdAt: new Date()
@@ -693,7 +669,7 @@ export const addReplyToQuestion = async (req: Request, res: Response): Promise<a
     }
 
     const newReply = {
-      id: uuidv4(),
+      id: v4(),
       adminId,
       message,
       createdAt: new Date()

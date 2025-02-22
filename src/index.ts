@@ -40,8 +40,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/", adminRouter);
-app.use("/", userRouter);
-
+app.use("/user", userRouter);
 setupSwagger(app);
 
 app.listen(PORT, () => {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import AppDataSource from "../config/ormconfig";
-import { User } from "../entities/user.entity";
-import { sign } from "../utils/jwt";
+import AppDataSource from "../../config/ormconfig";
+import { User } from "../../entities/user.entity";
+import { sign } from "../../utils/jwt";
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -75,10 +75,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export const updateProfile = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const updateProfile = async ( req: Request, res: Response): Promise<any> => {
   try {
     const userId = req.user.id;
     const { name, email } = req.body;
@@ -112,10 +109,7 @@ export const updateProfile = async (
   }
 };
 
-export const googleCallback = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const googleCallback = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email } = req.user as { email: string; name: string };
 
@@ -170,3 +164,54 @@ export const googleCallback = async (
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
+
+
+export const getUserById = async (req: Request, res: Response): Promise<any> => {
+    try {
+        if (req.admin.role !== 'super') {
+            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
+        }
+
+        const { id } = req.params;
+        const user = await userRepository.findOne({ 
+            where: { 
+                id
+            } ,
+            select:{
+              id:true,
+              name:true,
+              email:true,
+              phone:true
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.json({
+            data:user,
+            error: null,
+            status: 200
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const getAllUsers = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const users = await userRepository.find();
+        return res.json({
+            data: users,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+

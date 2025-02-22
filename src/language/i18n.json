@@ -1,0 +1,117 @@
+{
+  "user": {
+    "auth": {
+      "alreadyExists": "User already exists",
+      "createdSuccessfully": "User created successfully",
+      "loginSuccess": "User logged in successfully",
+      "invalidCredentials": "Invalid credentials",
+      "updateSuccess": "Profile updated successfully",
+      "notFound": "User not found",
+      "accountNotActive": "Your account is not active or you are not a super admin",
+      "errorCreating": "Error creating user",
+      "errorLoggingIn": "Error logging in",
+      "errorUpdating": "Error updating profile",
+      "internalError": "Internal server error"
+    },
+    "brand": {
+      "notFound": "Brand not found"
+    },
+    "catalogFilter": {
+      "notFound": "Catalog filter not found",
+      "filterRetrieved": "Catalog filter retrieved successfully."
+    },
+    "catalog": {
+      "notFound": "Catalog not found"
+    },
+    "subCatalog": {
+      "notFound": "subCatalog not found"
+    },
+    "productDetail": {
+      "notFound": "Product detail not found"
+    },
+    "popularProduct": {
+      "notFound": "Popular product not found"
+    },
+    "productComment": {
+      "notFound": "Product comment not found"
+    },
+    "productQuestion": {
+      "notFound": "Product question not found"
+    },
+    "product": {
+      "notFound": "Product not found",
+      "removedProduct": "Product removed from saved.",
+      "savedProduct": "Product saved successfully."
+    }
+  },
+  "admin": {
+    "auth": {
+      "alreadyExists": "Admin already exists",
+      "invalidCredentials": "Invalid credentials",
+      "accountInactive": "Account is inactive.",
+      "notSuperAdmin": "Your account is not active or you are not a super admin.",
+      "usernameExists": "Username already exists.",
+      "notFound": "Admin not found",
+      "userNotFound": "User not found",
+      "cannotDeleteOwnAccount": "Cannot delete your own account.",
+      "cannotDeleteSuperAdmin": "Cannot delete super admin account.",
+      "userDeletedSuccessfully": "User deleted successfully.",
+      "internalError": "Internal server error"
+    },
+    "brand": {
+      "notFound": "Brand not found",
+      "titleAndFileRequired": "Title and logo file are required.",
+      "titleExists": "Brand with this title already exists.",
+      "deletedSuccess": "Brand deleted successfully."
+    },
+    "catalogFilter": {
+      "notFound": "Catalog filter not found",
+      "filterRetrieved": "Catalog filter retrieved successfully.",
+      "subcatalogOrCategoryRequired": "Either subcatalogId or categoryId must be provided.",
+      "duplicateElement": "You can't create the same element: {{name}}",
+      "updatedSuccess": "New filter updated successfully.",
+      "createdSuccess": "New filter created successfully.",
+      "itemNotFound": "Item with name \"{{name}}\" not found in filter data",
+      "deletedSuccess": "Catalog filter deleted successfully.",
+      "nameRequired": "Name is required to delete a specific item."
+    },
+    "catalog": {
+      "notFound": "Catalog not found",
+      "titleExists": "Catalog with this title already exists.",
+      "deletedSuccess": "Catalog deleted successfully.",
+      "titleAndCatalogIdRequired": "Title and catalogId are required"
+    },
+    "subCatalog": {
+      "parentNotFound": "Parent catalog not found.",
+      "creationFailed": "Failed to create subcatalog.",
+      "notFound": "subCatalog not found",
+      "deletedSuccess": "Subcatalog deleted successfully."
+    },
+    "category": {
+      "requiredFields": "Title, logo file, and subCatalogId are required.",
+      "alreadyExists": "Category with this title already exists.",
+      "updatedSuccess": "Category updated successfully.",
+      "deletedSuccess": "Category deleted successfully.",
+      "notFound": "Category not found"
+    },
+    "productDetail": {
+      "conditionNotFound": "Product condition not found'",
+      "conditionDeletedSuccess": "Product condition deleted successfully",
+      "productRevalance": "Product relevance not found'",
+      "productRevalanceDeletedSuccess": "Product revalance deleted successfully",
+      "popularProductNotfound": "Product not found",
+      "popularProductDeletedSucces": "Popular product deleted successfully",
+      "popularProductUpdatesSucces": "Popular product created successfully",
+      "productCommentNotFound": "Product Comment not found",
+      "productCommentDeletedSuccess": "Product Comment deleted successfully",
+      "questionNotFound": "Question not found",
+      "questionDeletedSuccess": "Question deleted successfully"
+    },
+    "product": {
+      "notFound": "Product not found",
+      "createdProduct": "Product created successfully",
+      "removedProduct": "Product removed from saved.",
+      "savedProduct": "Product saved successfully."
+    }
+  }
+}
