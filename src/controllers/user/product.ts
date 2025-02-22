@@ -6,34 +6,33 @@ import { IsNull } from "typeorm";
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 
-export const getProducts = async ( req: Request, res: Response): Promise<any> => {
-    try {
-        const products = await productRepository.find({
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            articul: true,
-            productCode: true,
-            description: true,
-            inStock: true,
-            price: true,
-            mainImage: true,
-          },
-          where: {
-            deletedAt: IsNull(),
-          },
-        });
-      
-        res.json({
-          data: products,
-          error: null,
-          status: 200,
-        });
-        
-    } catch (error) {
-       return res.status(500).json({ message: "Internal server error" });
-    }
+export const getProducts = async (req: Request,res: Response): Promise<any> => {
+  try {
+    const products = await productRepository.find({
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        articul: true,
+        productCode: true,
+        description: true,
+        inStock: true,
+        price: true,
+        mainImage: true,
+      },
+      where: {
+        deletedAt: IsNull(),
+      },
+    });
+
+    res.json({
+      data: products,
+      error: null,
+      status: 200,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const getProductById = async (req: Request,res: Response): Promise<any> => {
@@ -108,9 +107,49 @@ export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
   }
 };
 
-export const getSavedProduct = async ( req: Request, res: Response): Promise<any> => {
+export const getUserSavedProducts = async (req: Request,res: Response): Promise<any> => {
   try {
-    
+    const { id } = req.user;
+    const { productId } = req.params;
+
+    const user = await savedProductRepository.find({
+      where: {
+        productId,
+        userId: id,
+      },
+      select: {
+        product: {
+          id: true,
+          mainImage: true,
+          title: true,
+          description: true,
+          images: true,
+          fullDescription: true,
+          price: true,
+          articul: true,
+          slug: true,
+        },
+        user: {
+          id: true,
+          email: true,
+          phone: true,
+          name: true,
+        },
+      },
+    });
+    if (user.length === 0) {
+      return res.status(404).json({
+        message: "In this user no found saved products",
+      });
+    }
+
+    res
+      .status(200)
+      .json({
+        message: "Saved products retrived successfully",
+        data: user,
+        error: null,
+      });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }

@@ -2,8 +2,6 @@ import express from 'express'
 import * as Product from '../../controllers/admin/products';
 import { validateAdminToken } from '../../middlewares/adminValidator';
 import { uploadPhoto } from '../../middlewares/multer';
-import { validate } from '../../middlewares/validate';
-import { savedProductSchema } from '../../validators/product-comment.validate';
 const router = express.Router();
 
 /**
@@ -81,38 +79,6 @@ router.get('/by-id/:id', validateAdminToken, Product.getProductById);
  *         description: Product created successfully
  */
 router.post('/create', validateAdminToken, uploadPhoto.array("productImages", 5), Product.createProduct);
-
-
-/**
- * @swagger
- * /product/toggle-saved:
- *   post:
- *     summary: Toggle saved product status
- *     tags: [SavedProduct]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 example: "user-uuid"
- *               productId:
- *                 type: string
- *                 example: "product-uuid"
- *     responses:
- *       200:
- *         description: Product removed from saved.
- *       201:
- *         description: Product saved successfully.
- *       500:
- *         description: Internal server error
- */
-router.post('/toggle-saved', validateAdminToken,validate(savedProductSchema), Product.toggleSaved);
 
 
 export default router;

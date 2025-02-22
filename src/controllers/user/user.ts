@@ -170,10 +170,6 @@ export const googleCallback = async (req: Request, res: Response): Promise<any> 
 
 export const getUserById = async (req: Request, res: Response): Promise<any> => {
     try {
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
-
         const { id } = req.params;
         const user = await userRepository.findOne({ 
             where: { 

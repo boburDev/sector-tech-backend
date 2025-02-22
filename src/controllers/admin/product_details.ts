@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { ProductCondition, ProductQuestion, ProductComment, PopularProduct, ProductRelevance } from '../../entities/product_details.entity';
-import { In, IsNull } from 'typeorm';
+import { In } from 'typeorm';
 import { Product } from '../../entities/products.entity';
-import { productCommentSchema, productQuestionSchema } from '../../validators/product-comment.validate';
 import { v4 } from '../../utils/uuid';
 
 const productRepository = AppDataSource.getRepository(Product);
@@ -428,28 +427,6 @@ export const deletePopularProduct = async (req: Request,res: Response): Promise<
 // product Comment Repository
 
 
-export const addProductComment = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { error,value } = productCommentSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-    const { commentBody, star, productId, userId } = value;
-    const newComment = new ProductComment();
-    newComment.commentBody = commentBody;
-    newComment.star = star;
-    newComment.productId = productId;
-    newComment.userId = userId;
-    newComment.reply = [];
-
-    const savedComment = await productCommentRepository.save(newComment);
-    return res.status(201).json(savedComment);
-  } catch (error) {
-    console.error("Error creating product comment:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 
 
 export const addReplyToComment = async (req:Request, res:Response):Promise<any> =>  {
@@ -636,27 +613,6 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
 
 // product Question Repository
 
-export const addProductQuestion = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { error, value } = productQuestionSchema.validate(req.body);
-
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message });
-    }
-    const { body, productId, userId } = value;
-    const newQuestion = new ProductQuestion();
-    newQuestion.body = body;
-    newQuestion.productId = productId;
-    newQuestion.userId = userId;
-    newQuestion.reply = [];
-
-    let savedQuestion = await productQuestionRepository.save(newQuestion);
-    return res.status(201).json(savedQuestion);
-  } catch (error) {
-    console.error("Error creating product question:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
 
 export const addReplyToQuestion = async (req: Request, res: Response): Promise<any> => {
   try {

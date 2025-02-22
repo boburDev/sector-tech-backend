@@ -444,40 +444,7 @@ router.delete('/popular/delete/:id',validateAdminToken,ProductCondition.deletePo
  *   description: Popular product management APIs
  */
 
-/**
- * @swagger
- * /product-detail/comment/add:
- *   post:
- *     summary: Add a new product comment
- *     tags: [productComment]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               commentBody:
- *                 type: string
- *                 example: "Great product!"
- *               star:
- *                 type: integer
- *                 example: 5
- *               productId:
- *                 type: string
- *                 example: "product-uuid"
- *               userId:
- *                 type: string
- *                 example: "user-uuid"
- *     responses:
- *       201:
- *         description: Product comment created successfully
- *       500:
- *         description: Internal server error
- */
-router.post('/comment/add',validateAdminToken,ProductCondition.addProductComment)
+
 
 /**
  * @swagger
@@ -615,39 +582,6 @@ router.get("/comment/product/:productId", validateAdminToken,ProductCondition.ge
  *   name: productQuestion
  *   description: Product question management APIs
  */
-
-/**
- * @swagger
- * /product-detail/question/add:
- *   post:
- *     summary: Add a new product question
- *     tags: [productQuestion]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               body:
- *                 type: string
- *                 example: "Is this product suitable for outdoor use?"
- *               productId:
- *                 type: string
- *                 example: "product-uuid"
- *               userId:
- *                 type: string
- *                 example: "user-uuid"
- *     responses:
- *       201:
- *         description: Product question created successfully
- *       500:
- *         description: Internal server error
- */
-router.post("/question/add", validateAdminToken, ProductCondition.addProductQuestion);
-
 
 /**
  * @swagger
