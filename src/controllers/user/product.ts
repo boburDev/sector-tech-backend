@@ -81,8 +81,8 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
 
 export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
   try {
-    const { userId, productId } = req.body;
-
+    const { productId } = req.body;
+    const { id: userId } = req.user;
     const existingSaved = await savedProductRepository.findOne({
       where: {
         userId,

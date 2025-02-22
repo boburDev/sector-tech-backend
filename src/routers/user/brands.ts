@@ -12,12 +12,10 @@ const router = Router();
 
 /**
  * @swagger
- * /brand/by-id/{id}:
+ * /user/brand/by-id/{id}:
  *   get:
  *     summary: Get a brand by ID
  *     tags: [Brands]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

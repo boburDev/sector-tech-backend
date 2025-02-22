@@ -58,10 +58,4 @@ export const savedProductSchema = Joi.object({
     "string.guid": "Product ID must be a valid UUID",
     "any.required": "Product ID is required",
   }),
-
-  userId: Joi.string().uuid().required().messages({
-    "string.base": "User ID must be a string",
-    "string.guid": "User ID must be a valid UUID",
-    "any.required": "User ID is required",
-  }),
 });
