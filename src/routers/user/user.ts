@@ -14,7 +14,7 @@ const router = express.Router();
  */
 /**
  * @swagger
- * /auth/google/login:
+ * /user/auth/google/login:
  *   get:
  *     summary: Login and sign-up with Google
  *     tags: [User]
@@ -30,17 +30,9 @@ const router = express.Router();
  *                   type: string
  *                   description: JWT token
  */
-router.get(
-  "/google/login",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get("/google/login",passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  loginAttemptLimiter,
-  User.googleCallback
-);
+router.get("/google/callback",passport.authenticate("google", { failureRedirect: "/" }),loginAttemptLimiter, User.googleCallback);
 
 /**
  * @swagger
@@ -60,19 +52,9 @@ router.get(
  *                   type: string
  *                   description: JWT token
  */
-router.get(
-  "/facebook/login",
-  passport.authenticate("facebook", {
-    scope: ["email", "public_profile"],
-  })
-);
+router.get( "/facebook/login", passport.authenticate("facebook", {   scope: ["email", "public_profile"] }));
 
-router.get(
-  "/facebook/callback",
-  passport.authenticate("facebook", { failureRedirect: "/" }),
-  loginAttemptLimiter,
-  User.googleCallback
-);
+router.get("/facebook/callback",passport.authenticate("facebook", { failureRedirect: "/" }),loginAttemptLimiter, User.googleCallback);
 
 /**
  * @swagger
@@ -92,19 +74,9 @@ router.get(
  *                   type: string
  *                   description: JWT token
  */
-router.get(
-  "/linkedin/login",
-  passport.authenticate("linkedin", {
-    scope: ["profile", "email"],
-  })
-);
+router.get("/linkedin/login",passport.authenticate("linkedin", { scope: ["profile", "email"]}));
 
-router.get(
-  "/linkedin/callback",
-  passport.authenticate("linkedin", { failureRedirect: "/" }),
-  loginAttemptLimiter,
-  User.googleCallback
-);
+router.get("/linkedin/callback",passport.authenticate("linkedin", { failureRedirect: "/" }), loginAttemptLimiter, User.googleCallback);
 
 /**
  * @swagger
@@ -124,19 +96,9 @@ router.get(
  *                   type: string
  *                   description: JWT token
  */
-router.get(
-  "/yandex/login",
-  passport.authenticate("yandex", {
-    scope: ["login:info", "login:email"],
-  })
-);
+router.get("/yandex/login",passport.authenticate("yandex", { scope: ["login:info", "login:email"]}));
 
-router.get(
-  "/yandex/callback",
-  passport.authenticate("yandex", { failureRedirect: "/" }),
-  loginAttemptLimiter,
-  User.googleCallback
-);
+router.get("/yandex/callback",passport.authenticate("yandex", { failureRedirect: "/" }), loginAttemptLimiter, User.googleCallback);
 
 /**
  * @swagger
