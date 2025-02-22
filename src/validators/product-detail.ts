@@ -36,12 +36,6 @@ export const replyToCommentSchema = Joi.object({
         "string.guid": "Comment ID must be a valid UUID",
         "any.required": "Comment ID is required"
     }),
-    adminId: Joi.string().uuid().required().messages({
-        "string.base": "Admin ID must be a string",
-        "string.empty": "Admin ID cannot be empty",
-        "string.guid": "Admin ID must be a valid UUID",
-        "any.required": "Admin ID is required"
-    }),
     message: Joi.string().min(3).max(500).required().messages({
         "string.base": "Message must be a string",
         "string.empty": "Message cannot be empty",
@@ -59,12 +53,6 @@ export const replyToQuestionSchema = Joi.object({
         "string.empty": "Question ID cannot be empty",
         "string.guid": "Question ID must be a valid UUID",
         "any.required": "Question ID is required"
-    }),
-    adminId: Joi.string().uuid().required().messages({
-        "string.base": "Admin ID must be a string",
-        "string.empty": "Admin ID cannot be empty",
-        "string.guid": "Admin ID must be a valid UUID",
-        "any.required": "Admin ID is required"
     }),
     message: Joi.string().min(3).max(500).required().messages({
         "string.base": "Message must be a string",

@@ -431,9 +431,9 @@ export const deletePopularProduct = async (req: Request,res: Response): Promise<
 
 export const addReplyToComment = async (req:Request, res:Response):Promise<any> =>  {
     try {
-        const {commentId,adminId,message} = req.body;
+        const { commentId, message } = req.body;
         // console.log(commentId);
-        
+        const { id: adminId } = req.admin;
         const comment = await productCommentRepository.findOneBy({id:commentId});
 
         if(!comment) {
@@ -616,8 +616,8 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
 
 export const addReplyToQuestion = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { questionId, adminId, message } = req.body;
-    
+    const { questionId, message } = req.body;
+    const { id: adminId } = req.admin
     const question = await productQuestionRepository.findOneBy({ id: questionId });
 
     if (!question) {
