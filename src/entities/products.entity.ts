@@ -17,7 +17,7 @@ import {
   ProductRelevance,
 } from "./product_details.entity";
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
-import { User } from "./user.entity";
+import { Users } from "./user.entity";
 
 @Entity()
 export class Product {
@@ -133,7 +133,7 @@ export class SavedProduct {
   @JoinColumn({ name: "productId" })
   product: Product;
 
-  @ManyToOne(() => User, (user) => user.saved_products)
+  @ManyToOne(() => Users, (user) => user.saved_products)
   @JoinColumn({ name: "userId" })
-  user: User;
+  user: Users;
 }
