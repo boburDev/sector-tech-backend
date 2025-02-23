@@ -1,108 +1,133 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
+} from "typeorm";
 import { Product } from "./products.entity";
 import { Users } from "./user.entity";
 
 @Entity()
 export class ProductCondition {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @OneToMany(() => Product, (product) => product.conditions)
-    products: Product[];
+  @OneToMany(() => Product, (product) => product.conditions)
+  products: Product[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
 
 @Entity()
 export class ProductRelevance {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @OneToMany(() => Product, (product) => product.relevances)
-    products: Product[];
+  @OneToMany(() => Product, (product) => product.relevances)
+  products: Product[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
-
 
 @Entity()
 export class ProductQuestion {
-    @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @Column()
+  body: string;
+
+  @Column()
+  userId: string;
+
+  @Column("jsonb", { default: [] })
+  reply: {
     id: string;
+    adminId: string;
+    message: string;
+    createdAt: Date;
+  }[];
 
-    @Column()
-    body: string;
+  @Column()
+  productId: string;
 
-    @Column()
-    userId: string;
+  @ManyToOne(() => Users, (user) => user.questions)
+  @JoinColumn({ name: "userId" })
+  user: Users;
 
-    // @Column()
-    // productId: string;
-
-    // @ManyToOne(() => User, (user) => user.questions)
-    // @JoinColumn({ name: 'userId' })
-    user: Users;
-
-    @ManyToOne(() => Product, (products) => products.questions)
-    @JoinColumn({ name: 'productId' })
-    products: Product;
+  @ManyToOne(() => Product, (products) => products.questions)
+  @JoinColumn({ name: "productId" })
+  products: Product;
+  
 }
 
 @Entity()
 export class ProductComment {
-    @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @Column()
+  commentBody: string;
+
+  @Column()
+  star: number;
+
+  @Column()
+  productId: string;
+
+  @Column("jsonb", { default: [] })
+  reply: {
     id: string;
+    adminId: string;
+    message: string;
+    createdAt: Date;
+  }[];
 
-    @Column()
-    commentBody: string;
+  @Column()
+  userId: string;
 
-    @Column()
-    star: number;
+  @ManyToOne(() => Users, (user) => user.comments)
+  @JoinColumn({ name: "userId" })
+  user: Users;
 
-    @Column()
-    productId: string;
-
-    // @Column()
-    // userId: string;
-
-    // @ManyToOne(() => User, (user) => user.comments)
-    // @JoinColumn({ name: 'userId' })
-    // user: User;
-
-    @ManyToOne(() => Product, (products) => products.comments)
-    @JoinColumn({ name: 'productId' })
-    products: Product;
+  @ManyToOne(() => Product, (products) => products.comments)
+  @JoinColumn({ name: "productId" })
+  products: Product;
 }
 
 @Entity()
 export class PopularProduct {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    productId: string;
+  @Column()
+  productId: string;
 
-    @ManyToOne(() => Product, (product) => product.populars)
-    @JoinColumn({ name: 'productId' })
-    products: Product;
+  @ManyToOne(() => Product, (product) => product.populars)
+  @JoinColumn({ name: "productId" })
+  products: Product;
 }

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import AppDataSource from '../config/ormconfig';
-import { Admin } from '../entities/admin.entity';
-import { sign } from '../utils/jwt';
+import AppDataSource from '../../config/ormconfig';
+import { Admin } from '../../entities/admin.entity';
+import { sign } from '../../utils/jwt';
 import { IsNull } from 'typeorm';
-import { Users } from '../entities/user.entity';
+import { Users } from '../../entities/user.entity';
 
 const adminRepository = AppDataSource.getRepository(Admin);
 const userRepository = AppDataSource.getRepository(Users);
@@ -76,6 +76,7 @@ export const createAdmin = async (req: Request, res: Response): Promise<any> => 
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 export const getUsers = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -211,7 +212,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<any> => {
         await adminRepository.save(user);
 
         return res.json({
-            data: 'User deleted successfully',
+            data: 'Admin deleted successfully',
             error: null,
             status: 200
         });

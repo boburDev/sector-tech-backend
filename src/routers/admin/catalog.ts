@@ -1,7 +1,10 @@
-import express from 'express'
-import * as Catalog from '../../controllers/catalog';
-import { validateAdminToken } from '../../middlewares/adminValidator';
-import { uploadPhoto } from '../../middlewares/multer';
+import express from "express";
+import * as Catalog from "../../controllers/admin/catalog";
+import { validateAdminToken } from "../../middlewares/adminValidator";
+import { uploadPhoto } from "../../middlewares/multer";
+import { validate, validateParams } from "../../middlewares/validate";
+import { catalogSchema } from "../../validators/catalog.validate";
+import { uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
 
@@ -34,7 +37,7 @@ const router = express.Router();
  *       201:
  *         description: Catalog created successfully
  */
-router.post('/create', validateAdminToken, Catalog.createCatalog);
+router.post("/create", validateAdminToken, validate(catalogSchema), Catalog.createCatalog);
 
 /**
  * @swagger
@@ -48,7 +51,7 @@ router.post('/create', validateAdminToken, Catalog.createCatalog);
  *       200:
  *         description: List of catalogs
  */
-router.get('/with-subcatalogs', validateAdminToken, Catalog.getAllCatalogs);
+router.get("/with-subcatalogs", validateAdminToken, Catalog.getAllCatalogs);
 
 /**
  * @swagger
@@ -71,7 +74,7 @@ router.get('/with-subcatalogs', validateAdminToken, Catalog.getAllCatalogs);
  *       404:
  *         description: Catalog not found
  */
-router.get('/by/:id', validateAdminToken, Catalog.getCatalogById);
+router.get("/by/:id", validateAdminToken, Catalog.getCatalogById);
 
 /**
  * @swagger
@@ -103,7 +106,7 @@ router.get('/by/:id', validateAdminToken, Catalog.getCatalogById);
  *       404:
  *         description: Catalog not found
  */
-router.put('/update/:id', validateAdminToken, Catalog.updateCatalog);
+router.put("/update/:id", validateAdminToken, validateParams(uuidSchema), Catalog.updateCatalog);
 
 /**
  * @swagger
@@ -126,8 +129,7 @@ router.put('/update/:id', validateAdminToken, Catalog.updateCatalog);
  *       404:
  *         description: Catalog not found
  */
-router.delete('/delete/:id', validateAdminToken, Catalog.deleteCatalog);
-
+router.delete("/delete/:id", validateAdminToken, validateParams(uuidSchema), Catalog.deleteCatalog);
 
 // Subcatalog routes
 /**
@@ -156,8 +158,7 @@ router.delete('/delete/:id', validateAdminToken, Catalog.deleteCatalog);
  *       200:
  *         description: Subcatalog with categories retrieved successfully
  */
-router.get('/subcatalog/with-categories/:id', validateAdminToken, Catalog.getSubcatalogWithCategoryByCatalogId);
-
+router.get("/subcatalog/with-categories/:id",validateAdminToken, validateParams(uuidSchema) ,Catalog.getSubcatalogWithCategoryByCatalogId);
 
 /**
  * @swagger
@@ -180,8 +181,7 @@ router.get('/subcatalog/with-categories/:id', validateAdminToken, Catalog.getSub
  *       404:
  *         description: Subcatalog not found
  */
-router.get('/subcatalog/by-id/:id', validateAdminToken, Catalog.getSubcatalogById);
-
+router.get( "/subcatalog/by-id/:id", validateAdminToken, validateParams(uuidSchema), Catalog.getSubcatalogById);
 
 /**
  * @swagger
@@ -206,8 +206,7 @@ router.get('/subcatalog/by-id/:id', validateAdminToken, Catalog.getSubcatalogByI
  *       201:
  *         description: Subcatalog created successfully
  */
-router.post('/subcatalog/create', validateAdminToken, Catalog.createSubcatalog);
-
+router.post("/subcatalog/create", validateAdminToken, Catalog.createSubcatalog);
 
 /**
  * @swagger
@@ -241,7 +240,7 @@ router.post('/subcatalog/create', validateAdminToken, Catalog.createSubcatalog);
  *       404:
  *         description: Subcatalog not found
  */
-router.put('/subcatalog/update/:id', validateAdminToken, Catalog.updateSubcatalog);
+router.put( "/subcatalog/update/:id", validateAdminToken, validateParams(uuidSchema), Catalog.updateSubcatalog);
 
 /**
  * @swagger
@@ -264,7 +263,7 @@ router.put('/subcatalog/update/:id', validateAdminToken, Catalog.updateSubcatalo
  *       404:
  *         description: Subcatalog not found
  */
-router.delete('/subcatalog/delete/:id', validateAdminToken, Catalog.deleteSubcatalog);
+router.delete( "/subcatalog/delete/:id", validateAdminToken, validateParams(uuidSchema), Catalog.deleteSubcatalog);
 
 /**
  * @swagger
@@ -273,7 +272,7 @@ router.delete('/subcatalog/delete/:id', validateAdminToken, Catalog.deleteSubcat
  *   description: Category management APIs
  */
 
-// Category routes 
+// Category routes
 
 /**
  * @swagger
@@ -296,8 +295,7 @@ router.delete('/subcatalog/delete/:id', validateAdminToken, Catalog.deleteSubcat
  *       404:
  *         description: Categories not found
  */
-router.get('/category/by-subcatalog/:id', validateAdminToken, Catalog.getCategoriesBySubcatalogId);
-
+router.get( "/category/by-subcatalog/:id", validateAdminToken,validateParams(uuidSchema), Catalog.getCategoriesBySubcatalogId);
 
 /**
  * @swagger
@@ -325,8 +323,7 @@ router.get('/category/by-subcatalog/:id', validateAdminToken, Catalog.getCategor
  *       201:
  *         description: Category created successfully
  */
-router.post('/category/create', validateAdminToken, uploadPhoto.single('categoryImage'), Catalog.createCategory);
-
+router.post( "/category/create", validateAdminToken, uploadPhoto.single("categoryImage"), Catalog.createCategory);
 
 /**
  * @swagger
@@ -363,8 +360,7 @@ router.post('/category/create', validateAdminToken, uploadPhoto.single('category
  *       404:
  *         description: Category not found
  */
-router.put('/category/update/:id', validateAdminToken, uploadPhoto.single('categoryImage'), Catalog.updateCategory);
-
+router.put("/category/update/:id",validateAdminToken,uploadPhoto.single("categoryImage"),validateParams(uuidSchema),Catalog.updateCategory);
 
 /**
  * @swagger
@@ -387,6 +383,6 @@ router.put('/category/update/:id', validateAdminToken, uploadPhoto.single('categ
  *       404:
  *         description: Category not found
  */
-router.delete('/category/delete/:id', validateAdminToken, Catalog.deleteCategory);
+router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSchema), Catalog.deleteCategory);
 
-export default router
+export default router;

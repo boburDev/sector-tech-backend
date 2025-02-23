@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import AppDataSource from '../config/ormconfig';
-import { Catalog, Subcatalog, Category } from '../entities/catalog.entity';
+import AppDataSource from '../../config/ormconfig';
+import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
 import { ILike, IsNull } from 'typeorm';
 import fs from 'fs';
-import { createSlug } from '../utils/slug';
+import { createSlug } from '../../utils/slug';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);

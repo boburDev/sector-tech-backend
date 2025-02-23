@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CatalogFilter } from '../entities/catalog_filter.entity';
-import AppDataSource from '../config/ormconfig';
+import { CatalogFilter } from '../../entities/catalog_filter.entity';
+import AppDataSource from '../../config/ormconfig';
 
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
@@ -123,12 +123,15 @@ export const updateCatalogFilter = async (req: Request, res: Response): Promise<
             return res.status(404).json({ message: "Catalog filter not found" });
         }
 
-        const itemIndex = filter.data.findIndex((item: any) => item.name === name);
+        const itemIndex = filter.data.findIndex((item: any) => item.name === name );
 
         if (itemIndex === -1) {
             return res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
         }
-        
+
+        if(filter.data[itemIndex].name === data.name){
+          return res.status(404) .json({message: `You can't update the same element: ${data.name}`});
+        }
         filter.data[itemIndex] = {
             ...data,
             productsId: filter.data[itemIndex].productsId
