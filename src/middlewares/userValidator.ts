@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from '../utils/jwt';
 import AppDataSource from '../config/ormconfig';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/user.entity';
 
 declare global {
     namespace Express {
@@ -12,7 +12,7 @@ declare global {
 }
 
 
-const userRepository = AppDataSource.getRepository(User);
+const userRepository = AppDataSource.getRepository(Users);
 
 export async function validateUserToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;

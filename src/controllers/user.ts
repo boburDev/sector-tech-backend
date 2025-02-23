@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../config/ormconfig';
-import { User } from "../entities/user.entity";
+import { Users } from "../entities/user.entity";
 import { sign } from '../utils/jwt';
 
-const userRepository = AppDataSource.getRepository(User);
+const userRepository = AppDataSource.getRepository(Users);
 
 export const signup = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -15,7 +15,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
         if (existingUser) return res.status(400).json({ message: "User already exists" });
 
 
-        const newUser = new User()
+        const newUser = new Users()
         newUser.name = name
         newUser.email = email
         newUser.password = password

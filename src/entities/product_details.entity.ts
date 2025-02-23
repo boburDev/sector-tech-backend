@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
 import { Product } from "./products.entity";
-import { User } from "./user.entity";
+import { Users } from "./user.entity";
 
 @Entity()
 export class ProductCondition {
@@ -61,7 +61,7 @@ export class ProductQuestion {
 
     // @ManyToOne(() => User, (user) => user.questions)
     // @JoinColumn({ name: 'userId' })
-    user: User;
+    user: Users;
 
     @ManyToOne(() => Product, (products) => products.questions)
     @JoinColumn({ name: 'productId' })

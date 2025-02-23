@@ -3,7 +3,7 @@ import { ProductQuestion, ProductComment } from "./product_details.entity";
 import * as bcrypt from "bcrypt";
 
 @Entity()
-export class User {
+export class Users {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -16,8 +16,8 @@ export class User {
     @Column()
     password: string;
 
-    @Column({ nullable: false})
-    phone: string;
+    @Column({ nullable: true, default: null })
+    phone?: string;
 
     // @OneToMany(() => ProductQuestion, (question) => question.user)
     // questions: ProductQuestion[];

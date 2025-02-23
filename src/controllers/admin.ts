@@ -3,10 +3,10 @@ import AppDataSource from '../config/ormconfig';
 import { Admin } from '../entities/admin.entity';
 import { sign } from '../utils/jwt';
 import { IsNull } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/user.entity';
 
 const adminRepository = AppDataSource.getRepository(Admin);
-const userRepository = AppDataSource.getRepository(User);
+const userRepository = AppDataSource.getRepository(Users);
 
 export const login = async (req: Request, res: Response): Promise<any> => {
     try {
