@@ -82,7 +82,12 @@ export class ProductQuestion {
   @ManyToOne(() => Product, (products) => products.questions)
   @JoinColumn({ name: "productId" })
   products: Product;
-  
+
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
 
 @Entity()
@@ -117,17 +122,10 @@ export class ProductComment {
   @ManyToOne(() => Product, (products) => products.comments)
   @JoinColumn({ name: "productId" })
   products: Product;
-}
 
-@Entity()
-export class PopularProduct {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column()
-  productId: string;
-
-  @ManyToOne(() => Product, (product) => product.populars)
-  @JoinColumn({ name: "productId" })
-  products: Product;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

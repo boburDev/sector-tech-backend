@@ -32,7 +32,7 @@ const router = express.Router();
  */
 router.get("/google/login",passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get("/google/callback",passport.authenticate("google", { failureRedirect: "/" }),loginAttemptLimiter, User.googleCallback);
+router.get("/google/callback",passport.authenticate("google", { failureRedirect: "/" }),loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -54,7 +54,7 @@ router.get("/google/callback",passport.authenticate("google", { failureRedirect:
  */
 router.get( "/facebook/login", passport.authenticate("facebook", {   scope: ["email", "public_profile"] }));
 
-router.get("/facebook/callback",passport.authenticate("facebook", { failureRedirect: "/" }),loginAttemptLimiter, User.googleCallback);
+router.get("/facebook/callback",passport.authenticate("facebook", { failureRedirect: "/" }),loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ router.get("/facebook/callback",passport.authenticate("facebook", { failureRedir
  */
 router.get("/linkedin/login",passport.authenticate("linkedin", { scope: ["profile", "email"]}));
 
-router.get("/linkedin/callback",passport.authenticate("linkedin", { failureRedirect: "/" }), loginAttemptLimiter, User.googleCallback);
+router.get("/linkedin/callback",passport.authenticate("linkedin", { failureRedirect: "/" }), loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -98,7 +98,7 @@ router.get("/linkedin/callback",passport.authenticate("linkedin", { failureRedir
  */
 router.get("/yandex/login",passport.authenticate("yandex", { scope: ["login:info", "login:email"]}));
 
-router.get("/yandex/callback",passport.authenticate("yandex", { failureRedirect: "/" }), loginAttemptLimiter, User.googleCallback);
+router.get("/yandex/callback",passport.authenticate("yandex", { failureRedirect: "/" }), loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -192,51 +192,6 @@ router.post("/sign-up", loginAttemptLimiter, User.signup);
  *         description: Unauthorized
  */
 router.put("/update", validateUserToken, User.updateProfile);
-
-
-
-// /**
-//  * @swagger
-//  * /user/auth/all:
-//  *   get:
-//  *     summary: Get all users
-//  *     tags: [User]
-//  *     security:
-//  *       - BearerAuth: []
-//  *     responses:
-//  *       200:
-//  *         description: Successfully retrieved all users
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 status:
-//  *                   type: integer
-//  *                   example: 200
-//  *                 data:
-//  *                   type: array
-//  *                   items:
-//  *                     type: object
-//  *                     properties:
-//  *                       id:
-//  *                         type: string
-//  *                         example: "1"
-//  *                       name:
-//  *                         type: string
-//  *                         example: "John Doe"
-//  *                       phone:
-//  *                         type: string
-//  *                         example: "+998901234567"
-//  *                       email:
-//  *                         type: string
-//  *                         example: "john@example.com"
-//  *       401:
-//  *         description: Unauthorized
-//  */
-// router.get('/all', validateUserToken, User.getAllUsers);
-
-
 
 /**
  * @swagger

@@ -23,9 +23,7 @@ const router = Router();
  *       200:
  *         description: List of all products
  */
-router.get("/", Product.getProducts);
-
-
+router.get("/all", Product.getProducts);
 
 /**
  * @swagger
@@ -47,9 +45,6 @@ router.get("/", Product.getProducts);
  *         description: Product not found
  */
 router.get('/by-id/:id', Product.getProductById);
-
-
-
 
 /**
  * @swagger
@@ -79,34 +74,17 @@ router.get('/by-id/:id', Product.getProductById);
  */
 router.post('/toggle-saved', validateUserToken,validate(productIdParamsSchema), Product.toggleSaved);
 
-
 /**
  * @swagger
- * /user/product/saved-product/{productId}:
+ * /user/product/saved-products:
  *   get:
- *     summary: Get saved product by productId for the user
+ *     summary: Get saved products
  *     tags: [savedProduct]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: productId
- *         required: true
- *         schema:
- *           type: string
- *           example: "product-uuid"
- *         description: The ID of the product to retrieve
  *     responses:
  *       200:
  *         description: Saved product found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 productId:
- *                   type: string
- *                   example: "product-uuid"
  *       401:
  *         description: Unauthorized. Token is missing or invalid.
  *       404:
@@ -114,6 +92,6 @@ router.post('/toggle-saved', validateUserToken,validate(productIdParamsSchema), 
  *       500:
  *         description: Internal server error
  */
-router.get('/saved-product/:productId', validateUserToken, validate(productIdParamsSchema), Product.getUserSavedProducts);
+router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
 
 export default router;

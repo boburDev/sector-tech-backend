@@ -5,6 +5,62 @@ import { sign } from "../../utils/jwt";
 
 const userRepository = AppDataSource.getRepository(Users);
 
+export const OAuthCallback = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { name, email } = req.user as { email: string; name: string };
+
+    let user = await userRepository.findOne({ where: { email } });
+
+    if (user) {
+      const accessToken = sign(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+        86400000, // 1 kun (24 soat)
+        "user"
+      );
+      const user_data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      };
+      return res.json({
+        message: "User logged in successfully",
+        accessToken,
+        user_data,
+      });
+    } else {
+      const newUser = new Users();
+      newUser.name = name;
+      newUser.email = email;
+      newUser.password = "";
+      newUser.phone = "";
+      const savedUser = await userRepository.save(newUser);
+
+      const token = sign(
+        { id: savedUser.id, name: savedUser.name, email: savedUser.email },
+        86400000, // 1 day in milliseconds
+        "user"
+      );
+
+      const userData = {
+        id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+      };
+
+      return res
+        .status(201)
+        .json({ message: "User created successfully", token, user: userData });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, password } = req.body;
@@ -109,62 +165,6 @@ export const updateProfile = async ( req: Request, res: Response): Promise<any> 
   }
 };
 
-export const googleCallback = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { name, email } = req.user as { email: string; name: string };
-
-    let user = await userRepository.findOne({ where: { email } });
-
-    if (user) {
-      const accessToken = sign(
-        {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-        86400000, // 1 kun (24 soat)
-        "user"
-      );
-      const user_data = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      };
-      return res.json({
-        message: "User logged in successfully",
-        accessToken,
-        user_data,
-      });
-    } else {
-      const newUser = new Users();
-      newUser.name = name;
-      newUser.email = email;
-      newUser.password = "";
-      newUser.phone = "";
-      const savedUser = await userRepository.save(newUser);
-
-      const token = sign(
-        { id: savedUser.id, name: savedUser.name, email: savedUser.email },
-        86400000, // 1 day in milliseconds
-        "user"
-      );
-
-      const userData = {
-        id: savedUser.id,
-        name: savedUser.name,
-        email: savedUser.email,
-      };
-
-      return res
-        .status(201)
-        .json({ message: "User created successfully", token, user: userData });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 export const getUserById = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
@@ -207,4 +207,3 @@ export const getAllUsers = async (req: Request, res: Response): Promise<any> => 
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
-

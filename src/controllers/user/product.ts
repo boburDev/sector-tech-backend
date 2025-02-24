@@ -14,11 +14,9 @@ export const getProducts = async (req: Request,res: Response): Promise<any> => {
         title: true,
         slug: true,
         articul: true,
-        productCode: true,
-        description: true,
         inStock: true,
         price: true,
-        mainImage: true,
+        mainImage: true
       },
       where: {
         deletedAt: IsNull(),
@@ -82,6 +80,7 @@ export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
   try {
     const { productId } = req.body;
     const { id: userId } = req.user;
+
     const existingSaved = await savedProductRepository.findOne({
       where: {
         userId,
@@ -110,11 +109,9 @@ export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
 export const getUserSavedProducts = async (req: Request,res: Response): Promise<any> => {
   try {
     const { id } = req.user;
-    const { productId } = req.params;
 
     const user = await savedProductRepository.find({
       where: {
-        productId,
         userId: id,
       },
       select: {

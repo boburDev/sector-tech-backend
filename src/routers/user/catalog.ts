@@ -19,7 +19,6 @@ const router = express.Router();
 //  *   description: Subcatalog management APIs
 //  */
 
-
 /**
  * @swagger
  * tags:
@@ -28,7 +27,6 @@ const router = express.Router();
  */
 
 // Category routes
-
 
 /**
  * @swagger
@@ -79,9 +77,6 @@ const router = express.Router();
  */
 
 router.get("/category/all", Catalog.getAllCategories);
-
-
-
 
 /**
  * @swagger
@@ -142,7 +137,6 @@ router.get("/category/all", Catalog.getAllCategories);
  *         description: Internal server error
  */
 router.get("/all", Catalog.getCatalogs);
-
 
 /**
  * @swagger

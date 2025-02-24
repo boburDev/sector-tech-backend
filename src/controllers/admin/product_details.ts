@@ -29,6 +29,15 @@ export const getProductConditionById = async (req: Request, res: Response): Prom
     try {
         const { id } = req.params;
         const productCondition = await productConditionRepository.findOne({ where: { id } });
+
+        if (!productCondition) {
+          return res.json({
+            data: null,
+            error: 'Condition not found',
+            status: 404
+          });
+        }
+
         return res.json({
             data: productCondition,
             error: null,
@@ -133,7 +142,6 @@ export const deleteProductCondition = async (req: Request, res: Response): Promi
     }
 };
 
-
 export const getAllProductRelavances = async (req: Request, res: Response): Promise<any> => {
     try {
         const productRelevances = await productRelevanceRepository.find({ relations: ['products'] });
@@ -151,6 +159,14 @@ export const getProductRelavanceById = async (req: Request, res: Response): Prom
     try {
         const { id } = req.params;
         const productRelevance = await productRelevanceRepository.findOne({ where: { id } });
+
+        if (!productRelevance) {
+          return res.json({
+            data: null,
+            error: 'Relevance not found',
+            status: 404
+          });
+        }
         return res.json({
             data: productRelevance,
             error: null,
@@ -252,9 +268,7 @@ export const deleteProductRelavance = async (req: Request, res: Response): Promi
     }
 }
 
-
 // Popular product
-
 export const addToPopularProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         const { productId } = req.body;
@@ -324,7 +338,6 @@ export const findAllPopularProducts = async (req: Request,res: Response): Promis
     }
 };
 
-
 export const findOnePopularProduct = async (req: Request,res: Response): Promise<any> => {
     try {
         const { id } = req.params;
@@ -366,7 +379,6 @@ export const findOnePopularProduct = async (req: Request,res: Response): Promise
     }
 };
 
-
 export const updatePopularProduct = async ( req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
@@ -405,7 +417,6 @@ export const updatePopularProduct = async ( req: Request, res: Response): Promis
     }
 };
 
-
 export const deletePopularProduct = async (req: Request,res: Response): Promise<any> => {
     try {
         const { id } = req.params;
@@ -435,12 +446,7 @@ export const deletePopularProduct = async (req: Request,res: Response): Promise<
     }
 };
 
-
 // product Comment Repository
-
-
-
-
 export const addReplyToComment = async (req:Request, res:Response):Promise<any> =>  {
     try {
         const { commentId, message } = req.body;
@@ -467,8 +473,6 @@ export const addReplyToComment = async (req:Request, res:Response):Promise<any> 
         return res.status(500).json({ message: "Internal server error" });
     }
 }
-
-
 
 export const getAllProductComments = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -500,7 +504,6 @@ export const getAllProductComments = async (req: Request, res: Response): Promis
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const getProductCommentById = async (req: Request,res: Response): Promise<any> => {
   try {
@@ -540,7 +543,6 @@ export const getProductCommentById = async (req: Request,res: Response): Promise
   }
 };
 
-
 export const updateProductComment = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
@@ -562,7 +564,6 @@ export const updateProductComment = async (req: Request, res: Response): Promise
   }
 };
 
-
 export const deleteProductComment = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
@@ -579,8 +580,6 @@ export const deleteProductComment = async (req: Request, res: Response): Promise
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 export const getCommentByProductId = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -621,11 +620,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
   }
 };
 
-
-
 // product Question Repository
-
-
 export const addReplyToQuestion = async (req: Request, res: Response): Promise<any> => {
   try {
     const { questionId, message } = req.body;
@@ -652,7 +647,6 @@ export const addReplyToQuestion = async (req: Request, res: Response): Promise<a
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const getAllProductQuestions = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -685,7 +679,6 @@ export const getAllProductQuestions = async (req: Request, res: Response): Promi
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const getProductQuestionById = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -725,7 +718,6 @@ export const getProductQuestionById = async (req: Request, res: Response): Promi
   }
 };
 
-
 export const deleteProductQuestion = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
@@ -742,8 +734,6 @@ export const deleteProductQuestion = async (req: Request, res: Response): Promis
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 export const getQuestionByProductId = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -778,4 +768,3 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
