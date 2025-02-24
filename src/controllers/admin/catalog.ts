@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
-import { ILike, IsNull } from 'typeorm';
+import { ILike, In, IsNull } from 'typeorm';
 import { createSlug } from '../../utils/slug';
 import { deleteFile } from '../../middlewares/removeFiltePath';
 
