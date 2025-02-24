@@ -5,10 +5,17 @@ import { validate, validateParams } from '../../middlewares/validate';
 import { productCommentSchema, productIdParamsSchema } from '../../validators/product-comment.validate';
 
 const router = Router();
+// Comment router
+/**
+ * @swagger
+ * tags:
+ *   name: productComment
+ *   description: Comment management APIs
+ */
 
 /**
  * @swagger
- * /user/product-detail/comment/add:
+ * /user/comment/add:
  *   post:
  *     summary: Add a new product comment
  *     tags: [productComment]
@@ -43,7 +50,7 @@ router.post('/add', validateUserToken, validate(productCommentSchema), ProductCo
 
 /**
  * @swagger
- * /user/product-detail/comment/product/{productId}:
+ * /user/comment/by-productId/{productId}:
  *   get:
  *     summary: Get comments by product ID
  *     tags: [productComment]

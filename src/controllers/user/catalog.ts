@@ -106,7 +106,7 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): P
             relations: ["catalog"]
         });
 
-        if (!subcatalog) {
+        if (subcatalog.length === 0) {
             return res.status(404).json({ message: "Subcatalog not found" });
         }
 

@@ -70,7 +70,6 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 // product Question Repository
 export const addProductQuestion = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -116,6 +115,10 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
         },
       },
     });
+    
+    if (questions.length === 0) {
+      return res.status(404).json({ message: "No questions found for this product" });
+    }
 
     return res.status(200).json(questions);
   } catch (error) {

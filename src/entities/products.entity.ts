@@ -10,7 +10,6 @@ import {
 } from "typeorm";
 import { Brand } from "./brands.entity";
 import {
-  PopularProduct,
   ProductComment,
   ProductCondition,
   ProductQuestion,
@@ -101,9 +100,6 @@ export class Product {
   @ManyToOne(() => ProductCondition, (condition) => condition.products)
   @JoinColumn({ name: "conditionId" })
   conditions: ProductCondition;
-
-  @OneToMany(() => PopularProduct, (popular) => popular.products)
-  populars: PopularProduct[];
 
   @OneToMany(() => ProductQuestion, (question) => question.products)
   questions: ProductQuestion[];

@@ -14,7 +14,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/product-detail/question/add:
+ * /user/question/add:
  *   post:
  *     summary: Add a new product question
  *     tags: [productQuestion]
@@ -46,7 +46,7 @@ router.post("/add", validateUserToken, validate(productQuestionSchema), ProductQ
 
 /**
  * @swagger
- * /user/product-detail/question/product/{productId}:
+ * /user/question/by-productId/{productId}:
  *   get:
  *     summary: Get questions by product ID
  *     tags: [productQuestion]
@@ -64,6 +64,6 @@ router.post("/add", validateUserToken, validate(productQuestionSchema), ProductQ
  *       500:
  *         description: Internal server error
  */
-router.get("/product/:productId", validateParams(productIdParamsSchema), ProductQuestion.getQuestionByProductId);
+router.get("/by-productId/:productId", validateParams(productIdParamsSchema), ProductQuestion.getQuestionByProductId);
 
 export default router;

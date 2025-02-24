@@ -11,23 +11,6 @@ const router = express.Router();
  *   description: Catalog management APIs
  */
 
-// Subcatalog routes
-// /**
-//  * @swagger
-//  * tags:
-//  *   name: Subcatalog
-//  *   description: Subcatalog management APIs
-//  */
-
-/**
- * @swagger
- * tags:
- *   name: Category
- *   description: Category management APIs
- */
-
-// Category routes
-
 /**
  * @swagger
  * /user/catalog/category/all:
@@ -35,7 +18,7 @@ const router = express.Router();
  *     summary: Get all categories
  *     description: Retrieve a list of all categories.
  *     tags:
- *       - Category
+ *       - Catalog
  *     responses:
  *       200:
  *         description: Successful response. Returns a list of categories.
@@ -140,6 +123,57 @@ router.get("/all", Catalog.getCatalogs);
 
 /**
  * @swagger
+ * /user/catalog/category/by-subcatalog/{subCatalogSlug}:
+ *   get:
+ *     summary: Get categories by subcatalog slug
+ *     tags: [Catalog]
+ *     parameters:
+ *       - in: path
+ *         name: subCatalogSlug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Slug of the subcatalog
+ *     responses:
+ *       200:
+ *         description: List of categories associated with the subcatalog
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: Category ID
+ *                   slug:
+ *                     type: string
+ *                     description: Category slug
+ *                   title:
+ *                     type: string
+ *                     description: Category title
+ *                   subCatalog:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: Subcatalog ID
+ *                       slug:
+ *                         type: string
+ *                         description: Subcatalog slug
+ *                       title:
+ *                         type: string
+ *                         description: Subcatalog title
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/category/by-subcatalog/:subCatalogSlug", Catalog.getCategoryBySubCatalogSlug);
+
+/**
+ * @swagger
  * /user/catalog/subcatalog/by-catalog/{catalogSlug}:
  *   get:
  *     summary: Get a subcatalog by catalog slug
@@ -186,56 +220,5 @@ router.get("/all", Catalog.getCatalogs);
  *         description: Internal server error
  */
 router.get("/subcatalog/by-catalog/:catalogSlug", Catalog.getSubCatalogByCatalogSlug);
-
-/**
- * @swagger
- * /user/catalog/category/by-subcatalog/{subCatalogSlug}:
- *   get:
- *     summary: Get categories by subcatalog slug
- *     tags: [Category]
- *     parameters:
- *       - in: path
- *         name: subCatalogSlug
- *         required: true
- *         schema:
- *           type: string
- *         description: Slug of the subcatalog
- *     responses:
- *       200:
- *         description: List of categories associated with the subcatalog
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     description: Category ID
- *                   slug:
- *                     type: string
- *                     description: Category slug
- *                   title:
- *                     type: string
- *                     description: Category title
- *                   subCatalog:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         description: Subcatalog ID
- *                       slug:
- *                         type: string
- *                         description: Subcatalog slug
- *                       title:
- *                         type: string
- *                         description: Subcatalog title
- *       404:
- *         description: Category not found
- *       500:
- *         description: Internal server error
- */
-router.get("/category/by-subcatalog/:subCatalogSlug", Catalog.getCategoryBySubCatalogSlug);
 
 export default router;
