@@ -42,11 +42,28 @@ jobs:
 
             cd $APP_DIR
 
-            echo 'PORT=${PORT}
+            echo '
+            PORT=${PORT}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_NAME=${{ secrets.DB_NAME }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}' > .env
+            JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
+            BASE_URL=${{ secrets.BASE_URL }}
+            FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
+            FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
+            FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
+            LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
+            LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
+            YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
+            YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
+            YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
+            ' > .env
+
 
             npm install
             npm run build

@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { ILike, In, IsNull } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
-import fs from 'fs';
 import { createSlug } from '../../utils/slug';
+import { deleteFile } from '../../middlewares/removeFiltePath';
 const brandRepository = AppDataSource.getRepository(Brand);
 
 export const getBrandById = async (req: Request, res: Response): Promise<any> => {
@@ -25,7 +25,6 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
         }
 
         const { createdAt, deletedAt, ...brandData } = brand;
-        brandData.path = brandData.path.replace(/^public\//, "")
         return res.json({
             data: brandData,
             error: null,
@@ -38,20 +37,20 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
 
 export const getAllBrands = async (req: Request, res: Response): Promise<any> => {
     try {
-        const brands = await brandRepository
-            .createQueryBuilder('brand')
-            .where('brand.deletedAt IS NULL')
-            .orderBy('brand.createdAt', 'DESC')
-            .getMany();
-
-        const brandsWithoutDates = brands.map(brand => {
-            const { createdAt, deletedAt, ...brandData } = brand;
-            brandData.path = brandData.path.replace(/^public\//, "")
-            return brandData;
+        const brands = await brandRepository.find({
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                path: true
+            },
+            where: {
+                deletedAt: IsNull(),
+            },
         });
 
         return res.json({
-            data: brandsWithoutDates,
+            data: brands,
             error: null,
             status: 200
         });
@@ -72,10 +71,10 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
                 status: 400
             });
         }
-        const lowerTitle = title.toLowerCase();
+
         const existingBrand = await brandRepository.findOne({
           where: {
-            title: ILike(lowerTitle),
+            title: ILike(title.toLowerCase()),
             deletedAt: IsNull(),
           },
         });
@@ -87,7 +86,8 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
                 status: 400
             });
         }
-        const newPath = file.path.replace(/\\/g, "/");
+        const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
+
         const brand = new Brand();
         brand.title = title;
         brand.slug = createSlug(title);
@@ -97,7 +97,6 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
         
         const { createdAt, deletedAt, ...brandData } = savedBrand;
 
-        brandData.path = brandData.path.replace(/^public\//, "")
         return res.json({
             data: brandData,
             error: null,
@@ -130,11 +129,9 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
         }
 
         if (title !== brand.title) {
-            const lowerTitle = title.toLowerCase();
-
             const existingBrand = await brandRepository.findOne({
                 where: {
-                    title:ILike(lowerTitle),
+                    title: ILike(title.toLowerCase()),
                     deletedAt: IsNull()
                 }
             });
@@ -150,11 +147,8 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
 
         if (file) {
             // Delete old file if exists
-            const oldPath = brand.path;
-            if (fs.existsSync(oldPath)) {
-                fs.unlinkSync(oldPath);
-            }
-            const newPath = file.path.replace(/\\/g, "/");
+            deleteFile(brand.path)
+            const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
             brand.path = newPath;
         }
 
@@ -162,10 +156,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
         brand.slug = createSlug(title);
 
         const updatedBrand = await brandRepository.save(brand);
-
         const { createdAt, deletedAt, ...brandData } = updatedBrand;
-
-        brandData.path = brandData.path.replace(/^public\//, "")
         return res.json({
             data: brandData,
             error: null,
@@ -179,14 +170,12 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
 export const deleteBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-
         const brand = await brandRepository.findOne({
             where: {
                 id,
                 deletedAt: IsNull()
             }
         });
-
         if (!brand) {
             return res.json({
                 data: null,
@@ -194,10 +183,8 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
                 status: 404
             });
         }
-
         brand.deletedAt = new Date();
         await brandRepository.save(brand);
-
         return res.json({
             data: { message: 'Brand deleted successfully' },
             error: null,

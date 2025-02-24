@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
 import { ILike, In, IsNull } from 'typeorm';
-import fs from 'fs';
 import { createSlug } from '../../utils/slug';
+import { deleteFile } from '../../middlewares/removeFiltePath';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -517,11 +517,10 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
                 status: 400
             });
         }
-          const lowerTitle = title.toLowerCase();
         
         const existingCategory = await categoryRepository.findOne({
             where: {
-                title:ILike(lowerTitle),
+                title: ILike(title.toLowerCase()),
                 deletedAt: IsNull()
             },
             order: {
@@ -553,7 +552,7 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
                 status: 400
             });
         }
-        const newPath = file.path.replace(/\\/g, "/");
+        const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
         const category = new Category();
         category.title = title;
@@ -564,8 +563,6 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
 
         const savedCategory = await categoryRepository.save(category);
         const { createdAt, deletedAt, ...categoryData } = savedCategory;
-
-        categoryData.path = categoryData.path.replace(/^public\//, "")
         return res.json({
             data: categoryData,
             error: null,
@@ -601,11 +598,9 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         }
 
         if (title !== category.title) {
-          const lowerTitle = title.toLowerCase();
-
             const existingCategory = await categoryRepository.findOne({
                 where: {
-                    title: ILike(lowerTitle),
+                    title: ILike(title.toLowerCase()),
                     deletedAt: IsNull()
                 }
             });
@@ -640,11 +635,8 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         }
 
         if (file) {
-            const oldPath = category.path;
-            if (fs.existsSync(oldPath)) {
-                fs.unlinkSync(oldPath);
-            }
-            const newPath = file.path.replace(/\\/g, "/");
+            deleteFile(category.path)
+            const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
             category.path = newPath;
         }
         if (title) {
@@ -654,8 +646,6 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         const updatedCategory = await categoryRepository.save(category);
 
         const { createdAt, deletedAt, ...categoryData } = updatedCategory;
-
-        categoryData.path = categoryData.path.replace(/^public\//, "")
         return res.json({
             data: categoryData,
             error: null,
