@@ -77,6 +77,9 @@ export class Category {
     @Column()
     subCatalogId: string;
 
+    @Column({type: "boolean", default: false})
+    isPopular: boolean;
+
     @ManyToOne(() => Subcatalog, subcatalog => subcatalog.categories, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'subCatalogId' })
     subCatalog: Subcatalog;

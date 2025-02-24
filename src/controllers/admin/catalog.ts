@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
-import { ILike, IsNull } from 'typeorm';
+import { ILike, In, IsNull } from 'typeorm';
 import fs from 'fs';
 import { createSlug } from '../../utils/slug';
 
@@ -697,6 +697,78 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+export const createPopularCategory = async (req: Request, res: Response): Promise<any> => {
+    try {
+        let {  categoryIds } = req.body;
+
+        if (!Array.isArray(categoryIds)) {
+            categoryIds = [categoryIds];
+        }
+
+        if (categoryIds.length === 0) {
+            return res.status(400).json({ message: "Invalid or empty categoryId" });
+        }
+
+        const categories = await categoryRepository.find({
+            where: {
+                id: In(categoryIds),
+                deletedAt: IsNull()
+            }
+        });
+
+        if (categories.length === 0) {
+            return res.status(404).json({ message: "No categories found" });
+        }
+
+        const updatedCategories = [];
+        const alreadyPopularCategories = [];
+
+        for (const category of categories) {
+            if (!category.isPopular) {
+                category.isPopular = true;
+                await categoryRepository.save(category);
+                updatedCategories.push(category.id);
+            } else {
+                alreadyPopularCategories.push(category.id);
+            }
+        }
+
+        return res.status(200).json({ 
+            message: "Categories processed successfully", 
+            updatedCategories,
+            alreadyPopularCategories
+        });
+
+    } catch (error) {
+        // console.error("Error in addPopularToCategory:", error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getCategories = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { isPopular } = req.query;
+
+        const whereCondition: any = {
+            deletedAt: IsNull(),
+        };
+
+        if (isPopular === "true") {
+            whereCondition.isPopular = true;
+        }
+
+        const categories = await categoryRepository.find({
+            where: whereCondition
+        });
+
+        return res.status(200).json(categories);
+    } catch (error) {
+        console.error("getCategories Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };

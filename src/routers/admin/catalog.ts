@@ -3,7 +3,7 @@ import * as Catalog from "../../controllers/admin/catalog";
 import { validateAdminToken } from "../../middlewares/adminValidator";
 import { uploadPhoto } from "../../middlewares/multer";
 import { validate, validateParams } from "../../middlewares/validate";
-import { catalogSchema } from "../../validators/catalog.validate";
+import { catalogSchema, categoryIdsSchema } from "../../validators/catalog.validate";
 import { uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
@@ -384,5 +384,100 @@ router.put("/category/update/:id",validateAdminToken,uploadPhoto.single("categor
  *         description: Category not found
  */
 router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSchema), Catalog.deleteCategory);
+
+/**
+ * @swagger
+ * /catalog/category/popular/create:
+ *   post:
+ *     summary: Add popular tag to categories
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               categoryIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: 
+ *                   - "fdajksmfasfd6514fdas51f"
+ *                   - "fadsfa516f-fads61"
+ *                   - "dafsfadsfa2-0ff"
+ *     responses:
+ *       200:
+ *         description: Categories processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Categories processed successfully
+ *                 updatedCategories:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["fdajksmfasfd6514fdas51f"]
+ *                 alreadyPopularCategories:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["fadsfa516f-fads61"]
+ *       400:
+ *         description: Invalid or empty categoryIds
+ *       404:
+ *         description: No categories found
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/category/popular/create", validateAdminToken, validate(categoryIdsSchema), Catalog.createPopularCategory);
+
+
+/**
+ * @swagger
+ * /catalog/categories/all:
+ *   get:
+ *     summary: Get categories
+ *     description: Barcha kategoriyalarni yoki faqat popular kategoriyalarni chiqaradi
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: isPopular
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: Agar true bo'lsa, faqat popular kategoriyalar chiqadi
+ *     responses:
+ *       200:
+ *         description: Category list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "cagqfdas"
+ *                   title:
+ *                     type: string
+ *                     example: "Electronics"
+ *                   isPopular:
+ *                     type: boolean
+ *                     example: true
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/categories/all',validateAdminToken, Catalog.getCategories);
 
 export default router;
