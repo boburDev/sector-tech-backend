@@ -255,28 +255,40 @@ export const deleteProductRelavance = async (req: Request, res: Response): Promi
 
 // Popular product
 
-export const addToPopularProduct = async (req: Request,res: Response): Promise<any> => {
+export const addToPopularProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         const { productId } = req.body;
+
         const product = await productRepository.findOne({ where: { id: productId } });
         if (!product) {
-          return res.status(404).json({
-            data: null,
-            error: "Product not found",
-            status: 404,
-          });
+            return res.status(404).json({
+                data: null,
+                error: "Product not found",
+                status: 404,
+            });
         }
-      
-        const popularProduct = popularProductRepository.create({ productId });
-      
-        await popularProductRepository.save(popularProduct);
-      
-        return res.status(201).json({
-          data: popularProduct,
-          message: "Popular product created successfully",
-          status: 201,
+
+        const existingPopularProduct = await popularProductRepository.findOne({ 
+            where: { productId }
         });
         
+        if (existingPopularProduct) {
+            return res.status(409).json({
+                data: null,
+                message: "This product is already added to popular products",
+                status: 409,
+            });
+        }
+
+        const popularProduct = popularProductRepository.create({ productId });
+        await popularProductRepository.save(popularProduct);
+
+        return res.status(201).json({
+            data: popularProduct,
+            message: "Popular product created successfully",
+            status: 201,
+        });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });
