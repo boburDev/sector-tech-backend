@@ -10,7 +10,10 @@ const createSwaggerConfig = (title: string, url: string, apis: string[]) => ({
       version: "1.0.0",
       description: `API documentation for ${title}`,
     },
-    servers: [{ url }],
+    servers: [
+      { url: `http://${baseUrl}` }, 
+      { url: `https://${baseUrl}` }
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -24,17 +27,20 @@ const createSwaggerConfig = (title: string, url: string, apis: string[]) => ({
   apis,
 });
 
+const baseUrl = process.env.BASE_URL || "localhost:4000/"
+
 const userSwaggerSpec = swaggerJSDoc(
-  createSwaggerConfig("User API", "http://localhost:4000/", [
+  createSwaggerConfig("User API", baseUrl, [
     "./src/routers/user/*.ts",
   ])
 );
 
 const adminSwaggerSpec = swaggerJSDoc(
-  createSwaggerConfig("Admin API", "http://localhost:4000/", [
+  createSwaggerConfig("Admin API", baseUrl, [
     "./src/routers/admin/*.ts",
   ])
 );
+
 
 export const setupSwagger = (app: Express) => {
   app.use(
