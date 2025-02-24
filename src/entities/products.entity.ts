@@ -57,6 +57,9 @@ export class Product {
   @Column("json", { nullable: true })
   images: string[];
 
+  @Column("json", { nullable: true })
+  fullDescriptionImages: string[];
+
   @Column()
   brandId: string;
 
