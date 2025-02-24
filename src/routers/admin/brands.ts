@@ -2,8 +2,9 @@ import { Router } from "express";
 import * as Brands from "../../controllers/admin/brands";
 import { uploadPhoto } from "../../middlewares/multer";
 import { validateAdminToken } from "../../middlewares/adminValidator";
-import { validateParams } from "../../middlewares/validate";
+import { validate, validateParams } from "../../middlewares/validate";
 import { uuidSchema } from "../../validators/admin.validate";
+import { brandIdsSchema, categoryIdsSchema } from "../../validators/catalog.validate";
 
 const router = Router();
 
@@ -134,5 +135,62 @@ router.put("/update/:id",validateAdminToken, uploadPhoto.single("logo"), validat
  *         description: Brand not found
  */
 router.delete("/delete/:id", validateAdminToken, validateParams(uuidSchema), Brands.deleteBrand);
+
+
+/**
+ * @swagger
+ * /brand/popular/create:
+ *   post:
+ *     summary: Mark brands as popular
+ *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               brandIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["brandId1", "brandId2"]
+ *     responses:
+ *       200:
+ *         description: Brands processed successfully
+ *       400:
+ *         description: Invalid or empty brandIds
+ *       404:
+ *         description: No brands found
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/popular/create", validateAdminToken, validate(brandIdsSchema), Brands.createPopularBrand);
+
+/**
+ * @swagger
+ * /brand/popular/all:
+ *   get:
+ *     summary: Get all brands or popular brands
+ *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: isPopular
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter by popular brands (true/false)
+ *     responses:
+ *       200:
+ *         description: List of brands
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/popular/all",validateAdminToken, Brands.getBrands);
+
 
 export default router;

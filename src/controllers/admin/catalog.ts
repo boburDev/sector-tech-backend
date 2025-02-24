@@ -691,7 +691,6 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
     }
 };
 
-
 export const createPopularCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         let {  categoryIds } = req.body;

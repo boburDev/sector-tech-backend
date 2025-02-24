@@ -27,3 +27,19 @@ export const categoryIdsSchema = Joi.object({
       "any.required": "categoryIds is required",
     }),
 });
+export const brandIdsSchema = Joi.object({
+  brandIds: Joi.array()
+    .items(
+      Joi.string()
+        .guid({ version: ["uuidv4", "uuidv5"] })
+        .required()
+    )
+    .min(1)
+    .required()
+    .messages({
+      "array.base": "brandIds must be an array",
+      "array.min": "At least one brandIds is required",
+      "string.guid": "Each brandIds must be a valid UUID",
+      "any.required": "brandIds is required",
+    }),
+});

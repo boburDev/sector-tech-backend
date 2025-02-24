@@ -11,23 +11,33 @@ const categoryRepository = AppDataSource.getRepository(Category);
 
 export const getCatalogs = async (req: Request, res: Response): Promise<any> => {
     try {
+        const { subcatalog, category } = req.query;
+
+        // Agar category true bo'lsa, subcatalog va category chiqadi
+        // Agar subcatalog true bo'lsa, faqat subcatalog chiqadi
+        // Agar ikkalasi false bo'lsa, faqat catalog chiqadi
+        const relations = ["subcatalogs"];
+        if (subcatalog === "true") {
+            relations.push("subcatalogs.categories");
+        }
+
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            relations: ["subcatalogs", "subcatalogs.categories"],
+            relations: relations,
             select: {
                 id: true,
                 slug: true,
                 title: true,
-                subcatalogs: {
+                subcatalogs: subcatalog === "true" ? {
                     id: true,
                     title: true,
                     slug: true,
-                    categories: {
+                    categories: category === "true" ? {
                         id: true,
                         slug: true,
                         title: true,
-                    }
-                }
+                    } : undefined
+                } : undefined
             }
         });
 
@@ -35,15 +45,12 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
             return res.status(404).json({ message: "Catalog not found" });
         }
 
-        // Return the catalogs if found
-        return res.status(200).json({data:catalogs});
-
+        return res.status(200).json({ data: catalogs });
     } catch (error) {
-        console.error('Error fetching catalogs:', error);
+        // console.error('Error fetching catalogs:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
-
 
 export const getAllCategories = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -84,7 +91,6 @@ export const getAllCategories = async (req: Request, res: Response): Promise<any
     }
 };
 
-
 export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): Promise<any> => {
     try {
         const { catalogSlug } = req.params;
@@ -114,7 +120,6 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): P
         });
     }
 };
-
 
 export const getCategoryBySubCatalogSlug = async (req: Request, res: Response): Promise<any> => {
     try {
