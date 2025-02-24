@@ -27,8 +27,6 @@ export const validationByName = Joi.object({
     })
 });
 
-
-
 export const replyToCommentSchema = Joi.object({
     commentId: Joi.string().uuid().required().messages({
         "string.base": "Comment ID must be a string",
@@ -44,8 +42,6 @@ export const replyToCommentSchema = Joi.object({
         "any.required": "Message is required"
     }),
 });
-
-
 
 export const replyToQuestionSchema = Joi.object({
     questionId: Joi.string().uuid().required().messages({

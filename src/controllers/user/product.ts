@@ -8,6 +8,8 @@ const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 
 export const getProducts = async (req: Request,res: Response): Promise<any> => {
   try {
+    const { condition, revalance } = req.query;
+    
     const products = await productRepository.find({
       select: {
         id: true,

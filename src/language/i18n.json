@@ -29,9 +29,6 @@
     "productDetail": {
       "notFound": "Product detail not found"
     },
-    "popularProduct": {
-      "notFound": "Popular product not found"
-    },
     "productComment": {
       "notFound": "Product comment not found"
     },
@@ -118,9 +115,6 @@
       "conditionDeletedSuccess": "Product condition deleted successfully",
       "productRevalance": "Product relevance not found'",
       "productRevalanceDeletedSuccess": "Product revalance deleted successfully",
-      "popularProductNotfound": "Product not found",
-      "popularProductDeletedSucces": "Popular product deleted successfully",
-      "popularProductUpdatesSucces": "Popular product created successfully",
       "productCommentNotFound": "Product Comment not found",
       "productCommentDeletedSuccess": "Product Comment deleted successfully",
       "questionNotFound": "Question not found",

@@ -167,11 +167,11 @@ export const updateProfile = async ( req: Request, res: Response): Promise<any> 
 
 export const getUserById = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { id } = req.params;
+        const { id } = req.user;
         const user = await userRepository.findOne({ 
             where: { 
                 id
-            } ,
+            },
             select:{
               id:true,
               name:true,

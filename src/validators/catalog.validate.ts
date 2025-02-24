@@ -10,7 +10,6 @@ export const catalogSchema = Joi.object({
   }),
 });
 
-
 export const categoryIdsSchema = Joi.object({
   categoryIds: Joi.array()
     .items(
@@ -27,6 +26,7 @@ export const categoryIdsSchema = Joi.object({
       "any.required": "categoryIds is required",
     }),
 });
+
 export const brandIdsSchema = Joi.object({
   brandIds: Joi.array()
     .items(

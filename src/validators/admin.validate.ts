@@ -46,6 +46,7 @@ export const adminUpdateValidateSchema = Joi.object({
     "any.only": "Status must be either active or inactive",
   }),
 });
+
 export const adminLoginValidateSchema = Joi.object({
   username: Joi.string().min(3).max(30).required().messages({
     "string.base": "Username should be a type of text",

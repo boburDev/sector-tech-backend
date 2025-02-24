@@ -9,36 +9,68 @@ const categoryRepository = AppDataSource.getRepository(Category);
 
 // Catalog Controllers
 
+interface CatalogSelect {
+    id: boolean;
+    slug: boolean;
+    title: boolean;
+    subcatalogs?: {
+        id: boolean;
+        title: boolean;
+        slug: boolean;
+        categories?: {
+            id: boolean;
+            slug: boolean;
+            title: boolean;
+        };
+    };
+}
+
 export const getCatalogs = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { subcatalog, category } = req.query;
+        const { catalog, subcatalog, category } = req.query;
 
-        // Agar category true bo'lsa, subcatalog va category chiqadi
-        // Agar subcatalog true bo'lsa, faqat subcatalog chiqadi
-        // Agar ikkalasi false bo'lsa, faqat catalog chiqadi
-        const relations = ["subcatalogs"];
-        if (subcatalog === "true") {
+        const isCatalog = catalog === "true";
+        const isSubcatalog = subcatalog === "true";
+        const isCategory = category === "true";
+
+        const defaultCase = !catalog && !subcatalog && !category;
+
+        const relations: string[] = [];
+        const select: CatalogSelect = {
+            id: true,
+            slug: true,
+            title: true,
+        };
+
+        if (isCategory || defaultCase) {
+            relations.push("subcatalogs");
+            select.subcatalogs = {
+                id: true,
+                title: true,
+                slug: true,
+            };
             relations.push("subcatalogs.categories");
+            select.subcatalogs.categories = {
+                id: true,
+                slug: true,
+                title: true,
+            };
+        }
+        else if (isSubcatalog) {
+            relations.push("subcatalogs");
+            select.subcatalogs = {
+                id: true,
+                title: true,
+                slug: true,
+            };
+        }
+        else if (isCatalog && !isSubcatalog && !isCategory) {
         }
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            relations: relations,
-            select: {
-                id: true,
-                slug: true,
-                title: true,
-                subcatalogs: subcatalog === "true" ? {
-                    id: true,
-                    title: true,
-                    slug: true,
-                    categories: category === "true" ? {
-                        id: true,
-                        slug: true,
-                        title: true,
-                    } : undefined
-                } : undefined
-            }
+            relations: relations.length > 0 ? relations : undefined,
+            select,
         });
 
         if (catalogs.length === 0) {
@@ -47,8 +79,8 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
 
         return res.status(200).json({ data: catalogs });
     } catch (error) {
-        // console.error('Error fetching catalogs:', error);
-        return res.status(500).json({ message: 'Internal server error' });
+        console.error("Error fetching catalogs:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 

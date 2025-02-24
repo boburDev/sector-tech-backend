@@ -12,6 +12,7 @@ const router = express.Router();
  *   name: User
  *   description: User authentication and profile management
  */
+
 /**
  * @swagger
  * /user/auth/google/login:
@@ -195,50 +196,63 @@ router.put("/update", validateUserToken, User.updateProfile);
 
 /**
  * @swagger
- * /user/auth/get/{id}:
+ * /user/auth/me:
  *   get:
  *     summary: Get user by ID
  *     tags: [User]
  *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Successfully retrieved user
+ *         description: User details retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
  *                 data:
  *                   type: object
  *                   properties:
  *                     id:
  *                       type: string
- *                       example: "1"
+ *                       example: "a1b2c3d4"
  *                     name:
  *                       type: string
  *                       example: "John Doe"
- *                     phone:
- *                       type: string
- *                       example: "+998901234567"
  *                     email:
  *                       type: string
- *                       example: "john@example.com"
- *       401:
- *         description: Unauthorized
+ *                       example: "john.doe@example.com"
+ *                     phone:
+ *                       type: string
+ *                       example: "+1234567890"
+ *                 error:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *                 status:
+ *                   type: number
+ *                   example: 200
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
  */
-router.get('/get/:id', validateUserToken, User.getUserById);
+router.get('/me', validateUserToken, User.getUserById);
 
 export default router;
