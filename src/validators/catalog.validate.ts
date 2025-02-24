@@ -9,3 +9,21 @@ export const catalogSchema = Joi.object({
     "any.required": "Title is required",
   }),
 });
+
+
+export const categoryIdsSchema = Joi.object({
+  categoryIds: Joi.array()
+    .items(
+      Joi.string()
+        .guid({ version: ["uuidv4", "uuidv5"] })
+        .required()
+    )
+    .min(1)
+    .required()
+    .messages({
+      "array.base": "categoryIds must be an array",
+      "array.min": "At least one categoryId is required",
+      "string.guid": "Each categoryId must be a valid UUID",
+      "any.required": "categoryIds is required",
+    }),
+});

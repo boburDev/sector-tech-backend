@@ -42,7 +42,26 @@
       "notFound": "Product not found",
       "removedProduct": "Product removed from saved.",
       "savedProduct": "Product saved successfully."
+    },
+    "middleware": {
+      "adminValidator":{
+        "noToken": "No token provided",
+        "invalidToken": "Invalid or expired token",
+        "adminNotFound": "Admin not found",
+        "accountNotActive": "Your account is not active"
+      },
+    "login": {
+      "tooManyAttempts": "Too many login attempts. Try again in {time} seconds.",
+      "blocked": "Too many login attempts. Please try again in 5 minutes."
+    },
+    "multer": {
+      "invalidTypeOrField": "Invalid Type or fieldName",
+      "destinationError": "Destination Error",
+      "filenameError": "Filename Error",
+      "invalidFileType": "Only image files are allowed.",
+      "fileFilterError": "File Filter Error"
     }
+  }
   },
   "admin": {
     "auth": {
