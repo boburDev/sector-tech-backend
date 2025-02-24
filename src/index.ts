@@ -14,7 +14,7 @@ import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";
 
-dotenv.config();
+dotenv.config(); 
 
 const PORT = Number(process.env.PORT) || 3030;
 
