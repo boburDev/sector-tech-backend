@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ILike, IsNull } from 'typeorm';
+import { ILike, In, IsNull } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 import fs from 'fs';
@@ -204,6 +204,78 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Create Popular Brand
+export const createPopularBrand = async (req: Request, res: Response): Promise<any> => {
+    try {
+        let { brandIds } = req.body;
+
+        if (!Array.isArray(brandIds)) {
+            brandIds = [brandIds];
+        }
+
+        if (brandIds.length === 0) {
+            return res.status(400).json({ message: "Invalid or empty brandIds" });
+        }
+
+        const brands = await brandRepository.find({
+            where: {
+                id: In(brandIds),
+                deletedAt: IsNull()
+            }
+        });
+
+        if (brands.length === 0) {
+            return res.status(404).json({ message: "No brands found" });
+        }
+
+        const updatedBrands = [];
+        const alreadyPopularBrands = [];
+
+        for (const brand of brands) {
+            if (!brand.isPopular) {
+                brand.isPopular = true;
+                await brandRepository.save(brand);
+                updatedBrands.push(brand.id);
+            } else {
+                alreadyPopularBrands.push(brand.id);
+            }
+        }
+
+        return res.status(200).json({ 
+            message: "Brands processed successfully", 
+            updatedBrands,
+            alreadyPopularBrands
+        });
+
+    } catch (error) {
+        console.error("createPopularBrand Error:", error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const getBrands = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { isPopular } = req.query;
+
+        const whereCondition: any = {
+            deletedAt: IsNull(),
+        };
+
+        if (isPopular === "true") {
+            whereCondition.isPopular = true;
+        }
+
+        const brands = await brandRepository.find({
+            where: whereCondition
+        });
+
+        return res.status(200).json(brands);
+    } catch (error) {
+        console.error("getBrands Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };

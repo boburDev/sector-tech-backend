@@ -15,6 +15,9 @@ export class Brand {
     @Column({ length: 500 })
     path: string;
 
+    @Column({ type:"boolean", default: false})
+    isPopular: boolean;
+
     @OneToMany(() => Product, (product) => product.brand)
     products: Product[];
 
