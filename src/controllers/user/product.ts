@@ -44,9 +44,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
     const { id } = req.params;
     const product = await productRepository.findOne({
       relations: [
-        "catalog",
-        "subcatalog",
-        "category",
         "comments",
         "questions",
         "brand",
@@ -67,23 +64,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
         fullDescriptionImages: true,
         characteristics: true,
         images: true,
-        catalog: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-        subcatalog: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-        category: {
-          id: true,
-          title: true,
-          slug: true,
-          isPopular: true,
-          path: true,
-        },
         comments: {
           id: true,
           commentBody: true,
