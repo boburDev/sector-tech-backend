@@ -43,7 +43,16 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
   try {
     const { id } = req.params;
     const product = await productRepository.findOne({
-      relations: ["comments","brand","questions"],
+      relations: [
+        "catalog",
+        "subcatalog",
+        "category",
+        "comments",
+        "questions",
+        "brand",
+        "conditions",
+        "relevances"
+      ],
       select: {
         id: true,
         title: true,
@@ -58,25 +67,24 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
         fullDescriptionImages: true,
         characteristics: true,
         images: true,
-        catalog:{
-           id: true,
-           title: true,
-           slug: true,
+        catalog: {
+          id: true,
+          title: true,
+          slug: true,
         },
-        subcatalog:{
-           id: true,
-           title: true,
-           slug: true,
+        subcatalog: {
+          id: true,
+          title: true,
+          slug: true,
         },
-         category: {
-           id: true,
-           title: true,
-           slug: true,
-           isPopular: true,
-           path: true,
-         },
-         
-        comments:{
+        category: {
+          id: true,
+          title: true,
+          slug: true,
+          isPopular: true,
+          path: true,
+        },
+        comments: {
           id: true,
           commentBody: true,
           reply: true,
@@ -87,7 +95,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
           body: true,
           reply: true,
         },
-        
         brand: {
           id: true,
           isPopular: true,
@@ -95,14 +102,25 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
           title: true,
           slug: true,
         },
-        
+        conditions:{
+          id: true,
+          title: true,
+          slug: true,
+        },
+        relevances: {
+          id: true,
+          title: true,
+          slug: true
+        }
       },
-      where: [
-        { id, deletedAt: IsNull() },
-      ],
+      where: {
+        id,
+        deletedAt: IsNull()
+      }
     });
 
-    if (!product) res.json({ data: "", error: null, status: 200 });
+
+    if (!product) res.json({ data: "Not found ", error: null, status: 200 });
 
     res.json({
       data: product,
@@ -110,15 +128,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
       status: 200,
     });
 
-    if (!product) {
-      return res.status(404).json({
-        data: null,
-        error: "Product not found",
-        status: 404,
-      });
-    }
-
-    res.json(product);
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
