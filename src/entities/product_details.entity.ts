@@ -19,8 +19,8 @@ export class ProductCondition {
   @Column()
   title: string;
 
-  @Column()
-  name: string;
+  @Column({ default: null })
+  slug: string;
 
   @OneToMany(() => Product, (product) => product.conditions)
   products: Product[];
@@ -40,8 +40,8 @@ export class ProductRelevance {
   @Column()
   title: string;
 
-  @Column()
-  name: string;
+  @Column( {default: null })
+  slug: string;
 
   @OneToMany(() => Product, (product) => product.relevances)
   products: Product[];

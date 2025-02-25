@@ -2,15 +2,22 @@ import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product, SavedProduct } from "../../entities/products.entity";
 import { IsNull } from "typeorm";
+import { ProductCondition, ProductRelevance } from "../../entities/product_details.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
+const conditonRepository = AppDataSource.getRepository(ProductCondition);
+const revalanceRepository = AppDataSource.getRepository(ProductRelevance);
 
 export const getProducts = async (req: Request,res: Response): Promise<any> => {
   try {
     const { condition, revalance } = req.query;
     
     const products = await productRepository.find({
+      where: {
+        deletedAt: IsNull(),
+      },
+      order: { createdAt: "DESC" },
       select: {
         id: true,
         title: true,
@@ -19,9 +26,6 @@ export const getProducts = async (req: Request,res: Response): Promise<any> => {
         inStock: true,
         price: true,
         mainImage: true
-      },
-      where: {
-        deletedAt: IsNull(),
       },
     });
 
@@ -39,6 +43,7 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
   try {
     const { id } = req.params;
     const product = await productRepository.findOne({
+      relations: ["comments","brand","questions"],
       select: {
         id: true,
         title: true,
@@ -49,10 +54,51 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
         inStock: true,
         price: true,
         mainImage: true,
+        fullDescription: true,
+        fullDescriptionImages: true,
+        characteristics: true,
+        images: true,
+        catalog:{
+           id: true,
+           title: true,
+           slug: true,
+        },
+        subcatalog:{
+           id: true,
+           title: true,
+           slug: true,
+        },
+         category: {
+           id: true,
+           title: true,
+           slug: true,
+           isPopular: true,
+           path: true,
+         },
+         
+        comments:{
+          id: true,
+          commentBody: true,
+          reply: true,
+          star: true,
+        },
+        questions: {
+          id: true,
+          body: true,
+          reply: true,
+        },
+        
+        brand: {
+          id: true,
+          isPopular: true,
+          path: true,
+          title: true,
+          slug: true,
+        },
+        
       },
       where: [
         { id, deletedAt: IsNull() },
-        { slug: id, deletedAt: IsNull() },
       ],
     });
 
@@ -116,6 +162,7 @@ export const getUserSavedProducts = async (req: Request,res: Response): Promise<
       where: {
         userId: id,
       },
+      order: { id: "DESC" },
       select: {
         product: {
           id: true,
@@ -123,7 +170,6 @@ export const getUserSavedProducts = async (req: Request,res: Response): Promise<
           title: true,
           description: true,
           images: true,
-          fullDescription: true,
           price: true,
           articul: true,
           slug: true,
@@ -142,12 +188,10 @@ export const getUserSavedProducts = async (req: Request,res: Response): Promise<
       });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Saved products retrived successfully",
+    res.status(200).json({message: "Saved products retrived successfully",
         data: user,
         error: null,
+        status: 200
       });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });

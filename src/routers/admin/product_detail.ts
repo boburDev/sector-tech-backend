@@ -28,7 +28,6 @@ const router = Router();
  */
 router.get('/condition/all', validateAdminToken, ProductCondition.getAllProductConditions)
 
-
 /**
  * @swagger
  * /product-detail/condition/by-id/{id}:
@@ -48,30 +47,7 @@ router.get('/condition/all', validateAdminToken, ProductCondition.getAllProductC
  *       200:
  *         description: Product condition details
  */
-
 router.get('/condition/by-id/:id', validateAdminToken,  validateParams(uuidSchema), ProductCondition.getProductConditionById)
-
-
-/**
- * @swagger
- * /product-detail/condition/by-name/{name}:
- *   get:
- *     summary: Get product conditions by name
- *     tags: [ProductCondition]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: name
- *         required: true
- *         schema:
- *           type: string
- *         description: Product condition names (comma-separated)
- *     responses:
- *       200:
- *         description: List of product conditions
- */
-router.get('/condition/by-name/:name', validateAdminToken, ProductCondition.getProductConditionByName)
 
 /**
  * @swagger
@@ -97,7 +73,6 @@ router.get('/condition/by-name/:name', validateAdminToken, ProductCondition.getP
  *         description: Product condition created successfully
  */
 router.post('/condition/create', validateAdminToken, validate(productConditionSchema), ProductCondition.createProductCondition)
-
 
 /**
  * @swagger
@@ -131,7 +106,6 @@ router.post('/condition/create', validateAdminToken, validate(productConditionSc
  */
 router.put('/condition/update/:id', validateAdminToken, validateParams(uuidSchema), ProductCondition.updateProductCondition)
 
-
 /**
  * @swagger
  * /product-detail/condition/delete/{id}:
@@ -153,9 +127,7 @@ router.put('/condition/update/:id', validateAdminToken, validateParams(uuidSchem
  */
 router.delete('/condition/delete/:id', validateAdminToken, validateParams(uuidSchema), ProductCondition.deleteProductCondition)
  
-
 // ///////////////////////////////////////////////////////////////////////////
-
 
 /**
  * @swagger
@@ -163,7 +135,6 @@ router.delete('/condition/delete/:id', validateAdminToken, validateParams(uuidSc
  *   name: ProductRelavance
  *   description: Product revalance management APIs
  */
-
 
 /**
  * @swagger
@@ -178,7 +149,6 @@ router.delete('/condition/delete/:id', validateAdminToken, validateParams(uuidSc
  *         description: List of all product relevances
  */
 router.get('/relavance/all', validateAdminToken, ProductCondition.getAllProductRelavances)
-
 
 /**
  * @swagger
@@ -226,30 +196,6 @@ router.get('/relavance/:id', validateAdminToken, validateParams(uuidSchema),  Pr
  *         description: Product relevance created
  */
 router.post('/relavance/create', validateAdminToken, validate(productConditionSchema), ProductCondition.createProductRelavance)
-/**
- * @swagger
- * /product-detail/relavance/by-name/{name}:
- *   get:
- *     summary: Get a product relevance by name
- *     tags: [ProductRelavance]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: name
- *         required: true
- *         schema:
- *           type: string
- *         description: Product relevance name
- *     responses:
- *       200:
- *         description: Product relevance details
- *       404:
- *         description: Product relevance not found
- */
-
-router.get('/relavance/by-name/:name', validateAdminToken, ProductCondition.getProductRelavanceByName);
-
 
 /**
  * @swagger
@@ -283,7 +229,6 @@ router.get('/relavance/by-name/:name', validateAdminToken, ProductCondition.getP
  */
 router.put('/relavance/update/:id', validateAdminToken, validateParams(uuidSchema), ProductCondition.updateProductRelavance)
 
-
 /**
  * @swagger
  * /product-detail/relavance/delete/{id}:
@@ -305,7 +250,6 @@ router.put('/relavance/update/:id', validateAdminToken, validateParams(uuidSchem
  */
 router.delete('/relavance/delete/:id', validateAdminToken,  validateParams(uuidSchema), ProductCondition.deleteProductRelavance);
 
-
 /// ///////////////////////////////////////////////////
 
 /**
@@ -314,8 +258,6 @@ router.delete('/relavance/delete/:id', validateAdminToken,  validateParams(uuidS
  *   name: productComment
  *   description: Popular product management APIs
  */
-
-
 
 /**
  * @swagger
@@ -363,7 +305,6 @@ router.post("/comment/reply", validateAdminToken, validate(replyToCommentSchema)
  *         description: Internal server error
  */
 router.get("/comment/all", validateAdminToken,ProductCondition.getAllProductComments);
-
 
 /**
  * @swagger
@@ -440,9 +381,7 @@ router.delete("/comments/:id", validateAdminToken, validateParams(uuidSchema), P
  */
 router.get("/comment/product/:productId", validateAdminToken,validateParams(productIdParamsSchema), ProductCondition.getCommentByProductId);
 
-
 //////////////////////////////////////////////////////////////////
-
 
 /**
  * @swagger
@@ -482,7 +421,6 @@ router.get("/comment/product/:productId", validateAdminToken,validateParams(prod
  */
 router.post("/question/reply", validateAdminToken, validate(replyToQuestionSchema),  ProductCondition.addReplyToQuestion);
 
-
 /**
  * @swagger
  * /product-detail/question/all:
@@ -498,7 +436,6 @@ router.post("/question/reply", validateAdminToken, validate(replyToQuestionSchem
  *         description: Internal server error
  */
 router.get("/question/all", validateAdminToken, ProductCondition.getAllProductQuestions);
-
 
 /**
  * @swagger
@@ -526,7 +463,6 @@ router.get("/question/all", validateAdminToken, ProductCondition.getAllProductQu
  */
 router.get("/question/:id", validateAdminToken, validateParams(uuidSchema), ProductCondition.getProductQuestionById);
 
-
 /**
  * @swagger
  * /product-detail/question/{id}:
@@ -552,7 +488,6 @@ router.get("/question/:id", validateAdminToken, validateParams(uuidSchema), Prod
  *         description: Internal server error
  */
 router.delete("/question/:id", validateAdminToken, validateParams(uuidSchema), ProductCondition.deleteProductQuestion);
-
 
 /**
  * @swagger

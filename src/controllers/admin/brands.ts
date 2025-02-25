@@ -13,6 +13,13 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             where: {
                 id,
                 deletedAt: IsNull()
+            },
+            select: {
+                id: true,
+                path: true,
+                isPopular: true,
+                title: true,
+                slug: true
             }
         });
 
@@ -24,9 +31,8 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             });
         }
 
-        const { createdAt, deletedAt, ...brandData } = brand;
         return res.json({
-            data: brandData,
+            data: brand,
             error: null,
             status: 200
         });
@@ -42,7 +48,8 @@ export const getAllBrands = async (req: Request, res: Response): Promise<any> =>
                 id: true,
                 title: true,
                 slug: true,
-                path: true
+                path: true,
+                isPopular: true,
             },
             where: {
                 deletedAt: IsNull(),
@@ -257,12 +264,19 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
         }
 
         const brands = await brandRepository.find({
-            where: whereCondition
+            where: whereCondition,
+            select: {
+                id: true,
+                title: true,
+                path: true,
+                isPopular: true,
+                slug: true,
+            }
         });
 
-        return res.status(200).json(brands);
+        return res.status(200).json({data: brands, error: null, status: 200});
     } catch (error) {
-        console.error("getBrands Error:", error);
+        // console.error("getBrands Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };

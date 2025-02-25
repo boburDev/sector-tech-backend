@@ -69,6 +69,7 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
+            order: { createdAt: "DESC" },
             relations: relations.length > 0 ? relations : undefined,
             select,
         });
@@ -77,7 +78,7 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
             return res.status(404).json({ message: "Catalog not found" });
         }
 
-        return res.status(200).json({ data: catalogs });
+        return res.status(200).json({ data: catalogs, error: null, status: 200  });
     } catch (error) {
         console.error("Error fetching catalogs:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -133,8 +134,9 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): P
                 deletedAt: IsNull(),
                 catalog: {
                     slug: catalogSlug
-                }
+                },
             },
+            order: { createdAt : "DESC" },
             relations: ["catalog"]
         });
 
@@ -142,7 +144,7 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): P
             return res.status(404).json({ message: "Subcatalog not found" });
         }
 
-        return res.status(200).json(subcatalog);
+        return res.status(200).json({ data: subcatalog, error: null, status: 200 });
 
     } catch (error) {
         // console.error('Error fetching subcatalog:', error);
@@ -165,6 +167,7 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response): 
                     slug: subCatalogSlug
                 }
             },
+            order: { createdAt: "DESC" },
             relations: ["subCatalog"]
         });
 
@@ -173,7 +176,7 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response): 
             return res.status(404).json({ message: "categories not found" });
         }
 
-        return res.status(200).json(categories);
+        return res.status(200).json({ data: categories, error: null, status: 200 });
 
     } catch (error) {
         // console.error('Error fetching subcatalog:', error);
