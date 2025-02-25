@@ -8,13 +8,6 @@ export const productConditionSchema = Joi.object({
         "string.max": "Title must not exceed 100 characters",
         "any.required": "Title is required"
     }),
-    name: Joi.string().min(3).max(100).required().messages({
-        "string.base": "Name must be a string",
-        "string.empty": "Name cannot be empty",
-        "string.min": "Name must be at least 3 characters long",
-        "string.max": "Name must not exceed 100 characters",
-        "any.required": "Name is required"
-    })
 });
 
 export const validationByName = Joi.object({

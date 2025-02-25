@@ -21,7 +21,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         86400000, // 1 kun (24 soat)
         "user"
       );
-      const user_data = {
+      const userData = {
         id: user.id,
         name: user.name,
         email: user.email,
@@ -29,7 +29,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
       return res.json({
         message: "User logged in successfully",
         accessToken,
-        user_data,
+        data:userData,
       });
     } else {
       const newUser = new Users();
@@ -51,9 +51,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         email: savedUser.email,
       };
 
-      return res
-        .status(201)
-        .json({ message: "User created successfully", token, user: userData });
+      return res.status(201).json({ message: "User created successfully", token, data: userData });
     }
   } catch (error) {
     console.error(error);
@@ -89,9 +87,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
       email: savedUser.email,
     };
 
-    return res
-      .status(201)
-      .json({ message: "User created successfully", token, user: userData });
+    return res.status(201).json({ message: "User created successfully", token, user: userData });
   } catch (error: any) {
     console.log(error?.message);
 
@@ -190,19 +186,6 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
 
-    } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-};
-
-export const getAllUsers = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const users = await userRepository.find();
-        return res.json({
-            data: users,
-            error: null,
-            status: 200
-        });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
     }

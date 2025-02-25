@@ -715,22 +715,20 @@ export const createPopularCategory = async (req: Request, res: Response): Promis
         }
 
         const updatedCategories = [];
-        const alreadyPopularCategories = [];
 
         for (const category of categories) {
-            if (!category.isPopular) {
-                category.isPopular = true;
-                await categoryRepository.save(category);
-                updatedCategories.push(category.id);
-            } else {
-                alreadyPopularCategories.push(category.id);
-            }
+            if (category.isPopular) continue;
+            category.isPopular = true;
+            await categoryRepository.save(category);
+            updatedCategories.push(category.id);
         }
 
+
         return res.status(200).json({ 
-            message: "Categories processed successfully", 
-            updatedCategories,
-            alreadyPopularCategories
+            message: "Categories updated successfully", 
+            data: updatedCategories,
+            error:null,
+            status: 200
         });
 
     } catch (error) {
@@ -752,10 +750,18 @@ export const getCategories = async (req: Request, res: Response): Promise<any> =
         }
 
         const categories = await categoryRepository.find({
-            where: whereCondition
+            where: whereCondition,
+            order: { createdAt : "DESC" },
+            select: {
+                id: true,
+                title: true,
+                isPopular: true,
+                path: true,
+                slug: true,
+            }
         });
 
-        return res.status(200).json(categories);
+        return res.status(200).json({data: categories, error: null, status: 200});
     } catch (error) {
         console.error("getCategories Error:", error);
         return res.status(500).json({ message: 'Internal server error' });

@@ -66,9 +66,15 @@ router.get("/category/all", Catalog.getAllCategories);
  *   get:
  *     summary: Get all catalogs with optional subcatalogs and categories
  *     tags: [Catalog]
- *     security:
- *       - bearerAuth: []
  *     parameters:
+ *       - in: query
+ *         name: catalog
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: ["true", "false"]
+ *           default: "true"
+ *         description: Include subcatalogs. Default is true.
  *       - in: query
  *         name: subcatalog
  *         required: false

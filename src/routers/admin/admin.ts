@@ -78,7 +78,7 @@ router.post("/create", validateAdminToken,validate(adminValidateSchema), Admin.c
  *       200:
  *         description: List of all admins
  */
-router.get("/all", validateAdminToken, Admin.getUsers);
+router.get("/all", validateAdminToken, Admin.getAdmins);
 
 /**
  * @swagger
@@ -101,7 +101,7 @@ router.get("/all", validateAdminToken, Admin.getUsers);
  *       404:
  *         description: Admin not found
  */
-router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.getUserById);
+router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.getAdminById);
 
 /**
  * @swagger
@@ -137,7 +137,7 @@ router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.g
  *       404:
  *         description: Admin not found
  */
-router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema), validateParams(uuidSchema), Admin.updateUser);
+router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema), validateParams(uuidSchema), Admin.updateAdmin);
 
 /**
  * @swagger
@@ -160,6 +160,62 @@ router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema)
  *       404:
  *         description: Admin not found
  */
-router.delete("/delete/:id", validateAdminToken,  validateParams(uuidSchema), Admin.deleteUser);
+router.delete("/delete/:id", validateAdminToken,  validateParams(uuidSchema), Admin.deleteAdmin);
+
+/**
+ * @swagger
+ * /admin/users/all:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "a1b2c3d4"
+ *                       name:
+ *                         type: string
+ *                         example: "John Doe"
+ *                       email:
+ *                         type: string
+ *                         example: "john.doe@example.com"
+ *                       phone:
+ *                         type: string
+ *                         example: "+1234567890"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.get("/users/all", validateAdminToken, Admin.getAllUsers);
 
 export default router;

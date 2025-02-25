@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { ProductQuestion, ProductComment } from '../../entities/product_details.entity';
+import { IsNull } from 'typeorm';
 
 const productQuestionRepository = AppDataSource.getRepository(ProductQuestion);
 const productCommentRepository = AppDataSource.getRepository(ProductComment);
@@ -27,7 +28,7 @@ export const addProductComment = async (req: Request, res: Response): Promise<an
       status: 201
     });
   } catch (error) {
-    console.error("Error creating product comment:", error);
+    // console.error("Error creating product comment:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -37,9 +38,14 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
     const { productId } = req.params;
     
     const comments = await productCommentRepository.find({
-      where: { productId },
+      where: { productId, deletedAt: IsNull() },
+      order: { createdAt: "DESC" } ,
       relations: ["user", "products"],
       select: {
+        id: true,
+        reply: true,
+        commentBody: true,
+        star: true,
         user: {
           id: true,
           email: true,
@@ -64,7 +70,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
       return res.status(404).json({ message: "No comments found for this product" });
     }
 
-    return res.status(200).json(comments);
+    return res.status(200).json({data: comments, error:null, status: 200 });
   } catch (error) {
     console.error("Error fetching comments by productId:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -82,7 +88,7 @@ export const addProductQuestion = async (req: Request, res: Response): Promise<a
     newQuestion.userId = userId;
     let savedQuestion = await productQuestionRepository.save(newQuestion);
 
-    return res.status(201).json(savedQuestion);
+    return res.status(201).json({data: savedQuestion, error: null, status: 200 });
   } catch (error) {
     console.error("Error creating product question:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -93,9 +99,13 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
   try {
     const { productId } = req.params;
     const questions = await productQuestionRepository.find({
-      where: { productId },
+      where: { productId, deletedAt: IsNull() },
+      order: { createdAt: "DESC" },
       relations: ["user", "products"],
       select: {
+        id: true,
+        body: true,
+        reply: true,
         user: {
           id: true,
           email: true,
@@ -120,7 +130,7 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
       return res.status(404).json({ message: "No questions found for this product" });
     }
 
-    return res.status(200).json(questions);
+    return res.status(200).json({ data: questions, error: null, status: 200 });
   } catch (error) {
     console.error("Error fetching questions for product:", error);
     return res.status(500).json({ message: "Internal server error" });

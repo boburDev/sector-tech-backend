@@ -79,26 +79,25 @@ export const createAdmin = async (req: Request, res: Response): Promise<any> => 
     }
 };
 
-
-export const getUsers = async (req: Request, res: Response): Promise<any> => {
+export const getAdmins = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
-        const users = await adminRepository.find({
-            where: { deletedAt: IsNull() }
+        const admins = await adminRepository.find({
+            where: { deletedAt: IsNull() },
+            order: { createdAt: "DESC" },
+            select: {
+                id: true,
+                username: true,
+                role: true,
+                status: true
+            }
         });
 
-        const sanitizedUsers = users.map(user => ({
-            id: user.id,
-            username: user.username,
-            role: user.role,
-            status: user.status
-        }));
-
         return res.json({
-            data: sanitizedUsers,
+            data: admins,
             error: null,
             status: 200
         });
@@ -108,7 +107,7 @@ export const getUsers = async (req: Request, res: Response): Promise<any> => {
     }
 };
 
-export const getUserById = async (req: Request, res: Response): Promise<any> => {
+export const getAdminById = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
@@ -119,7 +118,13 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
             where: { 
                 id,
                 deletedAt: IsNull()
-            } 
+            } ,
+            select: {
+                id: true,
+                username: true,
+                role: true,
+                status: true
+            }
         });
 
         if (!user) {
@@ -127,12 +132,7 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
         }
 
         return res.json({
-            data: {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-                status: user.status
-            },
+            data: user,
             error: null,
             status: 200
         });
@@ -142,7 +142,7 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
     }
 };
 
-export const updateUser = async (req: Request, res: Response): Promise<any> => {
+export const updateAdmin = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
@@ -155,7 +155,7 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
             where: { 
                 id,
                 deletedAt: IsNull()
-            } 
+            }
         });
 
         if (!user) {
@@ -184,7 +184,7 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
     }
 };
 
-export const deleteUser = async (req: Request, res: Response): Promise<any> => {
+export const deleteAdmin = async (req: Request, res: Response): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
