@@ -39,6 +39,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/', (req: any, res: any) => res.send('ok'))
 app.use("/", adminRouter);
 app.use("/user", userRouter);
 setupSwagger(app);
