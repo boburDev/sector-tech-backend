@@ -4,6 +4,8 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
+    CreateDateColumn,
+    DeleteDateColumn,
 } from "typeorm";
 
 import { Users } from "./user.entity";
@@ -47,4 +49,10 @@ export class Cart {
     @ManyToOne(() => Users, (user) => user.saved_products)
     @JoinColumn({ name: "userId" })
     user: Users;
+
+    @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+    
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

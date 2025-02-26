@@ -45,7 +45,7 @@ router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), 
  * @swagger
  * /user/cart/all:
  *   get:
- *     summary: Get cart products
+ *     summary: Get all carts user
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []

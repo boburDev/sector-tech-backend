@@ -254,6 +254,7 @@ export const getProductCarts = async (req: Request, res: Response): Promise<any>
         userId: id,
       },
       order: { id: "DESC" },
+      relations:["product","user"],
       select: {
         product: {
           id: true,

@@ -11,7 +11,7 @@ export const adminValidateSchema = Joi.object({
   password: Joi.string().min(4).max(50).required().messages({
     "string.base": "Password should be a type of text",
     "string.empty": "Password cannot be empty",
-    "string.min": "Password should have a minimum length of 6",
+    "string.min": "Password should have a minimum length of 4",
     "string.max": "Password should have a maximum length of 50",
     "any.required": "Password is required",
   }),
