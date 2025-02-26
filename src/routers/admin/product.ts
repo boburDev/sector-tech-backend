@@ -82,6 +82,149 @@ router.get('/by-id/:id', validateAdminToken,  validateParams(uuidSchema), Produc
  */
 router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.createProduct);
 
+/**
+ * @swagger
+ * /product/update/{id}:
+ *   put:
+ *     summary: Update a product by ID
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "New Product Title"
+ *               articul:
+ *                 type: string
+ *                 example: "ART123"
+ *               productCode:
+ *                 type: string
+ *                 example: "PRD123"
+ *               characteristics:
+ *                 type: string
+ *                 example: '{"size":"L","color":"Red"}'
+ *               description:
+ *                 type: string
+ *                 example: "Short description of the product"
+ *               fullDescription:
+ *                 type: string
+ *                 example: "Detailed full description of the product"
+ *               price:
+ *                 type: number
+ *                 example: 199.99
+ *               inStock:
+ *                 type: boolean
+ *                 example: true
+ *               brandId:
+ *                 type: string
+ *                 example: "brand123"
+ *               conditionId:
+ *                 type: string
+ *                 example: "condition123"
+ *               relevanceId:
+ *                 type: string
+ *                 example: "relevance123"
+ *               catalogId:
+ *                 type: string
+ *                 example: "catalog123"
+ *               subcatalogId:
+ *                 type: string
+ *                 example: "subcatalog123"
+ *               categoryId:
+ *                 type: string
+ *                 example: "category123"
+ *               productMainImage:
+ *                 type: string
+ *                 format: binary
+ *               productImages:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               fullDescriptionImages:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Product updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Product updated"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                       example: "New Product Title"
+ *                     articul:
+ *                       type: string
+ *                       example: "ART123"
+ *                     price:
+ *                       type: number
+ *                       example: 199.99
+ *                     mainImage:
+ *                       type: string
+ *                       example: "images/main-image.png"
+ *       400:
+ *         description: Validation error or invalid ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       404:
+ *         description: Product or related entity not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: null
+ *                 error:
+ *                   type: string
+ *                   example: "Product not found"
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+
+router.put('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.updateProduct);
+
 
 export default router;
 
