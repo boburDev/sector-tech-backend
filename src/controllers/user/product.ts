@@ -2,18 +2,28 @@ import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product, SavedProduct } from "../../entities/products.entity";
 import { IsNull } from "typeorm";
-import { ProductCondition, ProductRelevance } from "../../entities/product_details.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
-const conditonRepository = AppDataSource.getRepository(ProductCondition);
-const revalanceRepository = AppDataSource.getRepository(ProductRelevance);
 
-export const getProducts = async (req: Request,res: Response): Promise<any> => {
+export const getProducts = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { condition, revalance } = req.query;
+    const condition = req.query.condition === "true";
+    const revalance = req.query.revalance === "true";
+
+    const relation: string[] = [];
     
+    if (condition) {
+      relation.push("conditions");
+    }
+
+    // console.log('Revalance:', revalance);
+    if (revalance) {
+      relation.push("relevances");
+    }
+
     const products = await productRepository.find({
+      relations: relation,
       where: {
         deletedAt: IsNull(),
       },
@@ -25,8 +35,22 @@ export const getProducts = async (req: Request,res: Response): Promise<any> => {
         articul: true,
         inStock: true,
         price: true,
-        mainImage: true
-      },
+        mainImage: true,
+        ...(condition && {
+          conditions: {
+            id: true,
+            slug: true,
+            title: true
+          }
+        }),
+        ...(revalance && {
+          relevances: {
+            id: true,
+            slug: true,
+            title: true
+          }
+        })
+      }
     });
 
     res.json({
@@ -35,6 +59,7 @@ export const getProducts = async (req: Request,res: Response): Promise<any> => {
       status: 200,
     });
   } catch (error) {
+    console.error("Error fetching products:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -44,9 +69,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
     const { id } = req.params;
     const product = await productRepository.findOne({
       relations: [
-        "catalog",
-        "subcatalog",
-        "category",
         "comments",
         "questions",
         "brand",
@@ -67,23 +89,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
         fullDescriptionImages: true,
         characteristics: true,
         images: true,
-        catalog: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-        subcatalog: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-        category: {
-          id: true,
-          title: true,
-          slug: true,
-          isPopular: true,
-          path: true,
-        },
         comments: {
           id: true,
           commentBody: true,
