@@ -85,7 +85,7 @@ router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productM
 /**
  * @swagger
  * /product/update/{id}:
- *   post:
+ *   put:
  *     summary: Update a product by ID
  *     tags: [Product]
  *     security:
