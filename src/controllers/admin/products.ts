@@ -37,24 +37,11 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             catalogId: true,
             categoryId: true,
             conditionId: true,
-            createdAt: true,
-            deletedAt: true,
             relevanceId: true,
             subcatalogId: true,
         },
         where: {
             deletedAt: IsNull(),
-        },
-        relations: [
-            "brand",
-            "conditions",
-            "relevances",
-            "catalog",
-            "subcatalog",
-            "category",
-            "questions",
-            "comments",
-        ],
     });
 
     res.json({
