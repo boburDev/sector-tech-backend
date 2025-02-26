@@ -29,6 +29,10 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         inStock: true,
         price: true,
         mainImage: true,
+        fullDescription:true,
+        characteristics: true,
+        fullDescriptionImages: true,
+        images:true,
       },
       where: {
         deletedAt: IsNull(),
