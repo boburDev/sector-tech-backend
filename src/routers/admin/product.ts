@@ -223,7 +223,7 @@ router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productM
  *                   example: "Internal server error"
  */
 
-router.post('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.updateProduct);
+router.put('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.updateProduct);
 
 
 export default router;

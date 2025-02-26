@@ -42,6 +42,17 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         },
         where: {
             deletedAt: IsNull(),
+        },
+        relations: [
+            "brand",
+            "conditions",
+            "relevances",
+            "catalog",
+            "subcatalog",
+            "category",
+            "questions",
+            "comments",
+        ],
     });
 
     res.json({
@@ -50,7 +61,6 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         status: 200
     });
 };
-
 
 export const getProductById = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
