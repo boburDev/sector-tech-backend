@@ -19,26 +19,43 @@ const categoryRepository = AppDataSource.getRepository(Category);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
     const products = await productRepository.find({
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        articul: true,
-        productCode: true,
-        description: true,
-        inStock: true,
-        price: true,
-        mainImage: true,
-        fullDescription:true,
-        characteristics: true,
-        fullDescriptionImages: true,
-        images:true,
-      },
-      where: {
-        deletedAt: IsNull(),
-      },
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+            articul: true,
+            productCode: true,
+            description: true,
+            inStock: true,
+            price: true,
+            mainImage: true,
+            fullDescription: true,
+            characteristics: true,
+            fullDescriptionImages: true,
+            images: true,
+            brandId: true,
+            catalogId: true,
+            categoryId: true,
+            conditionId: true,
+            createdAt: true,
+            deletedAt: true,
+            relevanceId: true,
+            subcatalogId: true,
+        },
+        where: {
+            deletedAt: IsNull(),
+        },
+        relations: [
+            "brand",
+            "conditions",
+            "relevances",
+            "catalog",
+            "subcatalog",
+            "category",
+            "questions",
+            "comments",
+        ],
     });
-
 
     res.json({
         data: products,
@@ -46,6 +63,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         status: 200
     });
 };
+
 
 export const getProductById = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
