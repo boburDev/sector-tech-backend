@@ -2,11 +2,8 @@ import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
 import { IsNull } from "typeorm";
-<<<<<<< HEAD
 import { ProductCondition, ProductRelevance } from "../../entities/product_details.entity";
 import { SavedProduct } from "../../entities/user_details.entity";
-=======
->>>>>>> 3e4f7e2c3d35279aa1138ea7e8589c5dee489dba
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
