@@ -16,7 +16,7 @@ import {
   ProductRelevance,
 } from "./product_details.entity";
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
-import { SavedProduct } from "./user_details.entity";
+import { Cart, SavedProduct } from "./user_details.entity";
 
 @Entity()
 export class Product {
@@ -109,6 +109,9 @@ export class Product {
 
   @OneToMany(() => SavedProduct, (saved_products) => saved_products.product)
   saved_products: SavedProduct[];
+
+  @OneToMany(() => Cart, (cart) => cart.product)
+  carts: Cart[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -7,7 +7,7 @@ import {
 } from "typeorm";
 import { ProductQuestion, ProductComment } from "./product_details.entity";
 import * as bcrypt from "bcrypt";
-import { SavedProduct } from "./user_details.entity";
+import { Cart, SavedProduct } from "./user_details.entity";
 
 @Entity()
 export class Users {
@@ -34,6 +34,9 @@ export class Users {
 
   @OneToMany(() => SavedProduct, (savedProduct) => savedProduct.user)
   saved_products: SavedProduct[];
+
+  @OneToMany(() => Cart, (cart) => cart.user)
+  cart: Cart[];
 
   @BeforeInsert()
   async hashPassword() {

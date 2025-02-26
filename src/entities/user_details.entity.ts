@@ -28,3 +28,23 @@ export class SavedProduct {
     @JoinColumn({ name: "userId" })
     user: Users;
 }
+
+@Entity("cart")
+export class Cart {
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
+
+    @Column()
+    productId: string;
+
+    @Column()
+    userId: string;
+
+    @ManyToOne(() => Product, (product) => product.saved_products)
+    @JoinColumn({ name: "productId" })
+    product: Product;
+
+    @ManyToOne(() => Users, (user) => user.saved_products)
+    @JoinColumn({ name: "userId" })
+    user: Users;
+}
