@@ -4,11 +4,10 @@ import {
   Column,
   OneToMany,
   BeforeInsert,
-  ManyToOne,
 } from "typeorm";
 import { ProductQuestion, ProductComment } from "./product_details.entity";
 import * as bcrypt from "bcrypt";
-import { SavedProduct } from "./products.entity";
+import { SavedProduct } from "./user_details.entity";
 
 @Entity()
 export class Users {
