@@ -24,18 +24,18 @@ jobs:
       - name: Test SSH Connection
         run: |
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
         shell: bash
 
       - name: Test Git Access
         run: |
-          ssh ${{ secrets.USER }}@${{ secrets.HOST }} "git ls-remote https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git"
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "git ls-remote https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git"
         shell: bash
 
       - name: Deploy to server
         env:
           HOST: ${{ secrets.HOST }}
-          USER: ${{ secrets.USER }}
+          USER: ${{ secrets.USERNAME }}
           APP_DIR: /root/sertor_technology/sector_tech
           PORT: ${{ secrets.PORT }}
           G_TOKEN: ${{ secrets.G_TOKEN }}
