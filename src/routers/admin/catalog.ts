@@ -438,7 +438,6 @@ router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSche
  */
 router.patch("/category/popular/create", validateAdminToken, validate(categoryIdsSchema), Catalog.createPopularCategory);
 
-
 /**
  * @swagger
  * /catalog/categories/all:
