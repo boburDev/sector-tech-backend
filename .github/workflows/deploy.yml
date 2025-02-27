@@ -21,14 +21,14 @@ jobs:
         env:
           HOST: ${{ secrets.HOST }}
           USER: ${{ secrets.USERNAME }}
-          APP_DIR: /root/sector_tech  # ✅ Change deployment directory
+          APP_DIR: /root/sertor_technology/sector_tech
           PORT: ${{ secrets.PORT }}
           G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
           ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
           ssh $USER@$HOST "
             sudo mkdir -p $APP_DIR
-            sudo chown -R \$USER:\$USER $APP_DIR  # ✅ Ensure correct permissions
+            sudo chown -R \$USER:\$USER $APP_DIR
 
             if [ ! -d $APP_DIR/.git ]; then
               git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
