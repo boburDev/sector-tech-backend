@@ -45,8 +45,8 @@ export const uploadPhoto = multer({
     storage: storage,
     limits: {
         files: 5,
-        fileSize: 30 * 1024 * 1024
-    }, // 30MB limits
+        fileSize: 1 * 1024 * 1024
+    }, // 1MB limits
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
         try {
             const isValidType = photo.includes(file.mimetype);
