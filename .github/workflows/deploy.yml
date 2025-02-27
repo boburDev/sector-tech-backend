@@ -21,31 +21,36 @@ jobs:
           ssh-add ~/.ssh/id_rsa
         shell: bash
 
-      - name: Deploy to server
-        env:
-          HOST: ${{ secrets.HOST }}
-          USER: ${{ secrets.USERNAME }}
-          APP_DIR: "/root/sector_tech"
-          PORT: ${{ secrets.PORT }}
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+      - name: Debug Secrets Values
         run: |
-          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
-          ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
+          echo "HOST=${{ secrets.HOST }}"
+          echo "USERNAME=${{ secrets.USERNAME }}"
+          echo "APP_DIR=/root/sector_tech"
 
-          # Ensure essential variables are set
-          if [[ -z "$APP_DIR" || -z "$USER" ]]; then
-            echo "Error: APP_DIR or USER is not set."
+      - name: Deploy to server
+        run: |
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
+          set -e
+
+          # Define variables explicitly within SSH session
+          USERNAME="${{ secrets.USERNAME }}"
+          HOST="${{ secrets.HOST }}"
+          APP_DIR="/root/sector_tech"
+
+          echo "Checking essential variables..."
+          if [[ -z "$APP_DIR" || -z "$USERNAME" ]]; then
+            echo "Error: APP_DIR or USERNAME is not set."
             exit 1
           fi
 
-          # Ensure the deployment directory exists and is owned by the user
+          echo "Creating application directory and setting permissions..."
           sudo mkdir -p $APP_DIR
-          sudo chown -R $USER:$USER $APP_DIR
+          sudo chown -R $USERNAME:$USERNAME $APP_DIR
 
-          # Clone or update the repository
           echo "Cloning or updating repository..."
           if [ ! -d "$APP_DIR/.git" ]; then
-            git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
+            git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
           else
             cd $APP_DIR
             git reset --hard HEAD
@@ -54,10 +59,9 @@ jobs:
 
           cd $APP_DIR
 
-          # Create .env file
-          echo "Generating .env file..."
+          echo "Writing environment variables to .env file..."
           cat > .env <<EOL
-          PORT=${PORT}
+          PORT=${{ secrets.PORT }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           DB_NAME=${{ secrets.DB_NAME }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
@@ -77,7 +81,5 @@ jobs:
           YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
-
-          EOF
+          '
         shell: bash
-
