@@ -22,15 +22,31 @@ jobs:
         shell: bash
 
       - name: Test SSH Connection
-        run: |
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
-        shell: bash
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
 
-      - name: Test Git Access
-        run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "git ls-remote https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git"
-        shell: bash
+      - name: Check and Install Node.js and npm if needed
+        run: ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "
+          if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
+            echo 'Node.js or npm not found. Installing...'
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
+            sudo apt-get install -y nodejs
+          else
+            echo 'Node.js and npm are already installed.'
+          fi
+        "
+
+      - name: Check Node.js and npm versions
+        run: ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "node -v && npm -v"
+
+      - name: Check and Install PM2 if needed
+        run: ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "
+          if ! command -v pm2 &> /dev/null; then
+            echo 'PM2 not found. Installing...'
+            npm install -g pm2
+          else
+            echo 'PM2 is already installed.'
+          fi
+        "
 
       - name: Deploy to server
         env:
@@ -48,9 +64,6 @@ jobs:
               git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
             else 
               cd $APP_DIR
-              git config --global credential.helper 'cache --timeout=3600'
-              git config --global user.email 'github-actions@github.com'
-              git config --global user.name 'GitHub Actions'
               git pull https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git main
             fi
 
@@ -79,10 +92,15 @@ jobs:
             npm install
             npm run build
 
+            if ! command -v pm2 &> /dev/null; then
+              echo 'PM2 not found. Installing...'
+              npm install -g pm2
+            fi
+
             pm2 delete sector_tech || true
             pm2 start dist/index.js --name sector_tech
           "
         shell: bash
 
       - name: Check PM2 Status
-        run: ssh ${{ secrets.USER }}@${{ secrets.HOST }} "pm2 list"
+        run: ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "pm2 list"
