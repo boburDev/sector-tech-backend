@@ -5,12 +5,12 @@ import { uploadPhoto } from "../../middlewares/multer";
 
 const router = Router();
 
-/**
- * @swagger
- * tags:
- *   name: Banners
- *   description: Banner management APIs
- */
+// /**
+//  * @swagger
+//  * tags:
+//  *   name: Banners
+//  *   description: Banner management APIs
+//  */
 
 /**
  * @swagger
@@ -149,4 +149,4 @@ router.put("/update/:id", validateAdminToken, uploadPhoto.single("bannerImage"),
  */
 router.delete("/delete/:id", validateAdminToken, BannerController.deleteBanner);
 
-export default router;
+// export default router;

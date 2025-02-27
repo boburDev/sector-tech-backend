@@ -4,11 +4,10 @@ import { Product } from '../../entities/products.entity';
 import { IsNull } from 'typeorm';
 import { productSchema } from '../../validators/product.validator';
 import { createSlug } from '../../utils/slug';
-import { deleteFile } from '../../middlewares/removeFiltePath';
+import { deleteFile, deleteFileBeforeSave } from '../../middlewares/removeFiltePath';
 import { Brand } from '../../entities/brands.entity';
 import { ProductCondition, ProductRelevance } from '../../entities/product_details.entity';
 import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
-import { isFunction } from 'util';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -99,13 +98,16 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
 export const createProduct = async (req: Request, res: Response): Promise<any> => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     
+    const productMainImage = files['productMainImage'][0];
     const productImages = files["productImages"] || [];
     const fullDescriptionImages = files["fullDescriptionImages"] || [];
     
     try {
         const { error, value } = productSchema.validate(req.body);
-
+        
         if (error) {
+            deleteFileBeforeSave(productMainImage.path)
+
             productImages.forEach(file => {
                 deleteFile(file.path)
             });
@@ -118,7 +120,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
         
         const images = productImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
         const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
-        const mainImage = images.splice(0,1)[0]
+        const mainImage = productMainImage.path.replace(/\\/g, "/").replace(/^public\//, "");
         const product = new Product();
         product.title = value.title;
         product.slug = createSlug(value.title);
@@ -154,6 +156,9 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
         res.json({ message: "Product created", data: sortedData });
     } catch (error) {
         console.error("Error creating product:", error);
+
+        deleteFileBeforeSave(productMainImage.path)
+
         productImages.forEach(file => {
             deleteFile(file.path)
         });
@@ -177,6 +182,8 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
         const { error, value } = productSchema.validate(req.body);
 
         if (error) {
+            deleteFileBeforeSave(productMainImage.path)
+
             productImages.forEach(file => {
                 deleteFile(file.path)
             });
@@ -315,6 +322,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
         res.json({ message: "Product created", data: sortedData });
     } catch (error) {
         console.error("Error creating product:", error);
+        deleteFileBeforeSave(productMainImage.path)
         productImages.forEach(file => {
             deleteFile(file.path)
         });

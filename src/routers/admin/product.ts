@@ -81,7 +81,7 @@ router.get('/by-id/:id', validateAdminToken,  validateParams(uuidSchema), Produc
  *       201:
  *         description: Product created successfully
  */
-router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.createProduct);
+router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 4 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.createProduct);
 
 /**
  * @swagger
@@ -223,7 +223,7 @@ router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productM
  *                   type: string
  *                   example: "Internal server error"
  */
-router.put('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.updateProduct);
+router.put('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 4 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.updateProduct);
 
 /**
  * @swagger
