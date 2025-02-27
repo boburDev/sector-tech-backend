@@ -85,12 +85,11 @@ jobs:
           echo "Restarting PM2 process..."
           if pm2 list | grep -q sector_tech; then
             echo "PM2 process found. Restarting..."
-            pm2 restart sector_tech
-          else
+            pm2 restart sector_tech            
+          fi
             echo "PM2 process not found. Starting a new one..."
             npm install
             npm run build
             pm2 start dist/index.js --name sector_tech
-          fi
           '
         shell: bash
