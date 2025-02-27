@@ -8,6 +8,7 @@ import { deleteFile } from '../../middlewares/removeFiltePath';
 import { Brand } from '../../entities/brands.entity';
 import { ProductCondition, ProductRelevance } from '../../entities/product_details.entity';
 import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
+import { isFunction } from 'util';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -18,6 +19,15 @@ const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
+    const { recommended } = req.query;
+    const whereCondition: any = {
+        deletedAt: IsNull(),
+    };
+
+    if(recommended === "true"){
+        whereCondition.recommended = true
+    }
+
     const products = await productRepository.find({
         select: {
             id: true,
@@ -33,6 +43,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             characteristics: true,
             fullDescriptionImages: true,
             images: true,
+            recommended:true,
             brandId: true,
             catalogId: true,
             categoryId: true,
@@ -40,19 +51,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             relevanceId: true,
             subcatalogId: true,
         },
-        where: {
-            deletedAt: IsNull(),
-        },
-        relations: [
-            "brand",
-            "conditions",
-            "relevances",
-            "catalog",
-            "subcatalog",
-            "category",
-            "questions",
-            "comments",
-        ],
+        where: whereCondition,
     });
 
     res.json({
@@ -321,6 +320,34 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
             deleteFile(file.path)
         });
 
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const addRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { productId } = req.body;
+
+        if (!productId) {
+            return res.status(400).json({ error: "Product ID is required" });
+        }
+
+        const product = await productRepository.findOne({ where: { id: productId, deletedAt: IsNull() } });
+
+        if (!product) { 
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        if (product.recommended) {
+            return res.status(200).json({ message: "Product is already recommended", id:product.catalogId });
+        }
+
+        product.recommended = true;
+        await productRepository.save(product);
+
+        return res.status(200).json({ message: "Product recommendation updated successfully", id: product.id });
+    } catch (error) {
+        console.error("Error updating recommended product:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 };

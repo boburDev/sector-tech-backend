@@ -40,20 +40,6 @@ router.get("/by-id/:id", validateAdminToken,validateParams(uuidSchema), Brands.g
 
 /**
  * @swagger
- * /brand/all:
- *   get:
- *     summary: Get all brands
- *     tags: [Brands]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of all brands
- */
-router.get("/all", validateAdminToken, Brands.getAllBrands);
-
-/**
- * @swagger
  * /brand/create:
  *   post:
  *     summary: Create a new brand
@@ -171,7 +157,7 @@ router.post("/popular/create", validateAdminToken, validate(brandIdsSchema), Bra
 
 /**
  * @swagger
- * /brand/popular/all:
+ * /brand/all:
  *   get:
  *     summary: Get all brands or popular brands
  *     tags: [Brands]
@@ -190,7 +176,7 @@ router.post("/popular/create", validateAdminToken, validate(brandIdsSchema), Bra
  *       500:
  *         description: Internal server error
  */
-router.get("/popular/all",validateAdminToken, Brands.getBrands);
+router.get("/all",validateAdminToken, Brands.getBrands);
 
 
 export default router;
