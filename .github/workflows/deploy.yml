@@ -57,7 +57,7 @@ jobs:
         env:
           HOST: ${{ secrets.HOST }}
           USER: ${{ secrets.USERNAME }}
-          APP_DIR: /root/sertor_technology/sector_tech
+          APP_DIR: /root/sertor_technology/
           PORT: ${{ secrets.PORT }}
           G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
