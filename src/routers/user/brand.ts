@@ -60,7 +60,6 @@ const router = Router();
  */
 router.get("/all", Brands.getBrands);
 
-
 /**
  * @swagger
  * /user/brand/{id}:
@@ -107,6 +106,5 @@ router.get("/all", Brands.getBrands);
  *         description: Internal server error
  */
 router.get("/:id", Brands.getBrandById);
-
 
 export default router;

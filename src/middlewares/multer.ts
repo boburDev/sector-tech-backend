@@ -7,7 +7,7 @@ const storage: StorageEngine = multer.diskStorage({
     destination: (req, file, cb) => {
         try {
             let uploadPath = './public'
-
+ 
             if (file.fieldname == 'logo') {
                 uploadPath += '/brands'
             } else if (file.fieldname === "bannerImage") {

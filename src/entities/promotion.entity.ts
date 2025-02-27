@@ -15,7 +15,10 @@ export class Promotion {
     title: string;
 
     @Column()
-    path: string;
+    coverImage: string;
+
+    @Column()
+    bannerImage: string;
 
     @Column("timestamp")
     expireDate: Date;

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Banner } from '../../entities/banner.entity';
 import { IsNull } from 'typeorm';
+import { deleteFile } from '../../middlewares/removeFiltePath';
 
 const bannerRepository = AppDataSource.getRepository(Banner);
 
@@ -20,7 +21,6 @@ export const createBanner = async (req: Request, res: Response): Promise<any> =>
 
         const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
-
         const newBanner = bannerRepository.create({
             routePath,
             redirectUrl,
@@ -36,18 +36,17 @@ export const createBanner = async (req: Request, res: Response): Promise<any> =>
     }
 };
 
-
 export const getBanners = async (req: Request, res: Response): Promise<any> => {
     try {
         const banners = await bannerRepository.find({
             where: { deletedAt: IsNull() },
             order: { createdAt: "DESC" },
-            // select: {
-            //     id: true,
-            //     imagesPath: true,
-            //     url: true,
-            //     webPage: true,
-            // }
+            select: {
+                id: true,
+                imagePath: true,
+                redirectUrl: true,
+                routePath: true,
+            }
         });
 
         if(banners.length === 0){
@@ -78,29 +77,35 @@ export const getBannerById = async (req: Request, res: Response): Promise<any> =
     }
 };
 
-// export const updateBanner = async (req: Request, res: Response): Promise<any> => {
-//     try {
-//         const { id } = req.params;
-//         const { imagePath, webPage, url } = req.body;
+export const updateBanner = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const { routePath, redirectUrl } = req.body;
+        const file = req.file as Express.Multer.File;
 
-//         const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
+        const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
-//         if (!banner) {
-//             return res.status(404).json({ message: "Banner not found" });
-//         }
+        if (!banner) {
+            return res.status(404).json({ message: "Banner not found" });
+        }
 
-//         banner.imagesPath = imagePath || banner.imagesPath;
-//         banner.webPage = webPage || banner.webPage;
-//         banner.url = url || banner.url;
+        if (file) {
+            deleteFile(banner.imagePath)
+            const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
+            banner.imagePath = newPath;
+        }
 
-//         await bannerRepository.save(banner);
+        banner.routePath = routePath || banner.routePath;
+        banner.redirectUrl = redirectUrl || banner.redirectUrl;
 
-//         return res.status(200).json({ data: banner, message: "Banner updated successfully" });
-//     } catch (error) {
-//         console.error("Update Banner Error:", error);
-//         return res.status(500).json({ message: "Internal server error" });
-//     }
-// };
+        await bannerRepository.save(banner);
+
+        return res.status(200).json({ data: banner, message: "Banner updated successfully" });
+    } catch (error) {
+        console.error("Update Banner Error:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 export const deleteBanner = async (req: Request, res: Response): Promise<any> => {
     try {
