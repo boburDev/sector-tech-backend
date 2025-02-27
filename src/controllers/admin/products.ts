@@ -139,7 +139,9 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
         product.subcatalogId = value.subcatalogId;
         product.categoryId = value.categoryId;
         product.images = images;
-        product.fullDescriptionImages = descImages;
+        if (descImages.length) {
+            product.fullDescriptionImages = descImages;
+        }
         product.mainImage = mainImage
         let savedProduct = await productRepository.save(product);
         

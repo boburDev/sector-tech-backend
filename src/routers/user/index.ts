@@ -6,6 +6,7 @@ import commentRouter from "./comment";
 import questionRouter from "./question";
 import cartRouter from "./cart";
 import brandRouter from "./brand";
+import bannerRouter from "./banner";
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use("/catalog", catalogRouter);
 router.use("/comment", commentRouter);
 router.use("/question", questionRouter);
 router.use("/brand", brandRouter)
+router.use("/banner", bannerRouter)
 
 export default router;
