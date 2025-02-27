@@ -88,6 +88,8 @@ jobs:
             pm2 restart sector_tech
           else
             echo "PM2 process not found. Starting a new one..."
+            npm install
+            npm run build
             pm2 start /dist/index.js --name sector_tech
           fi
           '
