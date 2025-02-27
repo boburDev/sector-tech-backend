@@ -12,6 +12,11 @@ jobs:
       - name: Upload code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: Configure SSH key
         run: |
           mkdir -p ~/.ssh
@@ -81,6 +86,11 @@ jobs:
           YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
+
+          echo "Ensuring correct Node.js version..."
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          node -v
 
           echo "Restarting PM2 process..."
           if pm2 list | grep -q sector_tech; then
