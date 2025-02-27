@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Banner } from '../../entities/banner.entity';
 import { IsNull } from 'typeorm';
+import { deleteFile } from '../../middlewares/removeFiltePath';
 
 const bannerRepository = AppDataSource.getRepository(Banner);
 
@@ -20,7 +21,6 @@ export const createBanner = async (req: Request, res: Response): Promise<any> =>
 
         const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
-
         const newBanner = bannerRepository.create({
             routePath,
             redirectUrl,
@@ -36,7 +36,6 @@ export const createBanner = async (req: Request, res: Response): Promise<any> =>
     }
 };
 
-
 export const getBanners = async (req: Request, res: Response): Promise<any> => {
     try {
         const banners = await bannerRepository.find({
@@ -44,9 +43,9 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
             order: { createdAt: "DESC" },
             select: {
                 id: true,
-                imagesPath: true,
-                url: true,
-                webPage: true,
+                imagePath: true,
+                redirectUrl: true,
+                routePath: true,
             }
         });
 
@@ -81,7 +80,8 @@ export const getBannerById = async (req: Request, res: Response): Promise<any> =
 export const updateBanner = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-        const { imagePath, webPage, url } = req.body;
+        const { routePath, redirectUrl } = req.body;
+        const file = req.file as Express.Multer.File;
 
         const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
@@ -89,9 +89,14 @@ export const updateBanner = async (req: Request, res: Response): Promise<any> =>
             return res.status(404).json({ message: "Banner not found" });
         }
 
-        banner.imagesPath = imagePath || banner.imagesPath;
-        banner.webPage = webPage || banner.webPage;
-        banner.url = url || banner.url;
+        if (file) {
+            deleteFile(banner.imagePath)
+            const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
+            banner.imagePath = newPath;
+        }
+
+        banner.routePath = routePath || banner.routePath;
+        banner.redirectUrl = redirectUrl || banner.redirectUrl;
 
         await bannerRepository.save(banner);
 

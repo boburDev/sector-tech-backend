@@ -14,23 +14,26 @@ const router = Router();
 
 /**
  * @swagger
- * /banner:
+ * /banner/create:
  *   post:
  *     summary: Create a new banner
  *     tags: [Banners]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               imagePath:
+ *               routePath:
  *                 type: string
- *               webPage:
+ *               redirectUrl:
  *                 type: string
- *               url:
+ *               bannerImage:
  *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Banner created successfully
@@ -43,10 +46,12 @@ router.post("/create", validateAdminToken, uploadPhoto.single("bannerImage"), Ba
 
 /**
  * @swagger
- * /banner:
+ * /banner/all:
  *   get:
  *     summary: Get all banners
  *     tags: [Banners]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of banners
@@ -57,10 +62,12 @@ router.get("/all", validateAdminToken, BannerController.getBanners);
 
 /**
  * @swagger
- * /banner/{id}:
+ * /banner/by-id/{id}:
  *   get:
  *     summary: Get banner by ID
  *     tags: [Banners]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -76,14 +83,16 @@ router.get("/all", validateAdminToken, BannerController.getBanners);
  *       500:
  *         description: Internal server error
  */
-router.get("by-id/:id",validateAdminToken, BannerController.getBannerById);
+router.get("/by-id/:id", validateAdminToken, BannerController.getBannerById);
 
 /**
  * @swagger
- * /banner/{id}:
+ * /banner/update/{id}:
  *   put:
  *     summary: Update a banner
  *     tags: [Banners]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -92,18 +101,19 @@ router.get("by-id/:id",validateAdminToken, BannerController.getBannerById);
  *           type: string
  *         description: Banner ID
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               imagePath:
+ *               routePath:
  *                 type: string
- *               webPage:
+ *               redirectUrl:
  *                 type: string
- *               url:
+ *               bannerImage:
  *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Banner updated successfully
@@ -112,14 +122,16 @@ router.get("by-id/:id",validateAdminToken, BannerController.getBannerById);
  *       500:
  *         description: Internal server error
  */
-router.put("update/:id",validateAdminToken, BannerController.updateBanner);
+router.put("/update/:id", validateAdminToken, uploadPhoto.single("bannerImage"), BannerController.updateBanner);
 
 /**
  * @swagger
- * /banner/{id}:
+ * /banner/delete/{id}:
  *   delete:
  *     summary: Delete a banner
  *     tags: [Banners]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -135,6 +147,6 @@ router.put("update/:id",validateAdminToken, BannerController.updateBanner);
  *       500:
  *         description: Internal server error
  */
-router.delete("delete/:id", validateAdminToken, BannerController.deleteBanner);
+router.delete("/delete/:id", validateAdminToken, BannerController.deleteBanner);
 
 export default router;
