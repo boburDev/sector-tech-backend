@@ -116,7 +116,7 @@ export class Product {
   @OneToMany(() => Cart, (cart) => cart.product)
   carts: Cart[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @DeleteDateColumn()

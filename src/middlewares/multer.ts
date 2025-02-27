@@ -54,9 +54,10 @@ export const uploadPhoto = multer({
 
             if (isValidType && isValidField) {
                 cb(null, true);
-            } else {
-                console.error("Invalid File Type or Field Name:", file.mimetype, file.fieldname);
+            } else if (!isValidType) {
                 cb(new Error("Only image files are allowed."));
+            } else {
+                cb(new Error("Invalid Field Name"));
             }
         } catch (error) {
             console.error("File Filter Error:", error);
