@@ -15,7 +15,7 @@ const storage: StorageEngine = multer.diskStorage({
             }
              else if (file.fieldname == 'categoryImage') {
                 uploadPath += '/categories'
-            } else if (file.fieldname == 'productImages') {
+            } else if (['productImages', 'productMainImage'].includes(file.fieldname)) {
                 uploadPath += '/products'
             } else if (file.fieldname == 'fullDescriptionImages') {
                 uploadPath += '/descImages'
@@ -53,7 +53,7 @@ export const uploadPhoto = multer({
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
         try {
             const isValidType = photo.includes(file.mimetype);
-            const isValidField = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage' ].includes(file.fieldname);
+            const isValidField = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage'].includes(file.fieldname);
 
             if (isValidType && isValidField) {
                 cb(null, true);

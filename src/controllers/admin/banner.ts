@@ -42,12 +42,12 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
         const banners = await bannerRepository.find({
             where: { deletedAt: IsNull() },
             order: { createdAt: "DESC" },
-            select: {
-                id: true,
-                imagesPath: true,
-                url: true,
-                webPage: true,
-            }
+            // select: {
+            //     id: true,
+            //     imagesPath: true,
+            //     url: true,
+            //     webPage: true,
+            // }
         });
 
         if(banners.length === 0){
@@ -78,29 +78,29 @@ export const getBannerById = async (req: Request, res: Response): Promise<any> =
     }
 };
 
-export const updateBanner = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const { id } = req.params;
-        const { imagePath, webPage, url } = req.body;
+// export const updateBanner = async (req: Request, res: Response): Promise<any> => {
+//     try {
+//         const { id } = req.params;
+//         const { imagePath, webPage, url } = req.body;
 
-        const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
+//         const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
-        if (!banner) {
-            return res.status(404).json({ message: "Banner not found" });
-        }
+//         if (!banner) {
+//             return res.status(404).json({ message: "Banner not found" });
+//         }
 
-        banner.imagesPath = imagePath || banner.imagesPath;
-        banner.webPage = webPage || banner.webPage;
-        banner.url = url || banner.url;
+//         banner.imagesPath = imagePath || banner.imagesPath;
+//         banner.webPage = webPage || banner.webPage;
+//         banner.url = url || banner.url;
 
-        await bannerRepository.save(banner);
+//         await bannerRepository.save(banner);
 
-        return res.status(200).json({ data: banner, message: "Banner updated successfully" });
-    } catch (error) {
-        console.error("Update Banner Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-};
+//         return res.status(200).json({ data: banner, message: "Banner updated successfully" });
+//     } catch (error) {
+//         console.error("Update Banner Error:", error);
+//         return res.status(500).json({ message: "Internal server error" });
+//     }
+// };
 
 export const deleteBanner = async (req: Request, res: Response): Promise<any> => {
     try {
