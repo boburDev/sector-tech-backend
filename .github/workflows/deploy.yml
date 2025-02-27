@@ -1,8 +1,10 @@
 name: Deploy to VPS
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,58 +17,66 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
         shell: bash
 
-      - name: Deploy to server
-        env:
-          HOST: ${{ secrets.HOST }}
-          USER: ${{ secrets.USERNAME }}
-          APP_DIR: /root/sertor_technology/sector_tech
-          PORT: ${{ secrets.PORT }}
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+      - name: Debug APP_DIR and USER
         run: |
-          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
-          ssh $USER@$HOST "
-            sudo mkdir -p $APP_DIR
-            sudo chown -R \$USER:\$USER $APP_DIR
+          echo "HOST=${{ secrets.HOST }}"
+          echo "USERNAME=${{ secrets.USERNAME }}"
+          echo "APP_DIR=/root/sector_tech"
 
-            if [ ! -d $APP_DIR/.git ]; then
-              git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
-            else 
-              cd $APP_DIR
-              git config --global credential.helper 'cache --timeout=3600'
-              git config --global user.email 'github-actions@github.com'
-              git config --global user.name 'GitHub Actions'
-              git pull https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git main
-            fi
+      - name: Deploy to server
+        run: |
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
 
-            cd $APP_DIR
+          # Ensure essential variables are set
+          if [[ -z "${{ secrets.USERNAME }}" || -z "/root/sector_tech" ]]; then
+            echo "Error: APP_DIR or USER is not set."
+            exit 1
+          fi
 
-            echo '
-            PORT=${PORT}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
-            BASE_URL=${{ secrets.BASE_URL }}
-            FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
-            FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
-            FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
-            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
-            LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
-            LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
-            LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
-            YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
-            YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
-            YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
-            ' > .env
+          # Ensure the deployment directory exists and is owned by the user
+          sudo mkdir -p /root/sector_tech
+          sudo chown -R ${{ secrets.USERNAME }}:${{ secrets.USERNAME }} /root/sector_tech
 
+          # Clone or update the repository
+          echo "Cloning or updating repository..."
+          if [ ! -d "/root/sector_tech/.git" ]; then
+            git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git /root/sector_tech
+          else
+            cd /root/sector_tech
+            git reset --hard HEAD
+            git pull origin main
+          fi
 
-            npm install
-            npm run build
-            pm2 restart sector_tech || pm2 start dist/index.js --name sector_tech
-          "
+          cd /root/sector_tech
+
+          # Create .env file
+          echo "Generating .env file..."
+          cat > .env <<EOL
+          PORT=${{ secrets.PORT }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
+          BASE_URL=${{ secrets.BASE_URL }}
+          FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
+          FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
+          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+          LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
+          LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
+          LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
+          YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
+          YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
+          YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
+          EOL
+
+          EOF
         shell: bash
