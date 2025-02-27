@@ -39,7 +39,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post("/create", validateAdminToken, uploadPhoto.fields([{ name: "bannerImages", maxCount: 5 }]), BannerController.createBanner);
+router.post("/create", validateAdminToken, uploadPhoto.single("bannerImage"), BannerController.createBanner);
 
 /**
  * @swagger

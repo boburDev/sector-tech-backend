@@ -7,25 +7,29 @@ const bannerRepository = AppDataSource.getRepository(Banner);
 
 export const createBanner = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { webPage, url } = req.body;
-        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-        console.log("Received files:", req.files);
+        const { routePath, redirectUrl } = req.body;
+        const file = req.file as Express.Multer.File;
 
-        if (!webPage || !url || !files || !files.bannerImages) {
-            return res.status(400).json({ message: "All fields are required" });
+        if (!redirectUrl || !routePath || !file) {
+            return res.json({
+                data: null,
+                error: 'All fields are required',
+                status: 400
+            });
         }
 
-        const imagePaths = files.bannerImages.map((file) => file.path);
+        const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
+
 
         const newBanner = bannerRepository.create({
-            webPage,
-            url,
-            imagesPath: imagePaths 
+            routePath,
+            redirectUrl,
+            imagePath: newPath 
         });
 
-        await bannerRepository.save(newBanner);
-
-        return res.status(201).json({ message: "Banner created successfully", data: newBanner });
+        const savedBanner = await bannerRepository.save(newBanner);
+        const { createdAt, deletedAt, ...bannerData } = savedBanner;
+        return res.status(201).json({ message: "Banner created successfully", data: bannerData });
     } catch (error) {
         console.error("Create Banner Error:", error);
         return res.status(500).json({ message: "Internal server error" });
