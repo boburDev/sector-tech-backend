@@ -12,6 +12,7 @@ import "./common/strategy/linkiden.strategy";
 import "./common/strategy/yandex.strategy";
 import { setupSwagger } from "./config/swagger";
 import session from "express-session";
+import passport from "passport";
 
 dotenv.config(); 
 
