@@ -451,8 +451,8 @@ export const deleteSubcatalog = async (req: Request, res: Response): Promise<any
 export const getCategoriesBySubcatalogId = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
+        const { isPopular } = req.query;
 
-        // First check if subcatalog exists
         const subcatalog = await subcatalogRepository.findOne({
             where: {
                 id,
@@ -468,12 +468,19 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
             });
         }
 
-        // Get categories for this subcatalog
+        let whereCondition: any = {
+            subCatalogId: id,
+            deletedAt: IsNull(),
+        };
+
+        if (isPopular === "true") {
+            whereCondition.isPopular = true;
+        } else if (isPopular === "false") {
+            whereCondition.isPopular = false;
+        }
+
         const categories = await categoryRepository.find({
-            where: {
-                subCatalogId: id,
-                deletedAt: IsNull()
-            },
+            where: whereCondition,
             order: {
                 createdAt: 'DESC'
             }
@@ -487,7 +494,6 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
             });
         }
 
-        // Format response by removing timestamps
         const formattedCategories = categories.map(category => {
             const { createdAt, deletedAt, ...categoryData } = category;
             categoryData.path = categoryData.path.replace(/^public\//, "")
