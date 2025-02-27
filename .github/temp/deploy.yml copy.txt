@@ -1,3 +1,27 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload code
+        uses: actions/checkout@v4
+
+      - name: Configure SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+          ssh-keygen -F ${{ secrets.HOST }} || ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+        shell: bash
+
       - name: Deploy to server
         env:
           HOST: ${{ secrets.HOST }}
@@ -9,22 +33,15 @@
           ssh $USER@$HOST "
             set -e
 
-            echo 'Checking and installing Node.js and npm if needed...'
-            if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-              echo 'Node.js or npm not found. Installing...'
-              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-              sudo apt-get install -y nodejs
-            fi
-
             echo 'Checking application directory...'
             if [ ! -d '$APP_DIR' ]; then
               echo 'Creating application directory...'
               mkdir -p $APP_DIR
               git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
             fi
-
+            
             cd $APP_DIR
-
+            
             echo 'Updating repository...'
             git fetch --all
             git reset --hard origin/main
