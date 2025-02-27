@@ -25,30 +25,31 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
 
-      - name: Check and Install Node.js and npm if needed
+      - name: Check and Install Node.js, npm, and PM2 if needed
         run: |
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-          if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-            echo 'Node.js or npm not found. Installing...'
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
+          echo "Checking if Node.js, npm, and PM2 are installed..."
+
+          if ! command -v node &> /dev/null; then
+            echo "Node.js not found. Installing..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
             sudo apt-get install -y nodejs
           else
-            echo 'Node.js and npm are already installed.'
+            echo "Node.js is already installed."
           fi
-          EOF
 
-      - name: Check Node.js and npm versions
-        run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "node -v && npm -v"
+          if ! command -v npm &> /dev/null; then
+            echo "npm not found. Installing..."
+            sudo apt-get install -y npm
+          else
+            echo "npm is already installed."
+          fi
 
-      - name: Check and Install PM2 if needed
-        run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
           if ! command -v pm2 &> /dev/null; then
-            echo 'PM2 not found. Installing...'
+            echo "PM2 not found. Installing..."
             npm install -g pm2
           else
-            echo 'PM2 is already installed.'
+            echo "PM2 is already installed."
           fi
           EOF
 
@@ -96,15 +97,7 @@ jobs:
           npm install
           npm run build
 
-          if ! command -v pm2 &> /dev/null; then
-            echo 'PM2 not found. Installing...'
-            npm install -g pm2
-          fi
-
           pm2 delete sector_tech || true
           pm2 start dist/index.js --name sector_tech
           EOF
         shell: bash
-
-      - name: Check PM2 Status
-        run: ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "pm2 list"
