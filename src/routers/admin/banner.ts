@@ -5,12 +5,12 @@ import { uploadPhoto } from "../../middlewares/multer";
 
 const router = Router();
 
-// /**
-//  * @swagger
-//  * tags:
-//  *   name: Banners
-//  *   description: Banner management APIs
-//  */
+/**
+ * @swagger
+ * tags:
+ *   name: Banners
+ *   description: Banner management APIs
+ */
 
 /**
  * @swagger
