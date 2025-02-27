@@ -8,7 +8,6 @@ import { deleteFile, deleteFileBeforeSave } from '../../middlewares/removeFilteP
 import { Brand } from '../../entities/brands.entity';
 import { ProductCondition, ProductRelevance } from '../../entities/product_details.entity';
 import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
-import { isFunction } from 'util';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
