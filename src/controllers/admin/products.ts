@@ -335,6 +335,27 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
     }
 };
 
+export const deleteProduct = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const product = await productRepository.findOne({
+            where: { id, deletedAt: IsNull() }
+        });
+
+        if (!product) {
+            return res.status(404).json({ error: "Product not found or already deleted" });
+        }
+
+        product.deletedAt = new Date();
+        await productRepository.save(product);
+
+        return res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 export const addRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         const { productId } = req.body;
@@ -358,7 +379,7 @@ export const addRecommendedProduct = async (req: Request, res: Response): Promis
 
         return res.status(200).json({ message: "Product recommendation updated successfully", id: product.id });
     } catch (error) {
-        console.error("Error updating recommended product:", error);
+        // console.error("Error updating recommended product:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 };
