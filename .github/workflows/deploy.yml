@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "HOST=${{ secrets.HOST }}"
           echo "USERNAME=${{ secrets.USERNAME }}"
-          echo "APP_DIR=/root/sector_tech"
+          echo "APP_DIR=/root/sector_technology/sector-tech-backend"
 
       - name: Deploy to server
         run: |
@@ -36,7 +36,7 @@ jobs:
           # Define variables explicitly within SSH session
           USERNAME="${{ secrets.USERNAME }}"
           HOST="${{ secrets.HOST }}"
-          APP_DIR="/root/sector_tech"
+          APP_DIR="/root/sector_technology/sector-tech-backend"
 
           echo "Checking essential variables..."
           if [[ -z "$APP_DIR" || -z "$USERNAME" ]]; then
@@ -88,7 +88,7 @@ jobs:
             pm2 restart sector_tech
           else
             echo "PM2 process not found. Starting a new one..."
-            pm2 start dist/index.js --name sector_tech
+            pm2 start sector_technology/sector-tech-backend/dist/index.js --name sector_tech
           fi
           '
         shell: bash
