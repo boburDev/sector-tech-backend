@@ -34,27 +34,32 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
     }
 };
 
-export const getAllBrands = async (req: Request, res: Response): Promise<any> => {
+export const getBrands = async (req: Request, res: Response): Promise<any> => {
     try {
-        const brands = await brandRepository
-            .createQueryBuilder('brand')
-            .where('brand.deletedAt IS NULL')
-            .orderBy('brand.createdAt', 'DESC')
-            .getMany();
+        const { isPopular } = req.query;
 
-        const brandsWithoutDates = brands.map(brand => {
-            const { createdAt, deletedAt, ...brandData } = brand;
-            brandData.path = brandData.path.replace(/^public\//, "")
-            return brandData;
+        const whereCondition: any = {
+            deletedAt: IsNull(),
+        };
+
+        if (isPopular === "true") {
+            whereCondition.isPopular = true;
+        }
+
+        const brands = await brandRepository.find({
+            where: whereCondition,
+            select: {
+                id: true,
+                title: true,
+                path: true,
+                isPopular: true,
+                slug: true,
+            }
         });
 
-        return res.json({
-            data: brandsWithoutDates,
-            error: null,
-            status: 200
-        });
+        return res.status(200).json({data: brands, error: null, status: 200});
     } catch (error) {
+        // console.error("getBrands Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
-

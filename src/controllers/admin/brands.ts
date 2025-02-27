@@ -41,31 +41,6 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
     }
 };
 
-export const getAllBrands = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const brands = await brandRepository.find({
-            select: {
-                id: true,
-                title: true,
-                slug: true,
-                path: true,
-                isPopular: true,
-            },
-            where: {
-                deletedAt: IsNull(),
-            },
-        });
-
-        return res.json({
-            data: brands,
-            error: null,
-            status: 200
-        });
-    } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-};
-
 export const createBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         const { title } = req.body;
@@ -227,22 +202,19 @@ export const createPopularBrand = async (req: Request, res: Response): Promise<a
         }
 
         const updatedBrands = [];
-        const alreadyPopularBrands = [];
 
         for (const brand of brands) {
             if (!brand.isPopular) {
                 brand.isPopular = true;
                 await brandRepository.save(brand);
                 updatedBrands.push(brand.id);
-            } else {
-                alreadyPopularBrands.push(brand.id);
-            }
+            } 
         }
 
         return res.status(200).json({ 
             message: "Brands processed successfully", 
-            updatedBrands,
-            alreadyPopularBrands
+            data: updatedBrands,
+            status: 200
         });
 
     } catch (error) {
