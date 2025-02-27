@@ -81,5 +81,14 @@ jobs:
           YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
+
+          echo "Restarting PM2 process..."
+          if pm2 list | grep -q sector_tech; then
+            echo "PM2 process found. Restarting..."
+            pm2 restart sector_tech
+          else
+            echo "PM2 process not found. Starting a new one..."
+            pm2 start dist/index.js --name sector_tech
+          fi
           '
         shell: bash
