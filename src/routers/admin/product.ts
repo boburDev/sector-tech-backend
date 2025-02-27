@@ -2,8 +2,9 @@ import express from 'express'
 import * as Product from '../../controllers/admin/products';
 import { validateAdminToken } from '../../middlewares/adminValidator';
 import { uploadPhoto } from '../../middlewares/multer';
-import { validateParams } from '../../middlewares/validate';
+import { validate, validateParams } from '../../middlewares/validate';
 import { uuidSchema } from '../../validators/admin.validate';
+import { productIdParamsSchema } from '../../validators/product-comment.validate';
 const router = express.Router();
 
 /**
@@ -222,9 +223,49 @@ router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productM
  *                   type: string
  *                   example: "Internal server error"
  */
-
 router.put('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 5 }, { name: "fullDescriptionImages", maxCount: 5 } ]), Product.updateProduct);
 
+/**
+ * @swagger
+ * /product/recommend/add:
+ *   patch:
+ *     summary: Mark a product as recommended
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productId
+ *             properties:
+ *               productId:
+ *                 type: string
+ *                 example: "12345"
+ *     responses:
+ *       200:
+ *         description: Product recommendation updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Product recommendation updated successfully"
+ *                 product:
+ *                   type: object
+ *       400:
+ *         description: Product ID is required
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/recommend/add',validate(productIdParamsSchema), validateAdminToken, Product.addRecommendedProduct);
 
 export default router;
 

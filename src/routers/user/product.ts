@@ -19,9 +19,61 @@ const router = Router();
  *   get:
  *     summary: Get all products
  *     tags: [Product]
+ *     parameters:
+ *       - in: query
+ *         name: condition
+ *         schema:
+ *           type: boolean
+ *         description: Include condition relations if true
+ *         example: true
+ *       - in: query
+ *         name: revalance
+ *         schema:
+ *           type: boolean
+ *         description: Include relevance relations if true
+ *         example: false
+ *       - in: query
+ *         name: recommended
+ *         schema:
+ *           type: boolean
+ *         description: Filter products that are recommended
+ *         example: true
  *     responses:
  *       200:
  *         description: List of all products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "12345"
+ *                       title:
+ *                         type: string
+ *                         example: "Awesome Product"
+ *                       slug:
+ *                         type: string
+ *                         example: "awesome-product"
+ *                       inStock:
+ *                         type: boolean
+ *                         example: true
+ *                       price:
+ *                         type: number
+ *                         example: 199.99
+ *                       mainImage:
+ *                         type: string
+ *                         example: "https://example.com/image.jpg"
+ *                       recommended:
+ *                         type: boolean
+ *                         example: true
+ *       500:
+ *         description: Internal server error
  */
 router.get("/all", Product.getProducts);
 

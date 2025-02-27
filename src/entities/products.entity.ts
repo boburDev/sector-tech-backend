@@ -59,6 +59,9 @@ export class Product {
   @Column("json", { nullable: true })
   fullDescriptionImages: string[];
 
+  @Column({ type:"boolean", default: false})
+  recommended: boolean
+
   @Column()
   brandId: string;
 

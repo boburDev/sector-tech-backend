@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
 import { IsNull } from "typeorm";
-import { ProductCondition, ProductRelevance } from "../../entities/product_details.entity";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
@@ -13,23 +12,30 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
   try {
     const condition = req.query.condition === "true";
     const revalance = req.query.revalance === "true";
+    const { recommended } = req.query;
+    const whereCondition: any = {
+      deletedAt: IsNull(),
+    };
 
+    if (recommended === "true") {
+      whereCondition.recommended = true
+    }
+    if(recommended === "false"){
+      whereCondition.recommended = "false"
+    }
     const relation: string[] = [];
     
     if (condition) {
       relation.push("conditions");
     }
 
-    // console.log('Revalance:', revalance);
     if (revalance) {
       relation.push("relevances");
     }
 
     const products = await productRepository.find({
       relations: relation,
-      where: {
-        deletedAt: IsNull(),
-      },
+      where: whereCondition,
       order: { createdAt: "DESC" },
       select: {
         id: true,
@@ -39,6 +45,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         inStock: true,
         price: true,
         mainImage: true,
+        recommended:true,
         ...(condition && {
           conditions: {
             id: true,
@@ -291,3 +298,21 @@ export const getProductCarts = async (req: Request, res: Response): Promise<any>
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const searchProduct = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { title } = req.body;
+
+    const products = await productRepository.find({
+      where: { deletedAt: IsNull(), title }
+    })
+
+    if(products.length === 0){
+      return res.status(404).json({ message:"Products not found", error:null, status: 404 })
+    }
+
+    return res.status(200).json({ data: products, error: null, status: 200 });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
