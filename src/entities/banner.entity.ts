@@ -5,14 +5,14 @@ export class Banner {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column("text", { array: true }) 
-    imagesPath: string[];
+    @Column() 
+    imagePath: string;
 
     @Column()
-    webPage: string;
+    redirectUrl: string;
 
     @Column()
-    url: string;
+    routePath: string;
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
