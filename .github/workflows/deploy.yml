@@ -19,80 +19,68 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
-          ssh-keygen -F ${{ secrets.HOST }} || ssh-keyscan -H ${{ secrets.HOST }} > ~/.ssh/known_hosts
+          ssh-keygen -F ${{ secrets.HOST }} || ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
         shell: bash
 
       - name: Deploy to server
+        env:
+          HOST: ${{ secrets.HOST }}
+          USER: ${{ secrets.USERNAME }}
+          APP_DIR: /sector_tech
+          PORT: ${{ secrets.PORT }}
+          G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
-          set -e
+          ssh $USER@$HOST "
+            set -e
 
-          # Define variables
-          USERNAME="${{ secrets.USERNAME }}"
-          HOST="${{ secrets.HOST }}"
-          APP_DIR="/root/sector_technology/sector-tech-backend"
-
-          echo "Checking essential variables..."
-          if [[ -z "$APP_DIR" || -z "$USERNAME" ]]; then
-            echo "Error: APP_DIR or USERNAME is not set."
-            exit 1
-          fi
-
-          echo "Creating application directory and setting permissions..."
-          sudo mkdir -p $APP_DIR
-          sudo chown -R $USERNAME:$USERNAME $APP_DIR
-
-          echo "Cloning or updating repository..."
-          if [ ! -d "$APP_DIR/.git" ]; then
-            git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
-          else
+            echo 'Checking application directory...'
+            if [ ! -d '$APP_DIR' ]; then
+              echo 'Creating application directory...'
+              mkdir -p $APP_DIR
+              git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
+            fi
+            
             cd $APP_DIR
+            
+            echo 'Updating repository...'
             git fetch --all
             git reset --hard origin/main
-          fi
 
-          cd $APP_DIR
+            echo 'Setting up environment variables...'
+            cat > .env <<EOL
+            PORT=${PORT}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
+            EOL
 
-          echo "Writing environment variables to .env file..."
-          cat > .env <<EOL
-          PORT=${{ secrets.PORT }}
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_NAME=${{ secrets.DB_NAME }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
-          BASE_URL=${{ secrets.BASE_URL }}
-          FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
-          FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
-          FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
-          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
-          LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
-          LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
-          LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
-          YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
-          YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
-          YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
-          EOL
-          
-          chmod 600 .env
+            chmod 600 .env
 
-          echo "Checking if PM2 is installed..."
-          if ! command -v pm2 &> /dev/null; then
-            echo "PM2 not found, installing..."
-            npm install -g pm2
-          fi
+            echo 'Checking for node_modules...'
+            if [ ! -d "node_modules" ]; then
+              echo 'Installing dependencies...'
+              npm install
+            else
+              echo 'Skipping npm install, node_modules exists'
+            fi
 
-          echo "Checking if PM2 process exists..."
-          if pm2 list | grep -q sector_tech; then
-            echo "PM2 process found. Restarting..."
-            pm2 restart sector_tech            
-          else
-            echo "PM2 process not found. Starting a new one..."
-            npm install
+            echo 'Building project...'
             npm run build
-            pm2 start dist/index.js --name sector_tech
-          fi
-          '
+
+            echo 'Checking if PM2 is installed...'
+            if ! command -v pm2 &> /dev/null; then
+              echo 'PM2 not found, installing...'
+              npm install -g pm2
+            fi
+
+            echo 'Restarting PM2 process...'
+            if pm2 list | grep -q sector_tech; then
+              echo 'PM2 process found. Restarting...'
+              pm2 restart sector_tech
+            else
+              echo 'PM2 process not found. Starting a new one...'
+              pm2 start dist/index.js --name sector_tech
+            fi
+          "
         shell: bash
