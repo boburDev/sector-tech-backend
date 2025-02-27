@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
-import { Product, SavedProduct } from "../../entities/products.entity";
+import { Product } from "../../entities/products.entity";
 import { IsNull } from "typeorm";
+import { ProductCondition, ProductRelevance } from "../../entities/product_details.entity";
+import { Cart, SavedProduct } from "../../entities/user_details.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
+const cartProductRepository = AppDataSource.getRepository(Cart);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -152,7 +155,7 @@ export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
 
     if (existingSaved) {
       await savedProductRepository.remove(existingSaved);
-      return res.status(200).json({ message: "Product removed from saved." });
+      return res.status(200).json({ id:existingSaved.id, message: "Product removed from saved." });
     }
 
     const newSavedProduct = savedProductRepository.create({
@@ -161,7 +164,7 @@ export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
     });
 
     await savedProductRepository.save(newSavedProduct);
-    return res.status(201).json({ message: "Product saved successfully." });
+    return res.status(201).json({ id:newSavedProduct.id, message: "Product saved successfully." });
   } catch (error) {
     console.error("Error in toggleSaved:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -207,6 +210,83 @@ export const getUserSavedProducts = async (req: Request,res: Response): Promise<
         error: null,
         status: 200
       });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const toggleCart = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { productId } = req.body;
+    const { id: userId } = req.user;
+
+    const existingCartItem = await cartProductRepository.findOne({
+      where: {
+        userId,
+        productId,
+      },
+    });
+
+    if (existingCartItem) {
+      await cartProductRepository.remove(existingCartItem);
+      return res.status(200).json({ id:existingCartItem.id, message: "Product removed from cart." });
+    }
+
+    const newCartItem = cartProductRepository.create({
+      userId,
+      productId,
+    });
+
+    await cartProductRepository.save(newCartItem);
+    return res.status(201).json({ id:newCartItem.id, message: "Product added to cart successfully." });
+  } catch (error) {
+    // console.error("Error in toggleCart:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getProductCarts = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.user;
+
+    const userCart = await cartProductRepository.find({
+      where: {
+        userId: id,
+      },
+      order: { id: "DESC" },
+      relations:["product","user"],
+      select: {
+        product: {
+          id: true,
+          mainImage: true,
+          title: true,
+          description: true,
+          images: true,
+          price: true,
+          articul: true,
+          slug: true,
+        },
+        user: {
+          id: true,
+          email: true,
+          phone: true,
+          name: true,
+        },
+      },
+    });
+
+    if (userCart.length === 0) {
+      return res.status(404).json({
+        message: "No products found in the user's cart.",
+      });
+    }
+
+    res.status(200).json({
+      message: "Cart products retrieved successfully",
+      data: userCart,
+      error: null,
+      status: 200,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }

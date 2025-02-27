@@ -66,8 +66,6 @@ router.get('/condition/by-id/:id', validateAdminToken,  validateParams(uuidSchem
  *             properties:
  *               title:
  *                 type: string
- *               name:
- *                 type: string
  *     responses:
  *       201:
  *         description: Product condition created successfully
@@ -188,8 +186,6 @@ router.get('/relavance/:id', validateAdminToken, validateParams(uuidSchema),  Pr
  *             type: object
  *             properties:
  *               title:
- *                 type: string
- *               name:
  *                 type: string
  *     responses:
  *       201:

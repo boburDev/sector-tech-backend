@@ -647,7 +647,7 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
         }
         if (title) {
              category.title = title
-             category.title = createSlug(title)
+             category.slug = createSlug(title)
         }
         const updatedCategory = await categoryRepository.save(category);
 
