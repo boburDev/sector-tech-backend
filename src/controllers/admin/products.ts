@@ -441,7 +441,7 @@ export const addPopularProduct = async (req: Request, res: Response): Promise<an
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -463,8 +463,7 @@ export const deletePopularProduct = async (req: Request, res: Response): Promise
 
         return res.status(200).json({ message: "Popular product deleted successfully" });
     } catch (error) {
-        console.error("Error deleting popular product:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 

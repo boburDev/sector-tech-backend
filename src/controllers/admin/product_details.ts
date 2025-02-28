@@ -26,7 +26,7 @@ export const getAllProductConditions = async (req: Request, res: Response): Prom
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -56,7 +56,7 @@ export const getProductConditionById = async (req: Request, res: Response): Prom
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -73,7 +73,7 @@ export const createProductCondition = async (req: Request, res: Response): Promi
             status: 201
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -96,7 +96,7 @@ export const updateProductCondition = async (req: Request, res: Response): Promi
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -117,7 +117,7 @@ export const deleteProductCondition = async (req: Request, res: Response): Promi
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -137,7 +137,7 @@ export const getAllProductRelavances = async (req: Request, res: Response): Prom
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -166,7 +166,7 @@ export const getProductRelavanceById = async (req: Request, res: Response): Prom
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -182,7 +182,7 @@ export const createProductRelavance = async (req: Request, res: Response): Promi
             status: 201
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -212,7 +212,7 @@ export const updateProductRelavance = async (req: Request, res: Response): Promi
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -233,7 +233,7 @@ export const deleteProductRelavance = async (req: Request, res: Response): Promi
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -261,7 +261,7 @@ export const addReplyToComment = async (req:Request, res:Response):Promise<any> 
         return res.status(200).json({data: savedComment, error:null, status: 200});
     } catch (error) {
         console.error("Error adding reply to comment:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
@@ -295,7 +295,7 @@ export const getAllProductComments = async (req: Request, res: Response): Promis
     return res.status(200).json({data: comments, error: null, status: 200});
   } catch (error) {
     console.error("Error fetching product comments:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -337,7 +337,7 @@ export const getProductCommentById = async (req: Request,res: Response): Promise
     return res.status(200).json({data: comment, error: null, status: 200});
   } catch (error) {
     console.error("Error fetching product comment:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -372,7 +372,7 @@ export const updateProductComment = async (req: Request, res: Response): Promise
     return res.status(200).json({data: updatedComment, error: null, status: 200 });
   } catch (error) {
     console.error("Error updating product comment:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -390,7 +390,7 @@ export const deleteProductComment = async (req: Request, res: Response): Promise
     return res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
     console.error("Error deleting product comment:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -433,7 +433,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
     return res.status(200).json({data: comments, error: null, status: 200});
   } catch (error) {
     console.error("Error fetching comments by productId:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -461,7 +461,7 @@ export const addReplyToQuestion = async (req: Request, res: Response): Promise<a
     return res.status(200).json({data: savedQuestion, error: null, status: 200});
   } catch (error) {
     console.error("Error adding reply to question:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -497,7 +497,7 @@ export const getAllProductQuestions = async (req: Request, res: Response): Promi
     return res.status(200).json({ data: questions, error:null, status: 200 });
   } catch (error) {
     console.error("Error fetching questions:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -538,7 +538,7 @@ export const getProductQuestionById = async (req: Request, res: Response): Promi
     return res.status(200).json({ data: question, error: null, status: 200 });
   } catch (error) {
     console.error("Error fetching question:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -555,7 +555,7 @@ export const deleteProductQuestion = async (req: Request, res: Response): Promis
     return res.status(200).json({ message: "Question deleted successfully" });
   } catch (error) {
     console.error("Error deleting question:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -590,6 +590,6 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
     return res.status(200).json({ data: questions, error: null, status: 200 });
   } catch (error) {
     console.error("Error fetching questions for product:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };

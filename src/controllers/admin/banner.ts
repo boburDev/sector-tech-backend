@@ -32,7 +32,7 @@ export const createBanner = async (req: Request, res: Response): Promise<any> =>
         return res.status(201).json({ message: "Banner created successfully", data: bannerData });
     } catch (error) {
         console.error("Create Banner Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -55,7 +55,7 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
         return res.status(200).json({ data: banners, error: null, status: 200 });
     } catch (error) {
         console.error("Get Banners Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -73,7 +73,7 @@ export const getBannerById = async (req: Request, res: Response): Promise<any> =
         return res.status(200).json({ data: banner, error: null, status: 200 });
     } catch (error) {
         console.error("Get Banner By ID Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -103,7 +103,7 @@ export const updateBanner = async (req: Request, res: Response): Promise<any> =>
         return res.status(200).json({ data: banner, message: "Banner updated successfully" });
     } catch (error) {
         console.error("Update Banner Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -122,6 +122,6 @@ export const deleteBanner = async (req: Request, res: Response): Promise<any> =>
         return res.status(200).json({ message: "Banner deleted successfully" });
     } catch (error) {
         console.error("Delete Banner Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
