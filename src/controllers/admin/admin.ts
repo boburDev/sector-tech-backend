@@ -50,13 +50,13 @@ export const createAdmin = async (req: Request, res: Response): Promise<any> => 
     try {
         const { username, password, role, status } = req.body;
                
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
+        // if (req.admin.role !== 'super') {
+        //     return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
+        // }
 
-        if (req.admin.username === username) {
-            return res.status(400).json({ message: 'Username already exists' });
-        }
+        // if (req.admin.username === username) {
+        //     return res.status(400).json({ message: 'Username already exists' });
+        // }
 
         const admin = new Admin();
         admin.username = username;
