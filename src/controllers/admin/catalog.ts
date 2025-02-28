@@ -277,6 +277,8 @@ export const getSubcatalogById = async (req: Request, res: Response): Promise<an
             status: 200
         });
     } catch (error) {
+        console.log(error);
+        
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
