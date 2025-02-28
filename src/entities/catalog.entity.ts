@@ -25,7 +25,7 @@ export class Catalog {
     @DeleteDateColumn()
     deletedAt: Date;
 }
-
+ 
 @Entity()
 export class Subcatalog {
     @PrimaryGeneratedColumn('uuid')
