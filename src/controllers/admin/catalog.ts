@@ -499,7 +499,6 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
 
         const formattedCategories = categories.map(category => {
             const { createdAt, deletedAt, ...categoryData } = category;
-            categoryData.path = categoryData.path.replace(/^public\//, "")
             return categoryData;
         });
 
