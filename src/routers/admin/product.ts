@@ -295,7 +295,6 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
  */
 router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken, Product.addRecommendedProduct);
 
-
 /**
  * @swagger
  * /product/popular/add:
@@ -328,13 +327,12 @@ router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken
  *       500:
  *         description: Internal server error
  */
-router.post('/popular/add',validate(productIdParamsSchema), validateAdminToken, Product.addPopularProduct);
-
+router.post('/popular/add', validateAdminToken, Product.addPopularProduct);
 
 /**
  * @swagger
  * /product/delete/popular/{id}:
- *   post:
+ *   delete:
  *     summary: Delete a popular product
  *     tags: [Product]
  *     security:
