@@ -32,16 +32,17 @@ jobs:
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
           set -e
-
-          # Define variables explicitly within SSH session
-          USERNAME="${{ secrets.USERNAME }}"
-          HOST="${{ secrets.HOST }}"
+          
+          # Define application directory
           APP_DIR="/root/sector_tech"
 
-          echo "Checking essential variables..."
-          if [[ -z "$APP_DIR" || -z "$USERNAME" ]]; then
-            echo "Error: APP_DIR or USERNAME is not set."
-            exit 1
+          echo "Checking and updating Node.js..."
+          if ! command -v node &> /dev/null || [[ "$(node -v)" < "v18" ]]; then
+            echo "Installing Node.js 18..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          else
+            echo "Node.js version is already 18 or higher."
           fi
 
           echo "Creating application directory and setting permissions..."
@@ -59,16 +60,10 @@ jobs:
 
           cd $APP_DIR
 
-          echo "Installing Node.js and npm..."
-          if ! command -v npm &> /dev/null; then
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-          fi
-
           echo "Installing dependencies..."
           npm install
 
-          echo "Installing TypeScript..."
+          echo "Ensuring TypeScript is installed..."
           npm install -g typescript
 
           echo "Building the project..."
@@ -76,39 +71,32 @@ jobs:
 
           echo "Writing environment variables to .env file..."
           cat > .env <<EOL
-          PORT=${{ secrets.PORT }}
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_NAME=${{ secrets.DB_NAME }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
-          BASE_URL=${{ secrets.BASE_URL }}
-          FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
-          FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
-          FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
-          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
-          LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
-          LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
-          LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
-          YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
-          YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
-          YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
-          EOL
-
-          echo "Checking if dist/index.js exists..."
-          if [ ! -f "dist/index.js" ]; then
-            echo "Error: dist/index.js not found! Build failed?"
-            exit 1
-          fi
+PORT=${{ secrets.PORT }}
+DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+DB_NAME=${{ secrets.DB_NAME }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
+BASE_URL=${{ secrets.BASE_URL }}
+FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
+FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
+GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
+FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
+SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
+LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
+LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
+YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
+YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
+YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
+EOL
 
           echo "Restarting PM2 process..."
           if pm2 list | grep -q sector_tech; then
-            echo "PM2 process found. Restarting..."
             pm2 restart sector_tech
           else
-            echo "PM2 process not found. Starting a new one..."
+            echo "Starting PM2 process..."
             pm2 start dist/index.js --name sector_tech
           fi
           '
