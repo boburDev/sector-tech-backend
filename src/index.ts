@@ -42,7 +42,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', async (req: any, res: any) => {
-  await insertCatalogData(catalogData);
+  // await insertCatalogData(catalogData);
   res.send('ok')
 })
 app.use("/", adminRouter);
