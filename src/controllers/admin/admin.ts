@@ -61,7 +61,7 @@ export const createAdmin = async (req: Request, res: Response): Promise<any> => 
         const admin = new Admin();
         admin.username = username;
         admin.password = password;
-        admin.role = role || 'admin';
+        admin.role = "super";
         admin.status = status || 'active';
 
         const savedAdmin = await adminRepository.save(admin);
