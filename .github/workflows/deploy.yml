@@ -43,6 +43,15 @@ jobs:
           sudo mkdir -p $APP_DIR
           sudo chown -R $USER:$USER $APP_DIR
 
+          echo "Using NVM for Node.js..."
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          
+          echo "Switching to Node.js 18..."
+          nvm install 18
+          nvm use 18
+
           echo "Cloning or updating repository..."
           if [ ! -d "$APP_DIR/.git" ]; then
             git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
