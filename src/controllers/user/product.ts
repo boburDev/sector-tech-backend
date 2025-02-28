@@ -112,7 +112,6 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
         },
         brand: {
           id: true,
-          isPopular: true,
           path: true,
           title: true,
           slug: true,

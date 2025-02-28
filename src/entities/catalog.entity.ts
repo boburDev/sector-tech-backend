@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+    import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { CatalogFilter } from "./catalog_filter.entity";
 import { Product } from "./products.entity";
+import { PopularCategory } from "./popular.entity";
+
 
 @Entity()
 export class Catalog {
@@ -77,9 +79,6 @@ export class Category {
     @Column()
     subCatalogId: string;
 
-    @Column({type: "boolean", default: false })
-    isPopular: boolean;
-
     @ManyToOne(() => Subcatalog, subcatalog => subcatalog.categories, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'subCatalogId' })
     subCatalog: Subcatalog;
@@ -89,6 +88,9 @@ export class Category {
 
     @OneToMany(() => Product, product => product.category)
     products: Product[];
+
+    @OneToOne(() => PopularCategory, popularCategory => popularCategory.category)
+    popularCategory: PopularCategory;   
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

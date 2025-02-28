@@ -256,7 +256,7 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
 /**
  * @swagger
  * /product/recommend/add:
- *   patch:
+ *   post:  
  *     summary: Mark a product as recommended
  *     tags: [Product]
  *     security:
@@ -293,7 +293,70 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
  *       500:
  *         description: Internal server error
  */
-router.patch('/recommend/add',validate(productIdParamsSchema), validateAdminToken, Product.addRecommendedProduct);
+router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken, Product.addRecommendedProduct);
+
+
+/**
+ * @swagger
+ * /product/popular/add:
+ *   post:
+ *     summary: Add a popular product
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productIds
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   example: "12345"   
+ *     responses:
+ *       200:
+ *         description: Popular product added successfully
+ *       400:
+ *         description: Product ID is required
+ *       404:
+ *         description: Product not found   
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/popular/add',validate(productIdParamsSchema), validateAdminToken, Product.addPopularProduct);
+
+
+/**
+ * @swagger
+ * /product/delete/popular/{id}:
+ *   post:
+ *     summary: Delete a popular product
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Product ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Popular product deleted successfully
+ *       400:
+ *         description: Product ID is required
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete('/delete/popular/:id', validateAdminToken, validateParams(uuidSchema), Product.deletePopularProduct);
 
 export default router;
 

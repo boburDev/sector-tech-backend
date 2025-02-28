@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Product } from '../../entities/products.entity';
-import { IsNull } from 'typeorm';
+import { In, IsNull, Not } from 'typeorm';
 import { productSchema } from '../../validators/product.validator';
 import { createSlug } from '../../utils/slug';
 import { deleteFile, deleteFileBeforeSave } from '../../middlewares/removeFiltePath';
 import { Brand } from '../../entities/brands.entity';
 import { ProductCondition, ProductRelevance } from '../../entities/product_details.entity';
 import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
+import { PopularProduct } from '../../entities/popular.entity';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -16,15 +17,20 @@ const productRelevanceRepository = AppDataSource.getRepository(ProductRelevance)
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
+const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
-    const { recommended } = req.query;
+    const { recommended, popular } = req.query;
     const whereCondition: any = {
         deletedAt: IsNull(),
     };
 
     if(recommended === "true"){
         whereCondition.recommended = true
+    }
+
+    if(popular === "true"){
+        whereCondition.popularProduct = { id: Not(IsNull()) };
     }
 
     const products = await productRepository.find({
@@ -49,8 +55,12 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             conditionId: true,
             relevanceId: true,
             subcatalogId: true,
+            popularProduct: {
+                id: true
+            }   
         },
         where: whereCondition,
+        relations: ["popularProduct"]
     });
 
     res.json({
@@ -382,3 +392,79 @@ export const addRecommendedProduct = async (req: Request, res: Response): Promis
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
+export const addPopularProduct = async (req: Request, res: Response): Promise<any> => {
+    try {
+        let { productIds } = req.body;
+
+        if (!Array.isArray(productIds)) {
+            productIds = [productIds];
+        }
+
+        if (productIds.length === 0) {
+            return res.status(400).json({ message: "Invalid or empty productIds" });
+        }
+
+        const products = await productRepository.find({
+            where: { id: In(productIds), deletedAt: IsNull() }
+        });
+
+        if (products.length === 0) {
+            return res.status(404).json({ message: "No valid products found" });
+        }
+
+        const updatedProducts = [];
+
+        for (const product of products) {
+            const existingPopular = await popularProductRepository.findOne({
+                where: { productId: product.id }
+            });
+
+            if (existingPopular) {
+                continue;
+            }
+
+            const newPopularProduct = popularProductRepository.create({
+                productId: product.id,
+                product: product
+            });
+
+            await popularProductRepository.save(newPopularProduct);
+            updatedProducts.push(newPopularProduct);
+        }
+
+        return res.status(200).json({
+            message: "Popular products created successfully",
+            data: updatedProducts,
+            error: null,
+            status: 200
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const deletePopularProduct = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { productId } = req.body;
+
+        if (!productId) {
+            return res.status(400).json({ error: "Product ID is required" });
+        }
+
+        const product = await productRepository.findOne({ where: { id: productId, deletedAt: IsNull() } });
+
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        await popularProductRepository.delete({ productId: product.id });
+
+        return res.status(200).json({ message: "Popular product deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting popular product:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+

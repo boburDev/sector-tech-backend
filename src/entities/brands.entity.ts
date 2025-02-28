@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm";
 import { Product } from "./products.entity";
+import { PopularBrand } from "./popular.entity";
 
 @Entity()
 export class Brand {
@@ -15,15 +16,15 @@ export class Brand {
     @Column({ length: 500 })
     path: string;
 
-    @Column({ type:"boolean", default: false})
-    isPopular: boolean;
-
     @OneToMany(() => Product, (product) => product.brand)
     products: Product[];
+
+    @OneToOne(() => PopularBrand, (popularBrand) => popularBrand.brand)
+    popularBrand: PopularBrand;
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;
-}
+}   

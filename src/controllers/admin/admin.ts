@@ -113,7 +113,7 @@ export const getAdminById = async (req: Request, res: Response): Promise<any> =>
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
-        const { id } = req.params;
+        const { id } = req.admin;
         const user = await adminRepository.findOne({ 
             where: { 
                 id,
@@ -148,7 +148,7 @@ export const updateAdmin = async (req: Request, res: Response): Promise<any> => 
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
-        const { id } = req.params;
+        const { id } = req.admin;
         const { username, role, status } = req.body;
 
         const user = await adminRepository.findOne({ 
@@ -190,7 +190,7 @@ export const deleteAdmin = async (req: Request, res: Response): Promise<any> => 
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
         }
 
-        const { id } = req.params;
+        const { id } = req.admin;
         const user = await adminRepository.findOne({ 
             where: { 
                 id,
