@@ -1,13 +1,15 @@
 name: Deploy to VPS
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Upload code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Configure SSH key
@@ -15,36 +17,90 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
         shell: bash
 
-      - name: Deploy to server
-        env:
-          HOST: ${{ secrets.HOST }}
-          USER: ${{ secrets.USERNAME }}
-          APP_DIR: /sector_tech
-          PORT: ${{ secrets.PORT }}
-          G_TOKEN: ${{ secrets.G_TOKEN }}
+      - name: Add SSH host key
         run: |
-          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
-          ssh $USER@$HOST "
-            if [ ! -d $APP_DIR ]; then
-              mkdir -p $APP_DIR
-              git clone https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git $APP_DIR
-              cd $APP_DIR
-              echo 'PORT=${PORT}
-              DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-              DB_NAME=${{ secrets.DB_NAME }}
-              JWT_SECRET=${{ secrets.JWT_SECRET }}
-              JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}' > .env
-            else 
-              cd $APP_DIR
-              git config --global credential.helper 'cache --timeout=3600'
-              git config --global user.email "github-actions@github.com"
-              git config --global user.name "GitHub Actions"
-              git pull https://${G_TOKEN}@github.com/boburDev/sector-tech-backend.git main
-            fi
-            npm install
-            npm run build
-            pm2 restart sector_tech || pm2 start dist/index.js --name sector_tech
-          "
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+          set -e
+          
+          # Define variables
+          APP_DIR="/root/sector_technology/sector-tech-backend"
+
+          echo "Checking essential variables..."
+          if [[ -z "$APP_DIR" ]]; then
+            echo "Error: APP_DIR is not set."
+            exit 1
+          fi
+
+          echo "Creating application directory..."
+          sudo mkdir -p $APP_DIR
+          sudo chown -R $USER:$USER $APP_DIR
+
+          echo "Using NVM for Node.js..."
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          
+          echo "Switching to Node.js 18..."
+          nvm install 18
+          nvm use 18
+
+          echo "Cloning or updating repository..."
+          if [ ! -d "$APP_DIR/.git" ]; then
+            git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
+          else
+            cd $APP_DIR
+            git reset --hard HEAD
+            git pull origin main
+          fi
+
+          cd $APP_DIR
+
+          echo "Installing dependencies..."
+          npm install
+
+          echo "Building TypeScript project..."
+          npm run build
+
+          echo "Writing environment variables to .env file..."
+          cat > .env <<EOL
+          PORT=${{ secrets.PORT }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_SECRET_USER=${{ secrets.JWT_SECRET_USER }}
+          BASE_URL=${{ secrets.BASE_URL }}
+          FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
+          FACEBOOK_CALLBACK_URL=${{ secrets.FACEBOOK_CALLBACK_URL }}
+          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+          LINKEDIN_ID=${{ secrets.LINKEDIN_ID }}
+          LINKEDIN_SECRET=${{ secrets.LINKEDIN_SECRET }}
+          LINKEDIN_CALLBACK_URL=${{ secrets.LINKEDIN_CALLBACK_URL }}
+          YANDEX_CLIENT_ID=${{ secrets.YANDEX_CLIENT_ID }}
+          YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
+          YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
+          EOL
+
+          echo "Restarting PM2 process..."
+          if pm2 describe sector_tech > /dev/null; then
+            echo "PM2 process found. Restarting..."
+            pm2 restart sector_tech --update-env
+          else
+            echo "PM2 process not found. Starting a new one..."
+            pm2 start npm --name sector_tech -- start
+          fi
+          
+          pm2 save
+          EOF
         shell: bash

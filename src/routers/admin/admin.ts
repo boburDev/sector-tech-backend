@@ -64,7 +64,7 @@ router.post("/login", validate(adminLoginValidateSchema), loginAttemptLimiter, A
  *       201:
  *         description: Admin created successfully
  */
-router.post("/create", validateAdminToken,validate(adminValidateSchema), Admin.createAdmin);
+router.post("/create", validateAdminToken, validate(adminValidateSchema), Admin.createAdmin);
 
 /**
  * @swagger

@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Upload code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Configure SSH key
@@ -21,41 +21,55 @@ jobs:
           ssh-add ~/.ssh/id_rsa
         shell: bash
 
-      - name: Debug APP_DIR and USER
+      - name: Add SSH host key
         run: |
-          echo "HOST=${{ secrets.HOST }}"
-          echo "USERNAME=${{ secrets.USERNAME }}"
-          echo "APP_DIR=/root/sector_tech"
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to server
         run: |
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+          set -e
+          
+          # Define variables
+          APP_DIR="/root/sector_technology/sector-tech-backend"
 
-          # Ensure essential variables are set
-          if [[ -z "${{ secrets.USERNAME }}" || -z "/root/sector_tech" ]]; then
-            echo "Error: APP_DIR or USER is not set."
+          echo "Checking essential variables..."
+          if [[ -z "$APP_DIR" ]]; then
+            echo "Error: APP_DIR is not set."
             exit 1
           fi
 
-          # Ensure the deployment directory exists and is owned by the user
-          sudo mkdir -p /root/sector_tech
-          sudo chown -R ${{ secrets.USERNAME }}:${{ secrets.USERNAME }} /root/sector_tech
+          echo "Creating application directory..."
+          sudo mkdir -p $APP_DIR
+          sudo chown -R $USER:$USER $APP_DIR
 
-          # Clone or update the repository
+          echo "Using NVM for Node.js..."
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          
+          echo "Switching to Node.js 18..."
+          nvm install 18
+          nvm use 18
+
           echo "Cloning or updating repository..."
-          if [ ! -d "/root/sector_tech/.git" ]; then
-            git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git /root/sector_tech
+          if [ ! -d "$APP_DIR/.git" ]; then
+            git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
           else
-            cd /root/sector_tech
+            cd $APP_DIR
             git reset --hard HEAD
             git pull origin main
           fi
 
-          cd /root/sector_tech
+          cd $APP_DIR
 
-          # Create .env file
-          echo "Generating .env file..."
+          echo "Installing dependencies..."
+          npm install
+
+          echo "Building TypeScript project..."
+          npm run build
+
+          echo "Writing environment variables to .env file..."
           cat > .env <<EOL
           PORT=${{ secrets.PORT }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
@@ -78,5 +92,15 @@ jobs:
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
 
+          echo "Restarting PM2 process..."
+          if pm2 describe sector_tech > /dev/null; then
+            echo "PM2 process found. Restarting..."
+            pm2 restart sector_tech --update-env
+          else
+            echo "PM2 process not found. Starting a new one..."
+            pm2 start npm --name sector_tech -- start
+          fi
+          
+          pm2 save
           EOF
         shell: bash

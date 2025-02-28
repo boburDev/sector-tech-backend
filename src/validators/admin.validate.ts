@@ -15,8 +15,8 @@ export const adminValidateSchema = Joi.object({
     "string.max": "Password should have a maximum length of 50",
     "any.required": "Password is required",
   }),
-  role: Joi.string().valid("admin", "superadmin").default("admin").messages({
-    "any.only": "Role must be either admin or superadmin",
+  role: Joi.string().valid("admin", "super").default("admin").messages({
+    "any.only": "Role must be either admin or super",
   }),
   status: Joi.string().valid("active", "inactive").default("active").messages({
     "any.only": "Status must be either active or inactive",

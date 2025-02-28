@@ -25,7 +25,7 @@ export class Catalog {
     @DeleteDateColumn()
     deletedAt: Date;
 }
-
+ 
 @Entity()
 export class Subcatalog {
     @PrimaryGeneratedColumn('uuid')
@@ -71,13 +71,13 @@ export class Category {
     @Column({ length: 255, nullable: true })
     slug: string;
 
-    @Column({ length: 500 })
+    @Column({ length: 500, default: null, nullable: true })
     path: string;
 
     @Column()
     subCatalogId: string;
 
-    @Column({type: "boolean", default: false})
+    @Column({type: "boolean", default: false })
     isPopular: boolean;
 
     @ManyToOne(() => Subcatalog, subcatalog => subcatalog.categories, { onDelete: 'CASCADE' })
