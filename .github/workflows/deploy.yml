@@ -101,7 +101,6 @@ jobs:
             pm2 start npm --name sector_tech -- start
           fi
           
-          
           pm2 save
           EOF
         shell: bash
