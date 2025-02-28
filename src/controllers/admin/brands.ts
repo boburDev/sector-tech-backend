@@ -4,7 +4,10 @@ import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 import { createSlug } from '../../utils/slug';
 import { deleteFile } from '../../middlewares/removeFiltePath';
+import { PopularBrand } from '../../entities/popular.entity';
 const brandRepository = AppDataSource.getRepository(Brand);
+const popularBrandRepository = AppDataSource.getRepository(PopularBrand);
+
 
 export const getBrandById = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -17,7 +20,6 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             select: {
                 id: true,
                 path: true,
-                isPopular: true,
                 title: true,
                 slug: true
             }
@@ -177,7 +179,44 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
     }
 };
 
-// Create Popular Brand
+export const getBrands = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { popular } = req.query;
+
+        if (popular === "true") {
+            const popularBrands = await popularBrandRepository.find({
+                where: { brand: { deletedAt: IsNull() } },
+                relations: ["brand"],
+                select: {
+                    id: true,
+                    order: true,
+                    brand: { id: true, title: true, path: true, slug: true }
+                }
+            });
+
+            return res.status(200).json({
+                data: popularBrands,
+                error: null,
+                status: 200
+            });
+        }
+
+        const brands = await brandRepository.find({
+            where: { deletedAt: IsNull() },
+            select: {
+                id: true,
+                title: true,
+                path: true,
+                slug: true,
+            }
+        });
+
+        return res.status(200).json({ data: brands, error: null, status: 200 });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 export const createPopularBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         let { brandIds } = req.body;
@@ -186,69 +225,180 @@ export const createPopularBrand = async (req: Request, res: Response): Promise<a
             brandIds = [brandIds];
         }
 
-        if (brandIds.length === 0) {
-            return res.status(400).json({ message: "Invalid or empty brandIds" });
+        if (!brandIds || brandIds.length === 0) {
+            return res.status(400).json({
+                data: null,
+                error: 'Invalid or empty brandIds',
+                status: 400
+            });
         }
 
-        const brands = await brandRepository.find({
+        const existingPopularBrands = await popularBrandRepository.find({
             where: {
-                id: In(brandIds),
-                deletedAt: IsNull()
+                brand: In(brandIds)
             }
         });
 
-        if (brands.length === 0) {
-            return res.status(404).json({ message: "No brands found" });
+        if (existingPopularBrands.length > 0) {
+            return res.status(400).json({
+                data: null,
+                error: 'Popular brands already exist',
+                status: 400
+            });
         }
 
-        const updatedBrands = [];
+        const lastPopularBrand = await popularBrandRepository.find({
+            order: { order: 'DESC' }, 
+            take: 1
+        });
 
-        for (const brand of brands) {
-            if (!brand.isPopular) {
-                brand.isPopular = true;
-                await brandRepository.save(brand);
-                updatedBrands.push(brand.id);
-            } 
+        let nextOrder = lastPopularBrand.length > 0 ? lastPopularBrand[0].order + 1 : 1; 
+
+        const newPopularBrands = brandIds.map((brandId: string) => ({
+            brand: { id: brandId },
+            order: nextOrder++
+        }));
+
+        await popularBrandRepository.save(newPopularBrands);
+
+        return res.status(201).json({
+            data: newPopularBrands,
+            error: null
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const getPopularBrandById = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const popularBrand = await popularBrandRepository.findOne({
+            where: {
+                id: id,
+                brand: { deletedAt: IsNull() }
+            },
+            relations: ['brand'],
+            select: {
+                id: true,
+                order: true,
+                brand: { id: true, title: true, path: true, slug: true }
+            }
+        });
+
+        if (!popularBrand) {
+            return res.status(404).json({
+                data: null,
+                error: 'Popular brand not found',
+                status: 404
+            });     
+        }   
+        return res.status(200).json({ data: popularBrand, error: null, status: 200 });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};      
+
+export const updatePopularBrand = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const { order } = req.body;
+
+        const popularBrand = await popularBrandRepository.findOne({ where: { id } });
+
+        if (!popularBrand) {
+            return res.status(404).json({
+                data: null,
+                error: 'Popular brand not found',
+                status: 404
+            });
         }
 
-        return res.status(200).json({ 
-            message: "Brands processed successfully", 
-            data: updatedBrands,
+        if (popularBrand.order === order) {
+            return res.status(200).json({
+                data: popularBrand,
+                error: null,
+                status: 200
+            });
+        }
+
+        const existingOrderBrand = await popularBrandRepository.findOne({ where: { order } });
+
+        if (existingOrderBrand) {
+            await popularBrandRepository.update(existingOrderBrand.id, { order: popularBrand.order });
+        }
+
+        popularBrand.order = order;
+        await popularBrandRepository.save(popularBrand);
+
+        return res.status(200).json({
+            data: popularBrand,
+            error: null,
             status: 200
         });
 
     } catch (error) {
-        console.error("createPopularBrand Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-export const getBrands = async (req: Request, res: Response): Promise<any> => {
+export const getPopularBrandByBrandId = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { isPopular } = req.query;
-
-        const whereCondition: any = {
-            deletedAt: IsNull(),
-        };
-
-        if (isPopular === "true") {
-            whereCondition.isPopular = true;
-        }
-
-        const brands = await brandRepository.find({
-            where: whereCondition,
+        const { id } = req.params;
+        const popularBrand = await popularBrandRepository.findOne({
+            where: {
+                brand: { id },
+            },
+            relations: ['brand'],
             select: {
                 id: true,
-                title: true,
-                path: true,
-                isPopular: true,
-                slug: true,
+                order: true,
+                brand: {
+                    id: true,
+                    title: true,
+                    path: true,
+                    slug: true,
+                }
             }
         });
-
-        return res.status(200).json({data: brands, error: null, status: 200});
+        if (!popularBrand) {
+            return res.json({
+                data: null,
+                error: 'Popular brand not found',
+                status: 404
+            }); 
+        }       
+        return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        // console.error("getBrands Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+export const deletePopularBrand = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const popularBrand = await popularBrandRepository.findOne({
+            where: {
+                id: id,
+                brand: { deletedAt: IsNull() }
+            }
+        });
+        if (!popularBrand) {
+            return res.json({
+                data: null,
+                error: 'Popular brand not found',
+                status: 404
+            });
+        }
+
+        await popularBrandRepository.delete(id);
+
+        return res.json({
+            data: { message: 'Popular brand deleted successfully' },
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};  

@@ -20,6 +20,9 @@ export class Promotion {
     @Column()
     bannerImage: string;
 
+    @Column()
+    slug: string;
+
     @Column("timestamp")
     expireDate: Date;
 

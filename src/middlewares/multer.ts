@@ -2,6 +2,7 @@ import multer, { FileFilterCallback, StorageEngine } from 'multer';
 import fs from 'fs';
 
 const photo = ["image/jpeg", "image/png", "image/gif"];
+const fields = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage', 'coverImage', 'promotionBannerImage', 'promotionDescriptionImages'];
 
 const storage: StorageEngine = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -12,13 +13,14 @@ const storage: StorageEngine = multer.diskStorage({
                 uploadPath += '/brands'
             } else if (file.fieldname === "bannerImage") {
                 uploadPath += "/banners"
-            }
-             else if (file.fieldname == 'categoryImage') {
+            } else if (file.fieldname == 'categoryImage') {
                 uploadPath += '/categories'
             } else if (['productImages', 'productMainImage'].includes(file.fieldname)) {
                 uploadPath += '/products'
             } else if (file.fieldname == 'fullDescriptionImages') {
                 uploadPath += '/descImages'
+            } else if (file.fieldname == 'coverImage' || file.fieldname == 'promotionBannerImage' || file.fieldname == 'promotionDescriptionImages') {
+                uploadPath += '/promotions'
             } else {
                 throw new Error("Invalid Type or fieldName");
             }
@@ -53,8 +55,7 @@ export const uploadPhoto = multer({
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
         try {
             const isValidType = photo.includes(file.mimetype);
-            const isValidField = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage'].includes(file.fieldname);
-
+            const isValidField = fields.includes(file.fieldname);
             if (isValidType && isValidField) {
                 cb(null, true);
             } else if (!isValidType) {

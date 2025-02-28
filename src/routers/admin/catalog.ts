@@ -388,7 +388,7 @@ router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSche
 /**
  * @swagger
  * /catalog/category/popular/create:
- *   patch:
+ *   post:
  *     summary: Add popular tag to categories
  *     tags: [Category]
  *     security:
@@ -436,7 +436,7 @@ router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSche
  *       500:
  *         description: Internal server error
  */
-router.patch("/category/popular/create", validateAdminToken, validate(categoryIdsSchema), Catalog.createPopularCategory);
+router.post("/category/popular/create", validateAdminToken, validate(categoryIdsSchema), Catalog.createPopularCategory);
 
 /**
  * @swagger
@@ -449,7 +449,7 @@ router.patch("/category/popular/create", validateAdminToken, validate(categoryId
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: isPopular
+ *         name: popular
  *         required: false
  *         schema:
  *           type: string

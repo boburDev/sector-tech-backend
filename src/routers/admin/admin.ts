@@ -2,7 +2,7 @@ import express from "express";
 import * as Admin from "../../controllers/admin/admin";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateAdminToken } from "../../middlewares/adminValidator";
-import { validate, validateParams } from "../../middlewares/validate";
+import { validate } from "../../middlewares/validate";
 import {  adminLoginValidateSchema, adminUpdateValidateSchema, adminValidateSchema, uuidSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
@@ -88,20 +88,13 @@ router.get("/all", validateAdminToken, Admin.getAdmins);
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Admin ID
  *     responses:
  *       200:
  *         description: Admin details
  *       404:
  *         description: Admin not found
  */
-router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.getAdminById);
+router.get("/by-id/:id", validateAdminToken, Admin.getAdminById);
 
 /**
  * @swagger
@@ -111,13 +104,6 @@ router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.g
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Admin ID
  *     requestBody:
  *       required: true
  *       content:
@@ -137,7 +123,7 @@ router.get("/by-id/:id", validateAdminToken,  validateParams(uuidSchema),Admin.g
  *       404:
  *         description: Admin not found
  */
-router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema), validateParams(uuidSchema), Admin.updateAdmin);
+router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema), Admin.updateAdmin);
 
 /**
  * @swagger
@@ -147,20 +133,13 @@ router.put("/update/:id", validateAdminToken,validate(adminUpdateValidateSchema)
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Admin ID
  *     responses:
  *       200:
  *         description: Admin deleted successfully
  *       404:
  *         description: Admin not found
  */
-router.delete("/delete/:id", validateAdminToken,  validateParams(uuidSchema), Admin.deleteAdmin);
+router.delete("/delete/:id", validateAdminToken, Admin.deleteAdmin);
 
 /**
  * @swagger

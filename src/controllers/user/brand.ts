@@ -36,15 +36,10 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
 
 export const getBrands = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { isPopular } = req.query;
 
         const whereCondition: any = {
             deletedAt: IsNull(),
         };
-
-        if (isPopular === "true") {
-            whereCondition.isPopular = true;
-        }
 
         const brands = await brandRepository.find({
             where: whereCondition,
@@ -52,14 +47,12 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
                 id: true,
                 title: true,
                 path: true,
-                isPopular: true,
                 slug: true,
             }
         });
 
         return res.status(200).json({data: brands, error: null, status: 200});
     } catch (error) {
-        // console.error("getBrands Error:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };

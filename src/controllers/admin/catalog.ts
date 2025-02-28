@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
-import { ILike, In, IsNull } from 'typeorm';
+import { ILike, In, IsNull, Not } from 'typeorm';
 import { createSlug } from '../../utils/slug';
 import { deleteFile } from '../../middlewares/removeFiltePath';
+import { PopularCategory } from '../../entities/popular.entity';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
-
+const popularCategoryRepository = AppDataSource.getRepository(PopularCategory);
 // Catalog Controllers
 export const getCatalogById = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -699,77 +700,84 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
 
 export const createPopularCategory = async (req: Request, res: Response): Promise<any> => {
     try {
-        let {  categoryIds } = req.body;
+        let { categoryIds } = req.body;
 
         if (!Array.isArray(categoryIds)) {
             categoryIds = [categoryIds];
         }
 
         if (categoryIds.length === 0) {
-            return res.status(400).json({ message: "Invalid or empty categoryId" });
+            return res.status(400).json({ message: "Invalid or empty categoryIds" });
         }
 
         const categories = await categoryRepository.find({
-            where: {
-                id: In(categoryIds),
-                deletedAt: IsNull()
-            }
+            where: { id: In(categoryIds), deletedAt: IsNull() }
         });
 
         if (categories.length === 0) {
-            return res.status(404).json({ message: "No categories found" });
+            return res.status(404).json({ message: "No valid categories found" });
         }
 
         const updatedCategories = [];
 
         for (const category of categories) {
-            if (category.isPopular) continue;
-            category.isPopular = true;
-            await categoryRepository.save(category);
-            updatedCategories.push(category.id);
+            const existingPopular = await popularCategoryRepository.findOne({
+                where: { categoryId: category.id }
+            });
+
+            if (existingPopular) {
+                continue; 
+            }
+
+            const newPopularCategory = popularCategoryRepository.create({
+                categoryId: category.id,
+                category: category
+            });
+
+            await popularCategoryRepository.save(newPopularCategory);
+            updatedCategories.push(newPopularCategory);
         }
 
-
-        return res.status(200).json({ 
-            message: "Categories updated successfully", 
+        return res.status(200).json({
+            message: "Popular categories created successfully",
             data: updatedCategories,
-            error:null,
+            error: null,
             status: 200
         });
 
     } catch (error) {
-        // console.error("Error in addPopularToCategory:", error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
 
 export const getCategories = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { isPopular } = req.query;
+        const { popular } = req.query;
 
-        const whereCondition: any = {
-            deletedAt: IsNull(),
-        };
+        let whereCondition: any = { deletedAt: IsNull() };
 
-        if (isPopular === "true") {
-            whereCondition.isPopular = true;
+        if (popular === "true") {
+            whereCondition.popularCategory = { id: Not(IsNull()) };
         }
 
         const categories = await categoryRepository.find({
             where: whereCondition,
-            order: { createdAt : "DESC" },
+            order: { createdAt: "DESC" },
+            relations: ["popularCategory"],
             select: {
                 id: true,
                 title: true,
-                isPopular: true,
                 path: true,
                 slug: true,
+                ...(popular === "true" ? { popularCategory: { id: true } } : {})
             }
         });
 
-        return res.status(200).json({data: categories, error: null, status: 200});
+        return res.status(200).json({ data: categories, error: null, status: 200 });
     } catch (error) {
         console.error("getCategories Error:", error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
