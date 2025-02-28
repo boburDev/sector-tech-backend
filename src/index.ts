@@ -13,8 +13,8 @@ import "./common/strategy/yandex.strategy";
 import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";
-// import { insertCatalogData } from "./services/addCatalog";
-// import catalogData from "./services/mock/catalogs.json";
+import { insertCatalogData } from "./services/addCatalog";
+import catalogData from "./services/mock/catalogs.json";
 dotenv.config(); 
 
 const PORT = Number(process.env.PORT) || 3030;
@@ -42,7 +42,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', async (req: any, res: any) => {
-  // await insertCatalogData(catalogData);
+  await insertCatalogData(catalogData);
   res.send('ok')
 })
 app.use("/", adminRouter);
