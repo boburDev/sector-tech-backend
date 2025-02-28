@@ -26,23 +26,28 @@ jobs:
           echo "HOST=${{ secrets.HOST }}"
           echo "USERNAME=${{ secrets.USERNAME }}"
           echo "APP_DIR=/root/sector_technology/sector-tech-backend"
+
       - name: Deploy to server
         run: |
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
           set -e
-          # Define variables explicitly within SSH session
+          
+          # Define variables
           USERNAME="${{ secrets.USERNAME }}"
           HOST="${{ secrets.HOST }}"
           APP_DIR="/root/sector_technology/sector-tech-backend"
+
           echo "Checking essential variables..."
           if [[ -z "$APP_DIR" || -z "$USERNAME" ]]; then
             echo "Error: APP_DIR or USERNAME is not set."
             exit 1
           fi
+
           echo "Creating application directory and setting permissions..."
           sudo mkdir -p $APP_DIR
           sudo chown -R $USERNAME:$USERNAME $APP_DIR
+
           echo "Cloning or updating repository..."
           if [ ! -d "$APP_DIR/.git" ]; then
             git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
@@ -51,7 +56,13 @@ jobs:
             git reset --hard HEAD
             git pull origin main
           fi
+
           cd $APP_DIR
+
+          echo "Installing dependencies and building project..."
+          npm install
+          npm run build
+
           echo "Writing environment variables to .env file..."
           cat > .env <<EOL
           PORT=${{ secrets.PORT }}
@@ -74,13 +85,14 @@ jobs:
           YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
+
           echo "Restarting PM2 process..."
           if pm2 list | grep -q sector_tech; then
             echo "PM2 process found. Restarting..."
             pm2 restart sector_tech
           else
             echo "PM2 process not found. Starting a new one..."
-            pm2 start sector_technology/sector-tech-backend/dist/index.js --name sector_tech
+            pm2 start /root/sector_technology/sector-tech-backend/dist/index.js --name sector_tech
           fi
           '
         shell: bash
