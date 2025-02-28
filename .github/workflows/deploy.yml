@@ -59,22 +59,20 @@ jobs:
 
           cd $APP_DIR
 
-          echo "Ensuring Node.js and npm are installed..."
-          if ! command -v node &> /dev/null; then
-            echo "Node.js is not installed. Installing..."
+          echo "Installing Node.js and npm..."
+          if ! command -v npm &> /dev/null; then
             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
             sudo apt-get install -y nodejs
           fi
-          if ! command -v npm &> /dev/null; then
-            echo "npm is not installed. Installing..."
-            sudo apt-get install -y npm
-          fi
 
           echo "Installing dependencies..."
-          npm install --legacy-peer-deps
+          npm install
+
+          echo "Installing TypeScript..."
+          npm install -g typescript
 
           echo "Building the project..."
-          npm run build
+          npx tsc
 
           echo "Writing environment variables to .env file..."
           cat > .env <<EOL
@@ -98,6 +96,12 @@ jobs:
           YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
+
+          echo "Checking if dist/index.js exists..."
+          if [ ! -f "dist/index.js" ]; then
+            echo "Error: dist/index.js not found! Build failed?"
+            exit 1
+          fi
 
           echo "Restarting PM2 process..."
           if pm2 list | grep -q sector_tech; then
