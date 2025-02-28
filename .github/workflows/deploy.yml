@@ -26,23 +26,28 @@ jobs:
           echo "HOST=${{ secrets.HOST }}"
           echo "USERNAME=${{ secrets.USERNAME }}"
           echo "APP_DIR=/root/sector_tech"
+
       - name: Deploy to server
         run: |
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} '
           set -e
+
           # Define variables explicitly within SSH session
           USERNAME="${{ secrets.USERNAME }}"
           HOST="${{ secrets.HOST }}"
           APP_DIR="/root/sector_tech"
+
           echo "Checking essential variables..."
           if [[ -z "$APP_DIR" || -z "$USERNAME" ]]; then
             echo "Error: APP_DIR or USERNAME is not set."
             exit 1
           fi
+
           echo "Creating application directory and setting permissions..."
           sudo mkdir -p $APP_DIR
           sudo chown -R $USERNAME:$USERNAME $APP_DIR
+
           echo "Cloning or updating repository..."
           if [ ! -d "$APP_DIR/.git" ]; then
             git clone https://${{ secrets.G_TOKEN }}@github.com/boburDev/sector-tech-backend.git $APP_DIR
@@ -51,7 +56,26 @@ jobs:
             git reset --hard HEAD
             git pull origin main
           fi
+
           cd $APP_DIR
+
+          echo "Ensuring Node.js and npm are installed..."
+          if ! command -v node &> /dev/null; then
+            echo "Node.js is not installed. Installing..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          fi
+          if ! command -v npm &> /dev/null; then
+            echo "npm is not installed. Installing..."
+            sudo apt-get install -y npm
+          fi
+
+          echo "Installing dependencies..."
+          npm install --legacy-peer-deps
+
+          echo "Building the project..."
+          npm run build
+
           echo "Writing environment variables to .env file..."
           cat > .env <<EOL
           PORT=${{ secrets.PORT }}
@@ -74,6 +98,7 @@ jobs:
           YANDEX_CLIENT_SECRET=${{ secrets.YANDEX_CLIENT_SECRET }}
           YANDEX_CALLBACK_URL=${{ secrets.YANDEX_CALLBACK_URL }}
           EOL
+
           echo "Restarting PM2 process..."
           if pm2 list | grep -q sector_tech; then
             echo "PM2 process found. Restarting..."
