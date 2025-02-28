@@ -93,9 +93,9 @@ jobs:
           EOL
 
           echo "Restarting PM2 process..."
-          if pm2 list | grep -q sector_tech; then
+          if pm2 describe sector_tech > /dev/null; then
             echo "PM2 process found. Restarting..."
-            pm2 restart sector_tech
+            pm2 restart sector_tech --update-env
           else
             echo "PM2 process not found. Starting a new one..."
             pm2 start npm --name sector_tech -- start
