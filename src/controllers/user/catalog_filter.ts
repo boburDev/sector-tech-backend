@@ -32,6 +32,6 @@ export const getCatalogFilterById = async (req: Request, res: Response): Promise
         }
         return res.status(200).json(result);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };

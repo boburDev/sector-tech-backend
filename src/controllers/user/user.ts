@@ -55,7 +55,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -187,6 +187,6 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };

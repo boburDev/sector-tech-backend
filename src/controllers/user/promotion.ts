@@ -13,7 +13,7 @@ export const getPromotions = async (req: Request, res: Response): Promise<any> =
         }
         return res.status(200).json(promotions);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -26,6 +26,6 @@ export const getPromotionById = async (req: Request, res: Response): Promise<any
         }
         return res.status(200).json({ data: promotion, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };

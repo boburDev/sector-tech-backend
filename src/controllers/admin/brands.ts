@@ -39,7 +39,7 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -87,7 +87,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
             status: 201
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -147,7 +147,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -175,7 +175,7 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -213,7 +213,7 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -266,7 +266,7 @@ export const createPopularBrand = async (req: Request, res: Response): Promise<a
             error: null
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -295,7 +295,7 @@ export const getPopularBrandById = async (req: Request, res: Response): Promise<
         }   
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };      
 
@@ -338,7 +338,7 @@ export const updatePopularBrand = async (req: Request, res: Response): Promise<a
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -370,7 +370,7 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response): Pro
         }       
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -399,6 +399,6 @@ export const deletePopularBrand = async (req: Request, res: Response): Promise<a
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };  

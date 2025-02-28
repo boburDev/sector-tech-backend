@@ -24,7 +24,7 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
         return res.status(200).json({ data: banners, error: null, status: 200 });
     } catch (error) {
         console.error("Get Banners Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -42,6 +42,6 @@ export const getBannerById = async (req: Request, res: Response): Promise<any> =
         return res.status(200).json({ data: banner, error: null, status: 200 });
     } catch (error) {
         console.error("Get Banner By ID Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };

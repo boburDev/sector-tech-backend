@@ -32,7 +32,7 @@ export const getCatalogFilterById = async (req: Request, res: Response): Promise
         }
         return res.status(200).json(result);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -108,7 +108,7 @@ export const createCatalogFilter = async (req: Request, res: Response): Promise<
     } catch (error) {
         console.log(error);
         
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -153,7 +153,7 @@ export const updateCatalogFilter = async (req: Request, res: Response): Promise<
         }
         return res.status(200).json(filterResult);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -197,7 +197,7 @@ export const deleteCatalogFilter = async (req: Request, res: Response): Promise<
         }
         return res.status(200).json(filterResult);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
