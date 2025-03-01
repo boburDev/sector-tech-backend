@@ -21,10 +21,8 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         86400000, // 1 kun (24 soat)
         "user"
       );
-      return res.json({
-        message: "User logged in successfully",
-        token:accessToken,
-      });
+      return res.status(201).redirect(`http://localhost:3000?token=${accessToken}`);
+
     } else {
       const newUser = new Users();
       newUser.name = name;
@@ -38,12 +36,6 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         86400000, // 1 day in milliseconds
         "user"
       );
-
-      const userData = {
-        id: savedUser.id,
-        name: savedUser.name,
-        email: savedUser.email,
-      };
 
       return res.status(201).redirect(`http://localhost:3000?token=${token}`);
     }
