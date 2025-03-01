@@ -21,15 +21,9 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         86400000, // 1 kun (24 soat)
         "user"
       );
-      const userData = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      };
       return res.json({
         message: "User logged in successfully",
-        accessToken,
-        data:userData,
+        token:accessToken,
       });
     } else {
       const newUser = new Users();
@@ -51,11 +45,11 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         email: savedUser.email,
       };
 
-      return res.status(201).json({ message: "User created successfully", token, data: userData });
+      return res.status(201).redirect(`http://localhost:3000/login?token=${token}`);
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -89,7 +83,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
     return res.status(201).json({ message: "User created successfully", token, user: userData });
   } catch (error: any) {
-    console.log(error?.message);
+    // console.log(error?.message);
 
     return res.status(500).json({ message: "Error creating user", error });
   }
@@ -123,6 +117,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       user: userData,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error logging in", error });
   }
 };
@@ -187,6 +182,6 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };

@@ -69,7 +69,7 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            order: { createdAt: "DESC" },
+            order: { updatedAt: "ASC" },
             relations: relations.length > 0 ? relations : undefined,
             select,
         });
@@ -81,7 +81,7 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
         return res.status(200).json({ data: catalogs, error: null, status: 200  });
     } catch (error) {
         console.error("Error fetching catalogs:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 

@@ -41,7 +41,7 @@ export const getCatalogById = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -65,7 +65,7 @@ export const getAllCatalogs = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -106,7 +106,7 @@ export const createCatalog = async (req: Request, res: Response): Promise<any> =
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -145,7 +145,7 @@ export const updateCatalog = async (req: Request, res: Response): Promise<any> =
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -179,7 +179,7 @@ export const deleteCatalog = async (req: Request, res: Response): Promise<any> =
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -240,7 +240,7 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -277,7 +277,9 @@ export const getSubcatalogById = async (req: Request, res: Response): Promise<an
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        console.log(error);
+        
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -355,7 +357,7 @@ export const createSubcatalog = async (req: Request, res: Response): Promise<any
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -412,7 +414,7 @@ export const updateSubcatalog = async (req: Request, res: Response): Promise<any
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -444,7 +446,7 @@ export const deleteSubcatalog = async (req: Request, res: Response): Promise<any
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -497,7 +499,6 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
 
         const formattedCategories = categories.map(category => {
             const { createdAt, deletedAt, ...categoryData } = category;
-            categoryData.path = categoryData.path.replace(/^public\//, "")
             return categoryData;
         });
 
@@ -507,7 +508,9 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        console.log(error);
+        
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -576,7 +579,7 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -659,7 +662,7 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -694,7 +697,7 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -746,7 +749,7 @@ export const createPopularCategory = async (req: Request, res: Response): Promis
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -776,7 +779,7 @@ export const getCategories = async (req: Request, res: Response): Promise<any> =
         return res.status(200).json({ data: categories, error: null, status: 200 });
     } catch (error) {
         console.error("getCategories Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 

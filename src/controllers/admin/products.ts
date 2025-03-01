@@ -441,30 +441,29 @@ export const addPopularProduct = async (req: Request, res: Response): Promise<an
         });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
 export const deletePopularProduct = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { productId } = req.body;
-
-        if (!productId) {
+        const { id } = req.params;
+        console.log(id)
+        if (!id) {
             return res.status(400).json({ error: "Product ID is required" });
         }
 
-        const product = await productRepository.findOne({ where: { id: productId, deletedAt: IsNull() } });
+        const popularProduct = await popularProductRepository.findOne({ where: { id: id } });
 
-        if (!product) {
-            return res.status(404).json({ error: "Product not found" });
+        if (!popularProduct) {
+            return res.status(404).json({ error: "Popular product not found" });
         }
 
-        await popularProductRepository.delete({ productId: product.id });
+        await popularProductRepository.delete(popularProduct);
 
         return res.status(200).json({ message: "Popular product deleted successfully" });
     } catch (error) {
-        console.error("Error deleting popular product:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 

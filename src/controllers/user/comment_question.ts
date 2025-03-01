@@ -29,7 +29,7 @@ export const addProductComment = async (req: Request, res: Response): Promise<an
     });
   } catch (error) {
     // console.error("Error creating product comment:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -73,7 +73,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
     return res.status(200).json({data: comments, error:null, status: 200 });
   } catch (error) {
     console.error("Error fetching comments by productId:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 // product Question Repository
@@ -91,7 +91,7 @@ export const addProductQuestion = async (req: Request, res: Response): Promise<a
     return res.status(201).json({data: savedQuestion, error: null, status: 200 });
   } catch (error) {
     console.error("Error creating product question:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -133,6 +133,6 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
     return res.status(200).json({ data: questions, error: null, status: 200 });
   } catch (error) {
     console.error("Error fetching questions for product:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };

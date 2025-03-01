@@ -39,7 +39,7 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -87,7 +87,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
             status: 201
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -147,7 +147,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -175,7 +175,7 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -187,9 +187,10 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
             const popularBrands = await popularBrandRepository.find({
                 where: { brand: { deletedAt: IsNull() } },
                 relations: ["brand"],
+                order: { updatedAt: 'DESC' },
                 select: {
                     id: true,
-                    order: true,
+                    updatedAt: true,
                     brand: { id: true, title: true, path: true, slug: true }
                 }
             });
@@ -213,7 +214,7 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -248,15 +249,13 @@ export const createPopularBrand = async (req: Request, res: Response): Promise<a
         }
 
         const lastPopularBrand = await popularBrandRepository.find({
-            order: { order: 'DESC' }, 
+            order: { updatedAt: 'DESC' }, 
             take: 1
         });
 
-        let nextOrder = lastPopularBrand.length > 0 ? lastPopularBrand[0].order + 1 : 1; 
-
         const newPopularBrands = brandIds.map((brandId: string) => ({
             brand: { id: brandId },
-            order: nextOrder++
+            updatedAt: new Date()
         }));
 
         await popularBrandRepository.save(newPopularBrands);
@@ -266,7 +265,7 @@ export const createPopularBrand = async (req: Request, res: Response): Promise<a
             error: null
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -281,7 +280,6 @@ export const getPopularBrandById = async (req: Request, res: Response): Promise<
             relations: ['brand'],
             select: {
                 id: true,
-                order: true,
                 brand: { id: true, title: true, path: true, slug: true }
             }
         });
@@ -295,52 +293,9 @@ export const getPopularBrandById = async (req: Request, res: Response): Promise<
         }   
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };      
-
-export const updatePopularBrand = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const { id } = req.params;
-        const { order } = req.body;
-
-        const popularBrand = await popularBrandRepository.findOne({ where: { id } });
-
-        if (!popularBrand) {
-            return res.status(404).json({
-                data: null,
-                error: 'Popular brand not found',
-                status: 404
-            });
-        }
-
-        if (popularBrand.order === order) {
-            return res.status(200).json({
-                data: popularBrand,
-                error: null,
-                status: 200
-            });
-        }
-
-        const existingOrderBrand = await popularBrandRepository.findOne({ where: { order } });
-
-        if (existingOrderBrand) {
-            await popularBrandRepository.update(existingOrderBrand.id, { order: popularBrand.order });
-        }
-
-        popularBrand.order = order;
-        await popularBrandRepository.save(popularBrand);
-
-        return res.status(200).json({
-            data: popularBrand,
-            error: null,
-            status: 200
-        });
-
-    } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-};
 
 export const getPopularBrandByBrandId = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -352,7 +307,6 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response): Pro
             relations: ['brand'],
             select: {
                 id: true,
-                order: true,
                 brand: {
                     id: true,
                     title: true,
@@ -370,7 +324,7 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response): Pro
         }       
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };
 
@@ -399,6 +353,6 @@ export const deletePopularBrand = async (req: Request, res: Response): Promise<a
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 };  
