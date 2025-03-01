@@ -129,4 +129,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-public/
+public/banners
+public/categories
+public/products
+public/descImages
+public/promotions
