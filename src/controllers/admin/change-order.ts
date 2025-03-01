@@ -18,33 +18,39 @@ export const changeOrder = async (req: Request, res: Response): Promise<any> => 
         const { name } = req.query;
         const { index, id } = req.body;
 
-        console.log(req.body);
-        console.log(req.query);
-
-        if (name === 'catalog') {
-            const elements = await catalogRepository.find({ order: { updatedAt: 'ASC' } });
-
-            const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Catalog topilmadi' });
-            }
-
-            const [selectedCatalog] = elements.splice(elementIndex, 1);
-            elements.splice(index - 1, 0, selectedCatalog);
-
-            const updatedCatalogs = elements.map((catalog) => ({
-                ...catalog,
-                updatedAt: new Date(),
-            }));
-
-            await catalogRepository.save(updatedCatalogs);
-            return res.status(200).json({ message: 'Catalog muvaffaqiyatli yangilandi' });
+        if (name !== 'catalog') {
+            return res.status(400).json({ message: 'Invalid query parameter: name must be "catalog"' });
         }
 
-        return res.status(400).json({ message: 'Noto‘g‘ri so‘rov parametrlari yoki catalog topilmadi' });
+        const elements = await catalogRepository.find({ order: { updatedAt: 'ASC' } });
+
+        const elementIndex = elements.findIndex(element => element.id === id);
+        if (elementIndex === -1) {
+            return res.status(404).json({ message: 'Catalog not found' });
+        }
+
+        if (index < 0 || index >= elements.length) {
+            return res.status(400).json({ message: 'Invalid index' });
+        }
+
+        if (elementIndex === index) {
+            return res.status(200).json({ message: 'Catalog already in this index' });
+        }
+
+        const [selectedCatalog] = elements.splice(elementIndex, 1);
+        elements.splice(index, 0, selectedCatalog);
+
+        const updatedCatalogs = elements.map((catalog) => ({
+            ...catalog,
+            updatedAt: new Date(),
+        }));
+
+        await catalogRepository.save(updatedCatalogs);
+
+        return res.status(200).json({ message: 'Catalog updated successfully' });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Ichki server xatosi', error });
+        console.error('Error updating catalog order:', error);
+        return res.status(500).json({ message: 'Internal server error', error });
     }
 };

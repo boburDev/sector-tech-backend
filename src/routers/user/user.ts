@@ -3,7 +3,8 @@ import * as User from "../../controllers/user/user";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateUserToken } from "../../middlewares/userValidator";
 import passport from "passport";
-
+import { userSchemaValidator } from "../../validators/user.validator";
+import { validate } from "../../middlewares/validate";
 const router = express.Router();
 
 /**
@@ -162,7 +163,7 @@ router.post("/login", loginAttemptLimiter, User.login);
  *       400:
  *         description: Invalid data
  */
-router.post("/sign-up", loginAttemptLimiter, User.signup);
+router.post("/sign-up", loginAttemptLimiter, validate(userSchemaValidator), User.signup);
 
 /**
  * @swagger
