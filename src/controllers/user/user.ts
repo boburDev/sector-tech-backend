@@ -45,7 +45,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
         email: savedUser.email,
       };
 
-      return res.status(201).redirect(`http://localhost:3000/login?token=${token}`);
+      return res.status(201).redirect(`http://localhost:3000?token=${token}`);
     }
   } catch (error) {
     console.error(error);
