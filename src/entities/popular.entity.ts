@@ -1,4 +1,4 @@
-import { JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Entity } from "typeorm";
 import { Column } from "typeorm";
 import { Brand } from "./brands.entity";
@@ -9,8 +9,8 @@ export class PopularBrand {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ default: 0, type: "int" })
-    order: number;
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @Column({ type: 'uuid' })
     brandId: string;
@@ -27,6 +27,9 @@ export class PopularCategory {
 
     @Column({ type: 'uuid' })
     categoryId: string;
+
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
     
     @OneToOne(() => Category, (category) => category.id)
     @JoinColumn({ name: 'categoryId' })
@@ -37,10 +40,13 @@ export class PopularCategory {
 @Entity()
 export class PopularProduct {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id: string; 
     
     @Column({ type: 'uuid' })
     productId: string;
+
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @OneToOne(() => Product, (product) => product.id)
     @JoinColumn({ name: 'productId' })

@@ -176,40 +176,6 @@ router.get("/all",validateAdminToken, Brands.getBrands);
  */
 router.post("/popular/create", validateAdminToken,  Brands.createPopularBrand);
 
-/** 
- * @swagger
- * /brand/popular/update/{id}:
- *   put:
- *     summary: Update a popular brand
- *     tags: [PopularBrands] 
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Popular brand ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               brandId:
- *                 type: string
- *               order:
- *                 type: number 
- *     responses:
- *       200:
- *         description: Popular brand updated successfully
- *       404:
- *         description: Popular brand not found
- */
-router.put("/popular/update/:id", validateAdminToken, validateParams(uuidSchema), Brands.updatePopularBrand);   
-
 /**
  * @swagger
  * /brand/popular/delete/{id}:

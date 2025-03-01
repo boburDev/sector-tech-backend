@@ -16,6 +16,11 @@ const router = Router();
  *   get:
  *     summary: Get all banners
  *     tags: [Banners]
+ *     parameters:
+ *       - in: query
+ *         name: routePath
+ *         required: false
+ *         description: Route path to filter banners
  *     responses:
  *       200:
  *         description: List of banners
@@ -23,28 +28,5 @@ const router = Router();
  *         description: Internal server error
  */
 router.get("/all", BannerController.getBanners);
-
-/**
- * @swagger
- * /user/banner/by-id/{id}:
- *   get:
- *     summary: Get banner by ID
- *     tags: [Banners]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Banner ID
- *     responses:
- *       200:
- *         description: Banner data
- *       404:
- *         description: Banner not found
- *       500:
- *         description: Internal server error
- */
-router.get("/by-id/:id", BannerController.getBannerById);
 
 export default router;

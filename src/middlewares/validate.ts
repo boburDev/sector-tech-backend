@@ -34,3 +34,22 @@ export const validateParams = (schema: Schema) => {
         next();
     };
 };
+
+export const validateQuery = (schema: Schema) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        const { error } = schema.validate(req.query, { abortEarly: false });
+
+        if (error) {
+            res.status(400).json({
+                success: false,
+                message: "Query validation error",
+                error: error.details.map((err) => err.message),
+                    }); 
+            return;
+        }
+
+        next();
+        };  
+};
+
+

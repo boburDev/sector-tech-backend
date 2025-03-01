@@ -69,7 +69,7 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            order: { createdAt: "DESC" },
+            order: { updatedAt: "ASC" },
             relations: relations.length > 0 ? relations : undefined,
             select,
         });
