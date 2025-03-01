@@ -1,8 +1,7 @@
-    import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { CatalogFilter } from "./catalog_filter.entity";
 import { Product } from "./products.entity";
 import { PopularCategory } from "./popular.entity";
-
 
 @Entity()
 export class Catalog {
@@ -23,6 +22,9 @@ export class Catalog {
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
+
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;
@@ -57,6 +59,9 @@ export class Subcatalog {
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
+
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;
@@ -94,6 +99,9 @@ export class Category {
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
+
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

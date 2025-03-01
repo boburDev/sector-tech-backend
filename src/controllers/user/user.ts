@@ -123,6 +123,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       user: userData,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error logging in", error });
   }
 };
