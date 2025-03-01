@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn, OneToOne, UpdateDateColumn } from "typeorm";
 import { Product } from "./products.entity";
 import { PopularBrand } from "./popular.entity";
 
@@ -15,6 +15,9 @@ export class Brand {
 
     @Column({ length: 500 })
     path: string;
+
+    @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @OneToMany(() => Product, (product) => product.brand)
     products: Product[];
