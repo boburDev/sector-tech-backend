@@ -105,7 +105,7 @@
   },
   {
     "title": "SOYUZ",
-    "path": "brands/SOYUZ.webp"
+    "path": null
   },
   {
     "title": "SPB ZIP",
@@ -113,7 +113,7 @@
   },
   {
     "title": "Spetsinformatika-SI",
-    "path": "brands/spetsinformatikasi.webp"
+    "path": "brands/spetsinformatika-si.webp"
   },
   {
     "title": "Ufakor",
@@ -133,6 +133,7 @@
   },
   {
     "title": "KBT",
+    "key": "К",
     "path": "brands/kbt.webp"
   }
 ]
