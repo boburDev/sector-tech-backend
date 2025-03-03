@@ -31,7 +31,7 @@ export async function validateUserToken(req: Request, res: Response, next: NextF
         return;
     }
 
-    const existingUser = await userRepository.findOne({ where: { email: decoded.email, id: decoded.id, name: decoded.name } });
+    const existingUser = await userRepository.findOne({ where: { email: decoded.email, id: decoded.id } });
 	
     if (!existingUser) {
         res.status(401).json({ message: 'User not found' })

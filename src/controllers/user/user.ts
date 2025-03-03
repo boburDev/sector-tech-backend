@@ -13,11 +13,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
 
     if (user) {
       const accessToken = sign(
-        {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
+        { id: user.id, email: user.email },
         86400000, // 1 kun (24 soat)
         "user"
       );
@@ -32,7 +28,7 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
       const savedUser = await userRepository.save(newUser);
 
       const token = sign(
-        { id: savedUser.id, name: savedUser.name, email: savedUser.email },
+        { id: savedUser.id, email: savedUser.email },
         86400000, // 1 day in milliseconds
         "user"
       );
@@ -56,9 +52,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: "User already exists" });
 
     const newUser = new Users();
-    newUser.name = name;
     newUser.email = email;
-    newUser.password = password;
     const savedUser = await userRepository.save(newUser);
 
     const token = sign(
@@ -69,8 +63,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
     const userData = {
       id: savedUser.id,
-      name: savedUser.name,
-      email: savedUser.email,
+      email: savedUser.email
     };
 
     return res.status(201).json({ message: "User created successfully", token, user: userData });
@@ -99,7 +92,6 @@ export const login = async (req: Request, res: Response): Promise<any> => {
 
     const userData = {
       id: user.id,
-      name: user.name,
       email: user.email,
     };
 
@@ -127,7 +119,7 @@ export const updateProfile = async ( req: Request, res: Response): Promise<any> 
     await userRepository.save(user);
 
     const token = sign(
-      { id: user.id, name: user.name, email: user.email },
+      { id: user.id, email: user.email },
       86400000, // 1 day in milliseconds
       "user"
     );
