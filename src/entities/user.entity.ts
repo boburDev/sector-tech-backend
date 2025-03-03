@@ -11,8 +11,8 @@ import { Cart, SavedProduct } from "./user_details.entity";
 
 @Entity()
 export class Users {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ nullable: true, default: null })
   name?: string;
@@ -20,7 +20,7 @@ export class Users {
   @Column({ unique: true })
   email: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ type: "text", nullable: true, default: null }) // ✅ To'g'ri yo'l
   password?: string | null;
 
   @Column({ nullable: true, default: null })
@@ -40,10 +40,12 @@ export class Users {
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = this.password ? await bcrypt.hash(this.password, 10) : null
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
   }
 
   async validatePassword(plainPassword: string): Promise<boolean | null> {
-    return this.password ? bcrypt.compare(plainPassword, this.password) : null
+    return this.password ? bcrypt.compare(plainPassword, this.password) : null;
   }
 }
