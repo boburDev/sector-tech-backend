@@ -20,54 +20,73 @@ const categoryRepository = AppDataSource.getRepository(Category);
 const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
-    const { recommended, popular } = req.query;
-    const whereCondition: any = {
-        deletedAt: IsNull(),
-    };
+    try {
+        const condition = req.query.condition === "true";
+        const revalance = req.query.revalance === "true";
+        const { recommended, popular } = req.query;
 
-    if(recommended === "true"){
-        whereCondition.recommended = true
+        const queryBuilder = productRepository
+            .createQueryBuilder("product")
+            .leftJoin("product.popularProduct", "popularProduct")
+            .where("product.deletedAt IS NULL");
+
+        if (recommended === "true") {
+            queryBuilder.andWhere("product.recommended = :recommended", { recommended: true });
+        } else if (recommended === "false") {
+            queryBuilder.andWhere("product.recommended = :recommended", { recommended: false });
+        }
+
+        if (popular === "true") {
+            queryBuilder.andWhere("popularProduct.id IS NOT NULL"); 
+        } else if (popular === "false") {
+            queryBuilder.andWhere("popularProduct.id IS NULL"); 
+        }
+
+        if (condition) {
+            queryBuilder.leftJoin("product.conditions", "conditions");
+        }
+
+        if (revalance) {
+            queryBuilder.leftJoin("product.relevances", "relevances");
+        }
+
+        queryBuilder.select([
+            "product.id",
+            "product.title",
+            "product.slug",
+            "product.articul",
+            "product.inStock",
+            "product.price",
+            "product.mainImage",
+            "product.recommended",
+            "popularProduct.id",
+        ]);
+
+        if (condition) {
+            queryBuilder.addSelect([
+                "conditions.id",
+                "conditions.slug",
+                "conditions.title",
+            ]);
+        }
+
+        if (revalance) {
+            queryBuilder.addSelect([
+                "relevances.id",
+                "relevances.slug",
+                "relevances.title",
+            ]);
+        }
+
+        const products = await queryBuilder
+            .orderBy("product.createdAt", "DESC")
+            .getMany();
+
+        return res.status(200).json({ data: products, error: null, status: 200 });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({ message: "Internal server error", error });
     }
-
-    if(popular === "true"){
-        whereCondition.popularProduct = { id: Not(IsNull()) };
-    }
-
-    const products = await productRepository.find({
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-            articul: true,
-            productCode: true,
-            description: true,
-            inStock: true,
-            price: true,
-            mainImage: true,
-            fullDescription: true,
-            characteristics: true,
-            fullDescriptionImages: true,
-            images: true,
-            recommended:true,
-            brandId: true,
-            catalogId: true,
-            categoryId: true,
-            conditionId: true,
-            relevanceId: true,
-            subcatalogId: true,
-            popularProduct: {
-                id: true
-            }   
-        },
-        where: whereCondition,
-        relations: ["popularProduct"]
-    });
-
-    res.json({
-        data: products,
-        error: null,
-        status: 200
-    });
 };
 
 export const getProductById = async (req: Request, res: Response): Promise<any> => {
