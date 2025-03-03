@@ -14,6 +14,7 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
         if (routePath) {
             whereCondition.routePath = routePath as string;
         }
+        
 
         const banners = await bannerRepository.find({
             where: whereCondition,
