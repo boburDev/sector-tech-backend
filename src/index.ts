@@ -14,10 +14,8 @@ import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";
 import insertData from "./services";
-import listContents from "./utils/readFolders";
 dotenv.config(); 
 
-listContents('brands');
 
 const PORT = Number(process.env.PORT) || 3030;
 
