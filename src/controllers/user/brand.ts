@@ -49,7 +49,7 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
         }
 
         const brands = await queryBuilder
-            .orderBy("brand.createdAt", "DESC").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug'])
+            .orderBy("brand.createdAt", "DESC").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'popularBrand.id'])
             .getMany()
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
