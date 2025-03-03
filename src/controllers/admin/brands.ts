@@ -187,7 +187,10 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
 
         if (popular === "true") {
             whereCondition.popularBrand = { id: Not(IsNull()) };
+        } else if (popular === "false") {
+            whereCondition.popularBrand = IsNull();
         }
+
         const brands = await brandRepository.find({
             where: whereCondition,
             order: { createdAt: "DESC" },
