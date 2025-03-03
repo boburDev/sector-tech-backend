@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ILike, In, IsNull } from 'typeorm';
+import { ILike, In, IsNull, Not } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 import { createSlug } from '../../utils/slug';
@@ -183,33 +183,25 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
     try {
         const { popular } = req.query;
 
-        if (popular === "true") {
-            const popularBrands = await popularBrandRepository.find({
-                where: { brand: { deletedAt: IsNull() } },
-                relations: ["brand"],
-                order: { updatedAt: 'DESC' },
-                select: {
-                    id: true,
-                    updatedAt: true,
-                    brand: { id: true, title: true, path: true, slug: true }
-                }
-            });
+        let whereCondition: any = { deletedAt: IsNull() };
 
-            return res.status(200).json({
-                data: popularBrands,
-                error: null,
-                status: 200
-            });
+        if (popular === "true") {
+            whereCondition.popularBrand = { id: Not(IsNull()) };
+        } else if (popular === "false") {
+            whereCondition.popularBrand = IsNull();
         }
 
         const brands = await brandRepository.find({
-            where: { deletedAt: IsNull() },
+            where: whereCondition,
+            order: { createdAt: "DESC" },
             select: {
                 id: true,
                 title: true,
                 path: true,
                 slug: true,
-            }
+                ...(popular === "true" ? { popularBrand: { id: true } } : {})
+            },
+            relations: ['popularBrand']
         });
 
         return res.status(200).json({ data: brands, error: null, status: 200 });

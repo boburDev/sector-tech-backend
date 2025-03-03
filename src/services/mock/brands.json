@@ -1,139 +1,1468 @@
 [
   {
-    "title": "AGAT",
-    "path": "brands/AGAT.webp"
+    "title": "3CX",
+    "path": "brands/3cx.webp"
   },
   {
-    "title": "Algiz K",
-    "path": "brands/AlgizK.webp"
+    "title": "Aaeon",
+    "path": "brands/aaeon.webp"
   },
   {
-    "title": "ALPHAKABEL",
-    "path": "brands/ALPHAKABEL.webp"
+    "title": "AccordTec",
+    "path": "brands/accordTec.webp"
   },
   {
-    "title": "Alyans KB",
-    "path": "brands/AlyansKB.webp"
+    "title": "Acer",
+    "path": "brands/acer.webp"
   },
   {
-    "title": "Antex",
-    "path": "brands/Antex.webp"
+    "title": "Adaptec",
+    "path": "brands/adaptec.webp"
   },
   {
-    "title": "Antey",
-    "path": "brands/Antey.webp"
+    "title": "Adva",
+    "path": "brands/adva.webp"
   },
   {
-    "title": "Avton",
-    "path": "brands/Avton.webp"
+    "title": "Aem-test",
+    "path": "brands/aem-test.webp"
   },
   {
-    "title": "Bastion",
-    "path": "brands/Bastion.webp"
+    "title": "АГАТ",
+    "path": "brands/agat.webp"
   },
   {
-    "title": "Betar",
-    "path": "brands/Betar.webp"
+    "title": "AirBit",
+    "path": "brands/airBit.webp"
   },
   {
-    "title": "BST",
-    "path": "brands/BST.webp"
+    "title": "Akuvox",
+    "path": "brands/akuvox.webp"
   },
   {
-    "title": "Elektricheskaya Manufaktura",
-    "path": "brands/Elektricheskaya Manufaktura.webp"
+    "title": "Альгиз К",
+    "path": "brands/algizK.webp"
   },
   {
-    "title": "Elprom",
-    "path": "brands/Elprom.webp"
+    "title": "Alpha-mile",
+    "path": "brands/alpha-mile.webp"
   },
   {
-    "title": "Garnizon",
-    "path": "brands/Garnizon.webp"
+    "title": "АЛЬФАКАБЕЛЬ",
+    "path": "brands/alphakabel.webp"
   },
   {
-    "title": "Gidrolok",
-    "path": "brands/Gidrolok.webp"
+    "title": "Alt-Linux",
+    "path": "brands/alt-Linux.webp"
   },
   {
-    "title": "IVS-SIGNALSPETSAUTOMATIKA",
-    "path": "brands/IVS-SIGNALSPETSAUTOMATIKA.webp"
+    "title": "Альянс КБ",
+    "path": "brands/alyansKB.webp"
   },
   {
-    "title": "Intersvyaz",
-    "path": "brands/Intersvyaz.webp"
+    "title": "AMD",
+    "path": "brands/amd.webp"
   },
   {
-    "title": "ISTOK",
-    "path": "brands/ISTOK.webp"
+    "title": "Anritsu",
+    "path": "brands/anritsu.webp"
   },
   {
-    "title": "Kabeks",
-    "path": "brands/Kabeks.webp"
+    "title": "Антэкс",
+    "path": "brands/antex.webp"
   },
   {
-    "title": "Kavkazkabel",
-    "path": "brands/Kavkazkabel.webp"
+    "title": "Антей",
+    "path": "brands/antey.webp"
   },
   {
-    "title": "KB Svyaz",
-    "path": "brands/KB Svyaz.webp"
+    "title": "AOC",
+    "path": "brands/aoc.webp"
   },
   {
-    "title": "KOSTROMAKABEL",
-    "path": "brands/KOSTROMAKABEL.webp"
+    "title": "Аквариус",
+    "path": "brands/aquarius.webp"
   },
   {
-    "title": "Magnito-Kontakt",
-    "path": "brands/Magnito-Kontakt.webp"
+    "title": "Arista",
+    "path": "brands/arista.webp"
   },
   {
-    "title": "NPO Kabelnye Seti",
-    "path": "brands/NPO Kabelnye Seti.webp"
+    "title": "Aruba",
+    "path": "brands/aruba.webp"
   },
   {
-    "title": "NPP Starlink",
-    "path": "brands/NPP Starlink.webp"
+    "title": "Asterfusion",
+    "path": "brands/asterfusion.webp"
   },
   {
-    "title": "Saranskkabel-Optika",
-    "path": "brands/Saranskkabel-Optika.webp"
+    "title": "Astra-Linux",
+    "path": "brands/astra-Linux.webp"
   },
   {
-    "title": "Svyazpribor",
-    "path": "brands/Svyazpribor.webp"
+    "title": "Asus",
+    "path": "brands/asus.webp"
   },
   {
-    "title": "SOYUZ",
+    "title": "Aten",
+    "path": "brands/aten.webp"
+  },
+  {
+    "title": "Audiocodes",
+    "path": "brands/audiocodes.webp"
+  },
+  {
+    "title": "Aurora-evernet",
+    "path": "brands/aurora-evernet.webp"
+  },
+  {
+    "title": "Avocent",
+    "path": "brands/avocent.webp"
+  },
+  {
+    "title": "Автон",
+    "path": "brands/avton.webp"
+  },
+  {
+    "title": "B-Optix",
+    "path": "brands/b-optix.webp"
+  },
+  {
+    "title": "Bas-IP",
+    "path": "brands/bas-ip.webp"
+  },
+  {
+    "title": "Бастион",
+    "path": "brands/bastion.webp"
+  },
+  {
+    "title": "BDCOM",
+    "path": "brands/bdcom.webp"
+  },
+  {
+    "title": "Бетар",
+    "path": "brands/betar.webp"
+  },
+  {
+    "title": "Beward",
+    "path": "brands/beward.webp"
+  },
+
+  {
+    "title": "Bonch",
+    "path": "brands/bonch.webp"
+  },
+  {
+    "title": "Bridgetech",
+    "path": "brands/bridgetech.webp"
+  },
+  {
+    "title": "Broadcom",
+    "path": "brands/broadcom.webp"
+  },
+  {
+    "title": "Brocade",
+    "path": "brands/brocade.webp"
+  },
+  {
+    "title": "БСТ",
+    "path": "brands/bst.webp"
+  },
+  {
+    "title": "Cablexpert",
+    "path": "brands/cablexpert.webp"
+  },
+  {
+    "title": "Cambium",
+    "path": "brands/cambium.webp"
+  },
+  {
+    "title": "Came",
+    "path": "brands/came.webp"
+  },
+  {
+    "title": "CGS-Tower-Networks",
+    "path": "brands/cgs-tower-networks.webp"
+  },
+  {
+    "title": "Chronos-Meter",
+    "path": "brands/chronos-meter.webp"
+  },
+  {
+    "title": "Ciena",
+    "path": "brands/ciena.webp"
+  },
+  {
+    "title": "Cisco",
+    "path": "brands/cisco.webp"
+  },
+  {
+    "title": "Clevermic",
+    "path": "brands/clevermic.webp"
+  },
+  {
+    "title": "Crafttalk",
+    "path": "brands/crafttalk.webp"
+  },
+  {
+    "title": "CSB",
+    "path": "brands/csb.webp"
+  },
+  {
+    "title": "Cyberbajt",
+    "path": "brands/cyberbajt.webp"
+  },
+  {
+    "title": "Cyfral",
+    "path": "brands/cyfral.webp"
+  },
+  {
+    "title": "D-Link",
+    "path": "brands/d-link.webp"
+  },
+  {
+    "title": "Dahua",
+    "path": "brands/dahua.webp"
+  },
+  {
+    "title": "Dasan",
+    "path": "brands/dasan.webp"
+  },
+  {
+    "title": "Datapy",
+    "path": "brands/datapy.webp"
+  },
+  {
+    "title": "DCN",
+    "path": "brands/dcn.webp"
+  },
+  {
+    "title": "Dell",
+    "path": "brands/dell.webp"
+  },
+  {
+    "title": "Delta",
+    "path": "brands/delta.webp"
+  },
+  {
+    "title": "Digital-Devices",
+    "path": "brands/digital-devices.webp"
+  },
+  {
+    "title": "DKC",
+    "path": "brands/dkc.webp"
+  },
+  {
+    "title": "ДОК",
+    "path": "brands/dok.webp"
+  },
+  {
+    "title": "Dracor",
+    "path": "brands/dracor.webp"
+  },
+  {
+    "title": "ECI",
+    "path": "brands/eci.webp"
+  },
+  {
+    "title": "Ecorouter",
+    "path": "brands/ecorouter.webp"
+  },
+  {
+    "title": "Edgecore-Networks",
+    "path": "brands/edgecore-networks.webp"
+  },
+  {
+    "title": "Ekahau",
+    "path": "brands/ekahau.webp"
+  },
+  {
+    "title": "EKF",
+    "path": "brands/ekf.webp"
+  },
+  {
+    "title": "Ekinops",
+    "path": "brands/ekinops.webp"
+  },
+  {
+    "title": "Electronics-Solution",
+    "path": "brands/electronics-solution.webp"
+  },
+  {
+    "title": "Электрическая мануфактура",
+    "path": "brands/elektricheskaya-Manufaktura.webp"
+  },
+  {
+    "title": "Elemy",
+    "path": "brands/elemy.webp"
+  },
+
+  {
+    "title": "Elpida",
+    "path": "brands/elpida.webp"
+  },
+  {
+    "title": "ЭЛПРОМ",
+    "path": "brands/elprom.webp"
+  },
+  {
+    "title": "Eltex",
+    "path": "brands/eltex.webp"
+  },
+  {
+    "title": "Emulex",
+    "path": "brands/emulex.webp"
+  },
+  {
+    "title": "Energie",
+    "path": "brands/energie.webp"
+  },
+  {
+    "title": "EnGenius",
+    "path": "brands/enGenius.webp"
+  },
+  {
+    "title": "Ericsson",
+    "path": "brands/ericsson.webp"
+  },
+  {
+    "title": "Eset",
+    "path": "brands/eset.webp"
+  },
+  {
+    "title": "Exfo",
+    "path": "brands/exfo.webp"
+  },
+  {
+    "title": "Extreme-Networks",
+    "path": "brands/extreme-networks.webp"
+  },
+  {
+    "title": "EZ-IP-by-Dahua",
+    "path": "brands/ez-ip-by-dahua.webp"
+  },
+  {
+    "title": "Fanvil",
+    "path": "brands/fanvil.webp"
+  },
+  {
+    "title": "FiberFox",
+    "path": "brands/fiberFox.webp"
+  },
+  {
+    "title": "Fineco",
+    "path": "brands/fineco.webp"
+  },
+  {
+    "title": "FIS",
+    "path": "brands/fis.webp"
+  },
+  {
+    "title": "Fitel",
+    "path": "brands/fitel.webp"
+  },
+  {
+    "title": "Fluke",
+    "path": "brands/fluke.webp"
+  },
+  {
+    "title": "Forpost",
+    "path": "brands/forpost.webp"
+  },
+  {
+    "title": "Forsite",
+    "path": "brands/forsite.webp"
+  },
+  {
+    "title": "Fortinet",
+    "path": "brands/fortinet.webp"
+  },
+  {
+    "title": "Fortisflex",
+    "path": "brands/fortisflex.webp"
+  },
+  {
+    "title": "Fujikura",
+    "path": "brands/fujikura.webp"
+  },
+  {
+    "title": "Fujitsu",
+    "path": "brands/fujitsu.webp"
+  },
+  {
+    "title": "Fullkit",
+    "path": "brands/fullkit.webp"
+  },
+  {
+    "title": "Гарнизон",
+    "path": "brands/garnizon.webp"
+  },
+  {
+    "title": "General-Security",
+    "path": "brands/general-security.webp"
+  },
+  {
+    "title": "GFI-Software",
+    "path": "brands/gfi-software.webp"
+  },
+  {
+    "title": "Гидролок",
+    "path": "brands/gidrolok.webp"
+  },
+  {
+    "title": "Gigabyte",
+    "path": "brands/gigabyte.webp"
+  },
+  {
+    "title": "Gigaset",
+    "path": "brands/gigaset.webp"
+  },
+  {
+    "title": "Gooxi",
+    "path": "brands/gooxi.webp"
+  },
+  {
+    "title": "Grandstream",
+    "path": "brands/grandstream.webp"
+  },
+  {
+    "title": "GRT",
+    "path": "brands/grt.webp"
+  },
+  {
+    "title": "GS-Nanotech",
+    "path": "brands/gs-nanotech.webp"
+  },
+  {
+    "title": "Haupa",
+    "path": "brands/haupa.webp"
+  },
+  {
+    "title": "Hikvision",
+    "path": "brands/hikvision.webp"
+  },
+  {
+    "title": "Hiwatch",
+    "path": "brands/hiwatch.webp"
+  },
+
+  {
+    "title": "HP",
+    "path": "brands/hp.webp"
+  },
+  {
+    "title": "Huawei",
+    "path": "brands/huawei.webp"
+  },
+  {
+    "title": "Hynix",
+    "path": "brands/hynix.webp"
+  },
+  {
+    "title": "Hyperline",
+    "path": "brands/hyperline.webp"
+  },
+  {
+    "title": "IBM",
+    "path": "brands/ibm.webp"
+  },
+  {
+    "title": "IEK",
+    "path": "brands/iek.webp"
+  },
+  {
+    "title": "Ilsintech",
+    "path": "brands/ilsintech.webp"
+  },
+  {
+    "title": "Infinet",
+    "path": "brands/infinet.webp"
+  },
+  {
+    "title": "Inforim",
+    "path": "brands/inforim.webp"
+  },
+  {
+    "title": "Infortrend",
+    "path": "brands/infortrend.webp"
+  },
+  {
+    "title": "Install",
+    "path": "brands/install.webp"
+  },
+  {
+    "title": "Intel",
+    "path": "brands/intel.webp"
+  },
+  {
+    "title": "Интерсвязь",
+    "path": "brands/intersvyaz.webp"
+  },
+  {
+    "title": "Ipmatika",
+    "path": "brands/ipmatika.webp"
+  },
+  {
+    "title": "Iron Logic",
+    "path": "brands/iron-logic.webp"
+  },
+  {
+    "title": "IRU",
+    "path": "brands/iru.webp"
+  },
+  {
+    "title": "ИСТОК",
+    "path": "brands/istok.webp"
+  },
+  {
+    "title": "ITC",
+    "path": "brands/itc.webp"
+  },
+  {
+    "title": "Itelite",
+    "path": "brands/itelite.webp"
+  },
+  {
+    "title": "ITK",
+    "path": "brands/itk.webp"
+  },
+  {
+    "title": "ИВС-СИГНАЛСПЕЦАВТОМАТИКА",
+    "path": "brands/ivs-signalspetsavtomatika.webp"
+  },
+  {
+    "title": "Jilong",
+    "path": "brands/jilong.webp"
+  },
+  {
+    "title": "Jirous",
+    "path": "brands/jirous.webp"
+  },
+  {
+    "title": "JR",
+    "path": "brands/jr.webp"
+  },
+  {
+    "title": "Juniper",
+    "path": "brands/juniper.webp"
+  },
+  {
+    "title": "Кабэкс",
+    "path": "brands/kabefks.webp"
+  },
+  {
+    "title": "Kabifix",
+    "path": "brands/kabifix.webp"
+  },
+  {
+    "title": "Карат",
+    "path": "brands/karat.webp"
+  },
+  {
+    "title": "Kaspersky",
+    "path": "brands/kaspersky.webp"
+  },
+  {
+    "title": "Кавказкабел",
+    "path": "brands/kavkazkabel.webp"
+  },
+  {
+    "title": "КБ Связь",
+    "path": "brands/kb-svyaz.webp"
+  },
+  {
+    "title": "КВТ",
+    "path": "brands/kbt.webp"
+  },
+  {
+    "title": "КЭАЗ",
+    "path": "brands/keaz.webp"
+  },
+  {
+    "title": "Kingston",
+    "path": "brands/kingston.webp"
+  },
+  {
+    "title": "Kiwi",
+    "path": "brands/kiwi.webp"
+  },
+  {
+    "title": "Knipex",
+    "path": "brands/knipex.webp"
+  },
+  {
+    "title": "Кольчугино",
+    "path": "brands/kolchugino.webp"
+  },
+
+  {
+    "title": "КОСТРОМАКАБЕЛЬ",
+    "path": "brands/kostromakabel.webp"
+  },
+  {
+    "title": "КРОКС",
+    "path": "brands/kroks.webp"
+  },
+  {
+    "title": "KSC",
+    "path": "brands/ksc.webp"
+  },
+  {
+    "title": "Kyocera",
+    "path": "brands/kyocera.webp"
+  },
+  {
+    "title": "Lansens",
+    "path": "brands/lansens.webp"
+  },
+  {
+    "title": "Lavatelecom",
+    "path": "brands/lavatelecom.webp"
+  },
+  {
+    "title": "Lenovo",
+    "path": "brands/lenovo.webp"
+  },
+  {
+    "title": "Ligowave",
+    "path": "brands/ligowave.webp"
+  },
+  {
+    "title": "Линия",
+    "path": "brands/liniya.webp"
+  },
+  {
+    "title": "Linksys",
+    "path": "brands/linksys.webp"
+  },
+  {
+    "title": "Lofis",
+    "path": "brands/lofis.webp"
+  },
+  {
+    "title": "Logitech",
+    "path": "brands/logitech.webp"
+  },
+  {
+    "title": "LR-Link",
+    "path": "brands/lr-link.webp"
+  },
+  {
+    "title": "LSI",
+    "path": "brands/lsi.webp"
+  },
+  {
+    "title": "Lumax",
+    "path": "brands/lumax.webp"
+  },
+  {
+    "title": "Macroscope",
+    "path": "brands/macroscope.webp"
+  },
+  {
+    "title": "Магнито-Контакт",
+    "path": "brands/magnito-Kontakt.webp"
+  },
+  {
+    "title": "Makel",
+    "path": "brands/makel.webp"
+  },
+  {
+    "title": "Meanwell",
+    "path": "brands/meanwell.webp"
+  },
+  {
+    "title": "Megatec",
+    "path": "brands/megatec.webp"
+  },
+  {
+    "title": "Mellanox",
+    "path": "brands/mellanox.webp"
+  },
+  {
+    "title": "Меркурий",
+    "path": "brands/merkuriy.webp"
+  },
+  {
+    "title": "Metalbox",
+    "path": "brands/metalbox.webp"
+  },
+  {
+    "title": "Micron",
+    "path": "brands/micron.webp"
+  },
+  {
+    "title": "Microsoft",
+    "path": "brands/microsoft.webp"
+  },
+  {
+    "title": "Mikrotik",
+    "path": "brands/mikrotik.webp"
+  },
+  {
+    "title": "Milesight",
+    "path": "brands/milesight.webp"
+  },
+  {
+    "title": "Miller",
+    "path": "brands/miller.webp"
+  },
+  {
+    "title": "Molex",
+    "path": "brands/molex.webp"
+  },
+  {
+    "title": "Moxa",
+    "path": "brands/moxa.webp"
+  },
+  {
+    "title": "Nag",
+    "path": "brands/nag.webp"
+  },
+  {
+    "title": "Navigator",
+    "path": "brands/navigator.webp"
+  },
+  {
+    "title": "Nekta",
+    "path": "brands/nekta.webp"
+  },
+  {
+    "title": "Netally",
+    "path": "brands/netally.webp"
+  },
+  {
+    "title": "Netapp",
+    "path": "brands/netapp.webp"
+  },
+  {
+    "title": "Netko",
+    "path": "brands/netko.webp"
+  },
+  {
+    "title": "Netlan",
+    "path": "brands/netlan.webp"
+  },
+
+  {
+    "title": "Netup",
+    "path": "brands/netup.webp"
+  },
+  {
+    "title": "Nikolan",
+    "path": "brands/nikolan.webp"
+  },
+  {
+    "title": "Nikomarx",
+    "path": "brands/nikomarx.webp"
+  },
+  {
+    "title": "Nordic",
+    "path": "brands/nordic.webp"
+  },
+  {
+    "title": "Норси-Транс",
+    "path": "brands/norsi-trans.webp"
+  },
+  {
+    "title": "НОВОУЧЕТ",
+    "path": "brands/novouchet.webp"
+  },
+  {
+    "title": "Noyafa",
+    "path": "brands/noyafa.webp"
+  },
+  {
+    "title": "НПО Кабельные сети",
+    "path": "brands/npo-kabelnye-seti.webp"
+  },
+  {
+    "title": "НПП Старлинк",
+    "path": "brands/npp-starlink.webp"
+  },
+  {
+    "title": "Nsgate",
+    "path": "brands/nsgate.webp"
+  },
+  {
+    "title": "Ntss",
+    "path": "brands/ntss.webp"
+  },
+  {
+    "title": "Nvidia",
+    "path": "brands/nvidia.webp"
+  },
+  {
+    "title": "Олевс",
+    "path": "brands/olevs.webp"
+  },
+  {
+    "title": "Omny",
+    "path": "brands/omny.webp"
+  },
+  {
+    "title": "Omnypro",
+    "path": "brands/omnypro.webp"
+  },
+  {
+    "title": "ООО Фирма Радиал",
+    "path": "brands/ooo-firma-radial.webp"
+  },
+  {
+    "title": "Optimus",
+    "path": "brands/optimus.webp"
+  },
+  {
+    "title": "Opwill",
+    "path": "brands/opwill.webp"
+  },
+  {
+    "title": "Orion",
+    "path": "brands/orion.webp"
+  },
+  {
+    "title": "Osnovo",
+    "path": "brands/osnovo.webp"
+  },
+  {
+    "title": "Отзвук",
+    "path": "brands/otzvuk.webp"
+  },
+  {
+    "title": "Packetlight",
+    "path": "brands/packetlight.webp"
+  },
+  {
+    "title": "Panasonic",
+    "path": "brands/panasonic.webp"
+  },
+  {
+    "title": "Pantum",
+    "path": "brands/pantum.webp"
+  },
+  {
+    "title": "Pbi",
+    "path": "brands/pbi.webp"
+  },
+  {
+    "title": "Perco",
+    "path": "brands/perco.webp"
+  },
+  {
+    "title": "Phison",
+    "path": "brands/phison.webp"
+  },
+  {
+    "title": "Planar",
+    "path": "brands/planar.webp"
+  },
+  {
+    "title": "Полисервис",
+    "path": "brands/poliservis.webp"
+  },
+  {
+    "title": "Power-Cube",
+    "path": "brands/power-cube.webp"
+  },
+  {
+    "title": "Powercom",
+    "path": "brands/powercom.webp"
+  },
+  {
+    "title": "Powertone",
+    "path": "brands/powertone.webp"
+  },
+  {
+    "title": "ПРОФИТТ",
+    "path": "brands/profitt.webp"
+  },
+  {
+    "title": "Промрукав",
+    "path": "brands/promrukav.webp"
+  },
+  {
+    "title": "Proxway",
+    "path": "brands/proxway.webp"
+  },
+  {
+    "title": "Qlogic",
+    "path": "brands/qlogic.webp"
+  },
+  {
+    "title": "Qnap",
+    "path": "brands/qnap.webp"
+  },
+
+  {
+    "title": "Qsan",
+    "path": "brands/qsan.webp"
+  },
+  {
+    "title": "Quanta",
+    "path": "brands/quanta.webp"
+  },
+  {
+    "title": "QuWireless",
+    "path": "brands/quwireless.webp"
+  },
+  {
+    "title": "Raidix",
+    "path": "brands/raidix.webp"
+  },
+  {
+    "title": "Raisecom",
+    "path": "brands/raisecom.webp"
+  },
+  {
+    "title": "Raritan",
+    "path": "brands/raritan.webp"
+  },
+  {
+    "title": "Rcntec",
+    "path": "brands/rcntec.webp"
+  },
+  {
+    "title": "Rdrpru",
+    "path": "brands/rdrpru.webp"
+  },
+  {
+    "title": "РЭК-PRYSMIAN",
+    "path": "brands/rek-prysmian.webp"
+  },
+  {
+    "title": "Релион",
+    "path": "brands/relion.webp"
+  },
+  {
+    "title": "РЗМКП",
+    "path": "brands/remkp.webp"
+  },
+  {
+    "title": "Rexant",
+    "path": "brands/rexant.webp"
+  },
+  {
+    "title": "Rf Elements",
+    "path": "brands/rf-elements.webp"
+  },
+  {
+    "title": "Риелта",
+    "path": "brands/rielta.webp"
+  },
+  {
+    "title": "Rightech",
+    "path": "brands/rightech.webp"
+  },
+  {
+    "title": "Rikor",
+    "path": "brands/rikor.webp"
+  },
+  {
+    "title": "Rittal",
+    "path": "brands/rittal.webp"
+  },
+  {
+    "title": "Росдомофон",
+    "path": "brands/rosdomofon.webp"
+  },
+  {
+    "title": "Ruckus",
+    "path": "brands/ruckus.webp"
+  },
+  {
+    "title": "Ruijie Networks",
+    "path": "brands/ruijie-networks.webp"
+  },
+  {
+    "title": "Ruwel",
+    "path": "brands/ruwel.webp"
+  },
+  {
+    "title": "Samsung",
+    "path": "brands/samsung.webp"
+  },
+  {
+    "title": "Сарансккабель-Оптика",
+    "path": "brands/saranskkabel-optika.webp"
+  },
+  {
+    "title": "Sc&T",
+    "path": "brands/sc&t.webp"
+  },
+  {
+    "title": "Schneider Electric",
+    "path": "brands/schneider-electric.webp"
+  },
+  {
+    "title": "Seagate",
+    "path": "brands/seagate.webp"
+  },
+  {
+    "title": "Sfptotal",
+    "path": "brands/sfptotal.webp"
+  },
+  {
+    "title": "Штиль",
+    "path": "brands/shtil.webp"
+  },
+  {
+    "title": "Sigur",
+    "path": "brands/sigur.webp"
+  },
+  {
+    "title": "Siklu",
+    "path": "brands/siklu.webp"
+  },
+  {
+    "title": "Silart",
+    "path": "brands/silart.webp"
+  },
+  {
+    "title": "Silicom",
+    "path": "brands/silicom.webp"
+  },
+  {
+    "title": "Sirin",
+    "path": "brands/sirin.webp"
+  },
+  {
+    "title": "Slinex",
+    "path": "brands/slinex.webp"
+  },
+  {
+    "title": "Smit",
+    "path": "brands/smit.webp"
+  },
+  {
+    "title": "Snr Erd",
+    "path": "brands/snr-erd.webp"
+  },
+  {
+    "title": "Snr",
+    "path": "brands/snr.webp"
+  },
+  {
+    "title": "СОЮЗ",
+    "path": "brands/soyuz.webp"
+  },
+  {
+    "title": "СПБ ЗИП",
+    "path": "brands/spb-zip.webp"
+  },
+  {
+    "title": "Специнформатика-СИ",
+    "path": "brands/spetsinformatiks-si.webp"
+  },
+  {
+    "title": "Spl",
+    "path": "brands/spl.webp"
+  },
+  {
+    "title": "ССД",
+    "path": "brands/ssd.webp"
+  },
+  {
+    "title": "Stayer",
+    "path": "brands/stayer.webp"
+  },
+  {
+    "title": "Stelberry",
+    "path": "brands/stelberry.webp"
+  },
+  {
+    "title": "Streamlabs",
+    "path": "brands/streamlabs.webp"
+  },
+  {
+    "title": "Sumavision",
+    "path": "brands/sumavision.webp"
+  },
+  {
+    "title": "Sumitomo",
+    "path": "brands/sumitomo.webp"
+  },
+  {
+    "title": "Supermicro",
+    "path": "brands/supermicro.webp"
+  },
+  {
+    "title": "Связьприбор",
+    "path": "brands/svyazpribor.webp"
+  },
+  {
+    "title": "Symantec",
+    "path": "brands/symantec.webp"
+  },
+  {
+    "title": "Synology",
+    "path": "brands/synology.webp"
+  },
+  {
+    "title": "Tamosoft",
+    "path": "brands/tamosoft.webp"
+  },
+  {
+    "title": "Tantos",
+    "path": "brands/tantos.webp"
+  },
+  {
+    "title": "Tdm",
+    "path": "brands/tdm.webp"
+  },
+  {
+    "title": "Teltonika",
+    "path": "brands/teltonika.webp"
+  },
+  {
+    "title": "Tesla Power",
+    "path": "brands/tesla-power.webp"
+  },
+  {
+    "title": "Tfortis",
+    "path": "brands/tfortis.webp"
+  },
+  {
+    "title": "Tlk",
+    "path": "brands/tlk.webp"
+  },
+  {
+    "title": "Топаз",
+    "path": "brands/topaz.webp"
+  },
+  {
+    "title": "Toshiba",
+    "path": "brands/toshiba.webp"
+  },
+  {
+    "title": "Tp Link",
+    "path": "brands/tp-link.webp"
+  },
+  {
+    "title": "Trassir",
+    "path": "brands/trassir.webp"
+  },
+  {
+    "title": "Tyan",
+    "path": "brands/tyan.webp"
+  },
+  {
+    "title": "Ubiquiti",
+    "path": "brands/ubiquiti.webp"
+  },
+  {
+    "title": "УФАКОР",
+    "path": "brands/ufakor.webp"
+  },
+  {
+    "title": "Ufispace",
+    "path": "brands/ufispace.webp"
+  },
+  {
+    "title": "Ujin",
+    "path": "brands/ujin.webp"
+  },
+  {
+    "title": "Ulan",
+    "path": "brands/ulan.webp"
+  },
+  {
+    "title": "Unify",
+    "path": "brands/unify.webp"
+  },
+  {
+    "title": "Урал Пак",
+    "path": "brands/ural-pak.webp"
+  },
+  {
+    "title": "Usergate",
+    "path": "brands/usergate.webp"
+  },
+  {
+    "title": "Vas Experts",
+    "path": "brands/vas-experts.webp"
+  },
+
+  {
+    "title": "Vcom",
+    "path": "brands/vcom.webp"
+  },
+  {
+    "title": "Vector",
+    "path": "brands/vector.webp"
+  },
+  {
+    "title": "Veeam",
+    "path": "brands/veeam.webp"
+  },
+  {
+    "title": "Вега Абсолют",
+    "path": "brands/vega-absolyut.webp"
+  },
+  {
+    "title": "Vermax",
+    "path": "brands/vermax.webp"
+  },
+  {
+    "title": "Vizit",
+    "path": "brands/vizit.webp"
+  },
+  {
+    "title": "Vmware",
+    "path": "brands/vmware.webp"
+  },
+  {
+    "title": "Volsip",
+    "path": "brands/volsip.webp"
+  },
+  {
+    "title": "ВОСТОК PRO",
+    "path": "brands/vostok-pro.webp"
+  },
+  {
+    "title": "Vt",
+    "path": "brands/vt.webp"
+  },
+  {
+    "title": "Vutlan",
+    "path": "brands/vutlan.webp"
+  },
+  {
+    "title": "Wago",
+    "path": "brands/wago.webp"
+  },
+  {
+    "title": "Wbr",
+    "path": "brands/wbr.webp"
+  },
+  {
+    "title": "Western Digital",
+    "path": "brands/western-digital.webp"
+  },
+  {
+    "title": "Wi Tek",
+    "path": "brands/wi-tek.webp"
+  },
+  {
+    "title": "Wireless Instruments",
+    "path": "brands/wireless-instruments.webp"
+  },
+  {
+    "title": "Wisi",
+    "path": "brands/wisi.webp"
+  },
+  {
+    "title": "Yealink",
+    "path": "brands/yealink.webp"
+  },
+  {
+    "title": "Yeastar",
+    "path": "brands/yeastar.webp"
+  },
+  {
+    "title": "Yokogawa",
+    "path": "brands/yokogawa.webp"
+  },
+  {
+    "title": "Yunso",
+    "path": "brands/yunso.webp"
+  },
+  {
+    "title": "Zkteco",
+    "path": "brands/zkteco.webp"
+  },
+  {
+    "title": "Zte",
+    "path": "brands/zte.webp"
+  },
+  {
+    "title": "Zyxel",
+    "path": "brands/zyxel.webp"
+  },
+  {
+    "title": "A-DATA",
     "path": null
   },
   {
-    "title": "SPB ZIP",
-    "path": "brands/SPB ZIP.webp"
+    "title": "A4Tech",
+    "path": null
   },
   {
-    "title": "Spetsinformatika-SI",
-    "path": "brands/spetsinformatika-si.webp"
+    "title": "ABB РФ/РФ",
+    "path": null
   },
-  {
-    "title": "Ufakor",
-    "path": "brands/Ufakor.webp"
-  },
-  {
-    "title": "Ural Pak",
-    "path": "brands/Ural Pak.webp"
-  },
-  {
-    "title": "Vega Absolyut",
-    "path": "brands/Vega Absolyut.webp"
-  },
-  {
-    "title": "VOSTOK PRO",
-    "path": "brands/VOSTOK PRO.webp"
-  },
-  {
-    "title": "KBT",
-    "key": "К",
-    "path": "brands/kbt.webp"
-  }
+  { "title": "AGI РФ/РФ", "path": null },
+  { "title": "AMD РФ/РФ", "path": null },
+  { "title": "AOPEN", "path": null },
+  { "title": "ARM MEDIA", "path": null },
+  { "title": "Avago", "path": null },
+  { "title": "AVIORA", "path": null },
+  { "title": "AVISION", "path": null },
+  { "title": "AVISION РФ / РФ", "path": null },
+  { "title": "Bironi", "path": null },
+  { "title": "BM", "path": null },
+  { "title": "Buro", "path": null },
+  { "title": "CACTUS", "path": null },
+  { "title": "Camelion", "path": null },
+  { "title": "Canon РФ / РФ", "path": null },
+  { "title": "CHINT", "path": null },
+  { "title": "Dallas", "path": null },
+  { "title": "Defender", "path": null },
+  { "title": "DEKraft", "path": null },
+  { "title": "Deli", "path": null },
+  { "title": "Deli_РФ / РФ", "path": null },
+  { "title": "DELTA COMPUTERS", "path": null },
+  { "title": "DIGMA", "path": null },
+  { "title": "DIGMA PRO", "path": null },
+  { "title": "Duplex", "path": null },
+  { "title": "ETALON", "path": null },
+  { "title": "Flussonic", "path": null },
+  { "title": "GENERICA", "path": null },
+  { "title": "Gigabyte РФ / РФ", "path": null },
+  { "title": "GLADWORK", "path": null },
+  { "title": "GMNG", "path": null },
+  { "title": "GUSI", "path": null },
+  { "title": "N3C", "path": null },
+  { "title": "HEGEL", "path": null },
+  { "title": "HIPER", "path": null },
+  { "title": "HISENSE", "path": null },
+  { "title": "HKC", "path": null },
+  { "title": "HP_РФ / РФ", "path": null },
+  { "title": "IDECO", "path": null },
+  { "title": "liyama РФ / РФ", "path": null },
+  { "title": "IN HOME", "path": null },
+  { "title": "INDUSTRIAL", "path": null },
+  { "title": "INFINIX", "path": null },
+  { "title": "Inspiria(группа Legrand)", "path": null },
+  { "title": "Intro", "path": null },
+  { "title": "IONICH", "path": null },
+  { "title": "IPPON", "path": null },
+  { "title": "Joinwit", "path": null },
+  { "title": "KADRON", "path": null },
+  { "title": "KINGPRICE", "path": null },
+  { "title": "Kingspec", "path": null },
+  { "title": "Kingston РФ / РФ", "path": null },
+  { "title": "KNIGHT", "path": null },
+  { "title": "Kobra РФ / РФ", "path": null },
+  { "title": "KROMAX", "path": null },
+  { "title": "KVADRA", "path": null },
+  { "title": "Lanmaster", "path": null },
+  { "title": "Legrand РФ / РФ", "path": null },
+  { "title": "Lenovo_РФ / РФ", "path": null },
+  { "title": "Leoch", "path": null },
+  { "title": "Lezard", "path": null },
+  { "title": "LG РФ / РФ", "path": null },
+  { "title": "LightCom", "path": null },
+  { "title": "Masuma", "path": null },
+  { "title": "MEFERI", "path": null },
+  { "title": "MERTECH", "path": null },
+  { "title": "Metal Box PRO", "path": null },
+  { "title": "METRA", "path": null },
+  { "title": "Microsoft РФ / РФ", "path": null },
+  { "title": "MSI", "path": null },
+  { "title": "Netac", "path": null },
+  { "title": "NexTouch", "path": null },
+  { "title": "No name", "path": null },
+  { "title": "NPC", "path": null },
+  { "title": "OBO Bettermann", "path": null },
+  { "title": "OFFICE KIT", "path": null },
+  { "title": "OKLICK", "path": null },
+  { "title": "OneKeyElectro", "path": null },
+  { "title": "Oni ONKRON", "path": null },
+  { "title": "Orange Pi", "path": null },
+  { "title": "OSIO", "path": null },
+  { "title": "PC PET", "path": null },
+  { "title": "Penosi", "path": null },
+  { "title": "Phoenix Contact РФ / РФ", "path": null },
+  { "title": "PLUSTEK", "path": null },
+  { "title": "Powertek", "path": null },
+  { "title": "Raskat", "path": null },
+  { "title": "Rem", "path": null },
+  { "title": "RICOH РФ / РФ", "path": null },
+  { "title": "RusGuard", "path": null },
+  { "title": "Ruvinil", "path": null },
+  { "title": "SarmatT", "path": null },
+  { "title": "Seriallink", "path": null },
+  { "title": "SILICON POWER РФ / РФ", "path": null },
+  { "title": "Simon", "path": null },
+  { "title": "SLT", "path": null },
+  { "title": "Smartec", "path": null },
+  { "title": "SUNWIND", "path": null },
+  { "title": "SUPRLAN", "path": null },
+  { "title": "Systeme Electric", "path": null },
+  { "title": "Tech-Krep", "path": null },
+  { "title": "TOKOV ELECTRIC", "path": null },
+  { "title": "Toshiba РФ / РФ", "path": null },
+  { "title": "Transcend РФ / РФ", "path": null },
+  { "title": "TSC РФ / РФ", "path": null },
+  { "title": "Universal", "path": null },
+  { "title": "ULTRAMOUNTS", "path": null },
+  { "title": "WD РФ / РФ", "path": null },
+  { "title": "Wispen", "path": null },
+  { "title": "Xerox РФ / РФ", "path": null },
+  { "title": "XFusion", "path": null },
+  { "title": "Xiaomi", "path": null },
+  { "title": "YON (группа ДКС)", "path": null },
+  { "title": "Агрокабель", "path": null },
+  { "title": "АЛЮР", "path": null },
+  { "title": "Архив", "path": null },
+  { "title": "АТОЛ", "path": null },
+  { "title": "Балткабель", "path": null },
+  { "title": "БЫСТРЫЙ МОНТАЖ", "path": null },
+  { "title": "БЮРОКРАТ", "path": null },
+  { "title": "Вайбос", "path": null },
+  { "title": "Витек", "path": null },
+  { "title": "Гелеос", "path": null },
+  { "title": "Гравитон", "path": null },
+  { "title": "ДЕКАСТ", "path": null },
+  { "title": "ЗУБР", "path": null },
+  { "title": "ЗЭТАРУС", "path": null },
+  { "title": "ИВКЗ", "path": null },
+  { "title": "Конкорд", "path": null },
+  { "title": "Космос", "path": null },
+  { "title": "КСБСО прочее", "path": null },
+  { "title": "КУБ", "path": null },
+  { "title": "Кунцево-Электро", "path": null },
+  { "title": "Людиновокабель", "path": null },
+  { "title": "МАГНА", "path": null },
+  { "title": "Меандр", "path": null },
+  { "title": "Минсккабель", "path": null },
+  { "title": "Монэл", "path": null },
+  { "title": "НовАтек-Электро", "path": null },
+  { "title": "ОНЛАЙТ", "path": null },
+  { "title": "ПАРТНЕР-ЭЛЕКТРО", "path": null },
+  { "title": "ПромЭл", "path": null },
+  { "title": "ПТК \"ИВС\"", "path": null },
+  { "title": "ПЭМИ Ростов-на-Дону", "path": null },
+  { "title": "Равелин", "path": null },
+  { "title": "Радиус", "path": null },
+  { "title": "Реле и Автоматика", "path": null },
+  { "title": "РК", "path": null },
+  { "title": "Русский Свет", "path": null },
+  { "title": "Сибкабель", "path": null },
+  { "title": "Систем Электрик", "path": null },
+  { "title": "СОЭМИ", "path": null },
+  { "title": "Технокабель", "path": null },
+  { "title": "ТМИ", "path": null },
+  { "title": "Топаз", "path": null },
+  { "title": "ТПК", "path": null },
+  { "title": "ТСС", "path": null },
+  { "title": "УЭО прочее", "path": null },
+  { "title": "Форпост", "path": null },
+  { "title": "Цветлит", "path": null },
+  { "title": "ЧПТУП ВЭТП Свет Витебск", "path": null },
+  { "title": "ЧУП Элект Белтиз", "path": null },
+  { "title": "Штиль", "path": null },
+  { "title": "Электродеталь Воронеж", "path": null },
+  { "title": "ЭЛЕКТРОКАБЕЛЬ НН", "path": null },
+  { "title": "Электропромпласт", "path": null },
+  { "title": "Электротехника МПО", "path": null },
+  { "title": "Электрофидер", "path": null },
+  { "title": "ЭЛПРОМ", "path": null },
+  { "title": "Элтех-Сервис Омск", "path": null },
+  { "title": "Эм-кабель", "path": null },
+  { "title": "Энергия", "path": null },
+  { "title": "Энергокабель", "path": null },
+  { "title": "Энергокомплект", "path": null },
+  { "title": "ЭРА", "path": null },
+  { "title": "Инфосис", "path": null }
 ]

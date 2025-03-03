@@ -18,7 +18,7 @@ const router = Router();
  *     tags: [Brands]
  *     parameters:
  *       - in: query
- *         name: isPopular
+ *         name: popular
  *         schema:
  *           type: boolean
  *         required: false
@@ -46,7 +46,7 @@ const router = Router();
  *                       path:
  *                         type: string
  *                         example: "images/nike.png"
- *                       isPopular:
+ *                       popular:
  *                         type: boolean
  *                         example: true
  *                       slug:

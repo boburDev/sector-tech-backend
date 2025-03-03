@@ -13,8 +13,9 @@ import "./common/strategy/yandex.strategy";
 import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";
-import insertData from "./services";
+// import insertData from "./services";
 dotenv.config(); 
+
 
 const PORT = Number(process.env.PORT) || 3030;
 
@@ -43,7 +44,7 @@ app.use(passport.session());
 app.get('/', async (req: any, res: any) => {
   console.log();
   
-  await insertData(req.query);
+  // await insertData(req.query);
   res.send('ok')
 })
 app.use("/", adminRouter);

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {  IsNull } from 'typeorm';
+import {  IsNull, Not } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -36,22 +36,30 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
 
 export const getBrands = async (req: Request, res: Response): Promise<any> => {
     try {
+        const { popular } = req.query;
 
-        const whereCondition: any = {
-            deletedAt: IsNull(),
-        };
+        let whereCondition: any = { deletedAt: IsNull() };
+
+        if (popular === "true") {
+            whereCondition.popularBrand = { id: Not(IsNull()) };
+        } else if (popular === "false") {
+            whereCondition.popularBrand = IsNull();
+        }
 
         const brands = await brandRepository.find({
             where: whereCondition,
+            order: { createdAt: "DESC" },
             select: {
                 id: true,
                 title: true,
                 path: true,
                 slug: true,
-            }
+                ...(popular === "true" ? { popularBrand: { id: true } } : {})
+            },
+            relations: ['popularBrand']
         });
 
-        return res.status(200).json({data: brands, error: null, status: 200});
+        return res.status(200).json({ data: brands, error: null, status: 200 });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error });
     }
