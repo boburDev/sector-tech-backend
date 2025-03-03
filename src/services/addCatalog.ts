@@ -1,13 +1,15 @@
 import AppDataSource from '../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../entities/catalog.entity';
 import { createSlug } from '../utils/slug';
+import catalogData from "../services/mock/catalogs.json";
 
 // Repository obyektlarini olish
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
 
-export async function insertCatalogData(catalogData: any) {
+
+export async function insertCatalogData() {
     await AppDataSource.transaction(async transactionalEntityManager => {
         for (const catalogItem of catalogData) {
             let catalog = await catalogRepository.findOne({ where: { title: catalogItem.name } });
