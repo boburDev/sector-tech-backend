@@ -38,26 +38,19 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
     try {
         const { popular } = req.query;
 
-        let whereCondition: any = { deletedAt: IsNull() };
+        const queryBuilder = brandRepository.createQueryBuilder("brand")
+            .leftJoinAndSelect("brand.popularBrand", "popularBrand")
+            .where("brand.deletedAt IS NULL");
 
         if (popular === "true") {
-            whereCondition.popularBrand = { id: Not(IsNull()) };
+            queryBuilder.andWhere("popularBrand.id IS NOT NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'popularBrand.id']); 
         } else if (popular === "false") {
-            whereCondition.popularBrand = IsNull();
+            queryBuilder.andWhere("popularBrand.id IS NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug']);  
         }
 
-        const brands = await brandRepository.find({
-            where: whereCondition,
-            order: { createdAt: "DESC" },
-            select: {
-                id: true,
-                title: true,
-                path: true,
-                slug: true,
-                ...(popular === "true" ? { popularBrand: { id: true } } : {})
-            },
-            relations: ['popularBrand']
-        });
+        const brands = await queryBuilder
+            .orderBy("brand.createdAt", "DESC").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug'])
+            .getMany()
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
     } catch (error) {
