@@ -1,5 +1,3 @@
-import { Request, Response } from 'express';
-import { ILike, In, IsNull } from 'typeorm';
 import AppDataSource from '../config/ormconfig';
 import { Brand } from '../entities/brands.entity';
 import { createSlug } from '../utils/slug';
@@ -16,7 +14,7 @@ export async function insertBrandData() {
                 brand = brandRepository.create({
                     title: brandItem.title,
                     slug: createSlug(brandItem.title),
-                    path: brandItem.path
+                    path: brandItem.path ?? undefined
                 });
 
                 await transactionalEntityManager.save(brand);
