@@ -387,9 +387,9 @@ router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSche
 
 /**
  * @swagger
- * /catalog/category/popular/create:
+ * /catalog/category/popular/toggle:
  *   post:
- *     summary: Add popular tag to categories
+ *     summary: Toggle popular tag to categories
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -436,7 +436,7 @@ router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSche
  *       500:
  *         description: Internal server error
  */
-router.post("/category/popular/create", validateAdminToken, validate(categoryIdsSchema), Catalog.createPopularCategory);
+router.post("/category/popular/toggle", validateAdminToken, validate(categoryIdsSchema), Catalog.togglePopularCategory);
 
 /**
  * @swagger

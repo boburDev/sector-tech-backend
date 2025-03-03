@@ -203,7 +203,7 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
     }
 };
 
-export const createPopularBrand = async (req: Request, res: Response): Promise<any> => {
+export const togglePopularBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         let { brandIds } = req.body;
 
@@ -214,41 +214,39 @@ export const createPopularBrand = async (req: Request, res: Response): Promise<a
         if (!brandIds || brandIds.length === 0) {
             return res.status(400).json({
                 data: null,
-                error: 'Invalid or empty brandIds',
+                error: "brandIds is required",
                 status: 400
             });
         }
 
         const existingPopularBrands = await popularBrandRepository.find({
-            where: {
-                brand: In(brandIds)
-            }
+            where: { brandId: In(brandIds) }
         });
 
         if (existingPopularBrands.length > 0) {
-            return res.status(400).json({
-                data: null,
-                error: 'Popular brands already exist',
-                status: 400
+            await popularBrandRepository.delete({ brandId: In(brandIds) });
+            return res.status(200).json({
+                data: { message: 'Popular brands deleted successfully' },
+                error: null,
+                status: 200
             });
         }
 
-        const lastPopularBrand = await popularBrandRepository.find({
-            order: { updatedAt: 'DESC' }, 
-            take: 1
-        });
-
-        const newPopularBrands = brandIds.map((brandId: string) => ({
-            brand: { id: brandId },
-            updatedAt: new Date()
-        }));
+        const newPopularBrands = popularBrandRepository.create(
+            brandIds.map((brandId: string) => ({
+                brandId: brandId,
+                updatedAt: new Date()
+            }))
+        );
 
         await popularBrandRepository.save(newPopularBrands);
 
         return res.status(201).json({
-            data: newPopularBrands,
-            error: null
+            data: { message: 'Popular brands created successfully' },
+            error: null,
+            status: 201
         });
+
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error });
     }

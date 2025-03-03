@@ -153,9 +153,9 @@ router.get("/all",validateAdminToken, Brands.getBrands);
 
 /**
  * @swagger
- * /brand/popular/create:
+ * /brand/popular/toggle:
  *   post:
- *     summary: Create a new popular brand
+ *     summary: Toggle a popular brand
  *     tags: [PopularBrands]
  *     security:
  *       - bearerAuth: []
@@ -171,10 +171,12 @@ router.get("/all",validateAdminToken, Brands.getBrands);
  *                 items:
  *                   type: string
  *     responses:
- *       201:
- *         description: Popular brand created successfully      
+ *       200:
+ *         description: Popular brand toggled successfully    
+ *       400:
+ *         description: Invalid or empty brandIds
  */
-router.post("/popular/create", validateAdminToken,  Brands.createPopularBrand);
+router.post("/popular/toggle", validateAdminToken,  Brands.togglePopularBrand);
 
 /**
  * @swagger

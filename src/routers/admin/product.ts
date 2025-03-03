@@ -22,6 +22,31 @@ const router = express.Router();
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: recommended
+ *         required: false
+ *         description: Filter by recommended products
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: popular
+ *         required: false
+ *         description: Filter by popular products
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: condition
+ *         required: false
+ *         description: Filter by condition
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: relevance
+ *         required: false
+ *         description: Filter by relevance
+ *         schema:
+ *           type: boolean
  *     responses:
  *       200:
  *         description: List of all products
@@ -297,9 +322,9 @@ router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken
 
 /**
  * @swagger
- * /product/popular/add:
+ * /product/popular/toggle:
  *   post:
- *     summary: Add a popular product
+ *     summary: Toggle a popular product
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -319,7 +344,7 @@ router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken
  *                   example: "12345"   
  *     responses:
  *       200:
- *         description: Popular product added successfully
+ *         description: Popular product toggled successfully
  *       400:
  *         description: Product ID is required
  *       404:
@@ -327,7 +352,7 @@ router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken
  *       500:
  *         description: Internal server error
  */
-router.post('/popular/add', validateAdminToken, Product.addPopularProduct);
+router.post('/popular/toggle', validateAdminToken, Product.togglePopularProduct);
 
 /**
  * @swagger

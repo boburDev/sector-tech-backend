@@ -22,7 +22,7 @@ export const createBanner = async (req: Request, res: Response): Promise<any> =>
         const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
         const newBanner = bannerRepository.create({
-            routePath: routePath == '/' ? 'home' : routePath,
+            routePath,
             redirectUrl,
             imagePath: newPath 
         });
