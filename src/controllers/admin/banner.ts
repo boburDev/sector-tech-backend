@@ -49,9 +49,6 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
             }
         });
 
-        if(banners.length === 0){
-            return res.status(404).json({message:"No one banners found"})
-        }
         return res.status(200).json({ data: banners, error: null, status: 200 });
     } catch (error) {
         console.error("Get Banners Error:", error);

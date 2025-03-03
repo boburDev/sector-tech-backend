@@ -16,6 +16,7 @@ import passport from "passport";
 import insertData from "./services";
 dotenv.config(); 
 
+
 const PORT = Number(process.env.PORT) || 3030;
 
 AppDataSource.initialize()
