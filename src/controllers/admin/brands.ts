@@ -3,6 +3,7 @@ import { ILike, In, IsNull, Not } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 import { createSlug } from '../../utils/slug';
+import listContents from '../../utils/readFolders';
 import { deleteFile } from '../../middlewares/removeFiltePath';
 import { PopularBrand } from '../../entities/popular.entity';
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -150,6 +151,61 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
         return res.status(500).json({ message: "Internal server error", error });
     }
 };
+
+export const getBrandPath = async (req: Request, res: Response): Promise<any> => {
+    try {
+        let path = await listContents('brands');
+        if (!path) {
+            return res.json({
+                data: [],
+                error: null,
+                status: 200
+            });
+        }
+
+        path = path.filter((item: any) => item.type === 'file').map((item: any) => ({
+            name: 'brands/' + item.name,
+            type: item.type
+        }));
+
+        return res.json({
+            data: path,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error });
+    }
+}
+
+export const updateBrandPath = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const { path } = req.body;
+        const brand = await brandRepository.findOne({
+            where: {
+                id,
+                deletedAt: IsNull()
+            }
+        });
+        if (!brand) {
+            return res.json({
+                data: null,
+                error: 'Brand not found',
+                status: 404
+            });
+        }
+        brand.path = path;
+        await brandRepository.save(brand);
+        return res.json({
+            data: { message: 'Brand path updated successfully' },
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error });
+    }
+}
 
 export const deleteBrand = async (req: Request, res: Response): Promise<any> => {
     try {

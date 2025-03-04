@@ -35,7 +35,7 @@ const router = Router();
  *       404:
  *         description: Brand not found
  */
-router.get("/by-id/:id", validateAdminToken,validateParams(uuidSchema), Brands.getBrandById);
+router.get("/by-id/:id", validateAdminToken, validateParams(uuidSchema), Brands.getBrandById);
 
 /**
  * @swagger
@@ -96,7 +96,44 @@ router.post( "/create", validateAdminToken, uploadPhoto.single("logo"), Brands.c
  *       404:
  *         description: Brand not found
  */
-router.put("/update/:id",validateAdminToken, uploadPhoto.single("logo"), validateParams(uuidSchema), Brands.updateBrand);
+router.put("/update/:id", validateAdminToken, uploadPhoto.single("logo"), validateParams(uuidSchema), Brands.updateBrand);
+
+/** 
+ * @swagger
+ * /brand/get-paths:
+ *   get:
+ *     summary: Get all brand paths
+ *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Brand paths
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/get-paths", validateAdminToken, Brands.getBrandPath);
+
+/**
+ * @swagger
+ * /brand/update-path/{id}:
+ *   put:
+ *     summary: Update a brand path
+ *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Brand ID
+ *     responses:
+ *       200:
+ *         description: Brand path updated successfully
+ */
+router.put("/update-path/:id", validateAdminToken, validateParams(uuidSchema), Brands.updateBrandPath);
 
 /**
  * @swagger

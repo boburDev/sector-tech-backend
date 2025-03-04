@@ -3,10 +3,9 @@ import * as Admin from "../../controllers/admin/admin";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateAdminToken } from "../../middlewares/adminValidator";
 import { validate } from "../../middlewares/validate";
-import {  adminLoginValidateSchema, adminUpdateValidateSchema, adminValidateSchema, uuidSchema } from "../../validators/admin.validate";
+import {  adminLoginValidateSchema, adminUpdateValidateSchema, adminValidateSchema } from "../../validators/admin.validate";
 
 const router = express.Router();
-
 /**
  * @swagger
  * tags:
