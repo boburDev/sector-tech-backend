@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
-import { IsNull } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -82,45 +82,6 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
     } catch (error) {
         console.error("Error fetching catalogs:", error);
         return res.status(500).json({ message: "Internal server error", error });
-    }
-};
-
-export const getAllCategories = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const categories = await categoryRepository.find({
-            where: {
-                deletedAt: IsNull()
-            },
-            order: {
-                createdAt: 'DESC'
-            }
-        });
-
-        if (categories.length === 0) {
-            return res.json({
-                data: [],
-                error: null,
-                status: 200
-            });
-        }
-
-        const categoriesWithoutDates = categories.map(category => {
-            const { createdAt, deletedAt, ...categoryData } = category;
-            return categoryData;
-        });
-
-        return res.json({
-            data: categoriesWithoutDates,
-            error: null,
-            status: 200
-        });
-
-    } catch (error) {
-        // console.error('getAllCategories Error:', error);
-        return res.status(500).json({ 
-            message: 'Internal server error',
-            error: error
-        });
     }
 };
 
