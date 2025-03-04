@@ -6,21 +6,26 @@ import brandsData from "../services/mock/brands.json";
 const brandRepository = AppDataSource.getRepository(Brand);
 
 export async function insertBrandData() {
-    await AppDataSource.transaction(async transactionalEntityManager => {
-        for (const brandItem of brandsData) {
-            let brand = await brandRepository.findOne({ where: { title: brandItem.title } });
+    try {
+        await AppDataSource.transaction(async transactionalEntityManager => {
+            for (const brandItem of brandsData) {
+                let brand = await brandRepository.findOne({ where: { title: brandItem.title } });
 
-            if (!brand) {
-                brand = brandRepository.create({
-                    title: brandItem.title,
-                    slug: createSlug(brandItem.title),
-                    path: brandItem.path ?? undefined
-                });
+                if (!brand) {
+                    brand = brandRepository.create({
+                        title: brandItem.title,
+                        slug: createSlug(brandItem.title),
+                        path: brandItem.path ?? undefined
+                    });
 
-                await transactionalEntityManager.save(brand);
+                    await transactionalEntityManager.save(brand);
+                }
             }
-        }
-    });
+        });
 
-    console.log("✅ Brand ma'lumotlari muvaffaqiyatli qo'shildi!");
+        console.log("✅ Brand ma'lumotlari muvaffaqiyatli qo'shildi!");
+    } catch (error) {
+        console.log(error);
+    }
+    
 }

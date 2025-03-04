@@ -42,9 +42,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', async (req: any, res: any) => {
-  console.log();
-  await insertData(req.query);
-  res.send('ok')
+  try {
+    await insertData(req.query);
+    res.send('ok')
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('error')
+  }
 })
 app.use("/", adminRouter);
 app.use("/user", userRouter);
