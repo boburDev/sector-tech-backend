@@ -107,10 +107,10 @@ router.put("/update/:id", validateAdminToken, uploadPhoto.single("logo"), valida
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       200:
- *         description: Brand paths
  *       401:
  *         description: Unauthorized
+ *       200:
+ *         description: Brand paths
  */
 router.get("/get-paths", validateAdminToken, Brands.getBrandPath);
 
@@ -129,9 +129,22 @@ router.get("/get-paths", validateAdminToken, Brands.getBrandPath);
  *         schema:
  *           type: string
  *         description: Brand ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object 
+ *             properties:
+ *               path:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Brand path updated successfully
+ *       404:
+ *         description: Brand not found
+ *       500:   
+ *         description: Internal server error
  */
 router.put("/update-path/:id", validateAdminToken, validateParams(uuidSchema), Brands.updateBrandPath);
 
