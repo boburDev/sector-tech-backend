@@ -4,7 +4,9 @@ import { Users } from "../../entities/user.entity";
 import { Opt } from "../../entities/opt.entity";
 import { sign } from "../../utils/jwt";
 import { mailService } from "../../utils/mailService";
+
 const userRepository = AppDataSource.getRepository(Users);
+const optRepository = AppDataSource.getRepository(Opt);
 
 export const OAuthCallback = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -37,7 +39,6 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
       return res.status(201).redirect(`http://localhost:3000?token=${token}`);
     }
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -47,7 +48,26 @@ export const sendOtp = async (req: Request, res: Response): Promise<any> => {
     const { email } = req.body;
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
+    
+    const opt = await optRepository.findOne({ where: { email } });
+    const currentTime = new Date();
+    
+    if (opt) {
+        const createdAt = new Date(opt.createdAt);
+        const timeDifference = (currentTime.getTime() - createdAt.getTime()) / 1000;
+        
+        if (timeDifference < 180) {
+            return res.status(400).json({ message: 'OTP already sent, please try again' });
+        } else {
+            await optRepository.delete(opt.id);
+        }
+    }
+    
+    const newOpt = new Opt();
+    newOpt.email = email;
+    newOpt.optCode = otp;
+    await optRepository.save(newOpt);
+    
     await mailService(email, otp);
 
     return res.status(200).json({
@@ -60,10 +80,14 @@ export const sendOtp = async (req: Request, res: Response): Promise<any> => {
 
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { name, email, password } = req.body;
-    const existingUser = await userRepository.findOne({ where: { email } });
+    const { email, optCode } = req.body;
 
-    console.log(existingUser);
+    const opt = await optRepository.findOne({ where: { email } });
+    if (!opt) return res.status(400).json({ message: "OTP not found" });
+
+    if (opt.optCode !== optCode) return res.status(400).json({ message: "Invalid OTP" });
+
+    const existingUser = await userRepository.findOne({ where: { email } });
 
     if (existingUser)
       return res.status(400).json({ message: "User already exists" });
@@ -73,7 +97,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
     const savedUser = await userRepository.save(newUser);
 
     const token = sign(
-      { id: savedUser.id, name: savedUser.name, email: savedUser.email },
+      { id: savedUser.id, email: savedUser.email },
       86400000, // 1 day in milliseconds
       "user"
     );
@@ -102,7 +126,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: "Invalid credentials" });
 
     const token = sign(
-      { id: user.id, name: user.name, email: user.email },
+      { id: user.id, email: user.email },
       86400000, // 1 day in milliseconds
       "user"
     );
@@ -143,7 +167,6 @@ export const updateProfile = async ( req: Request, res: Response): Promise<any> 
 
     const userData = {
       id: user.id,
-      name: user.name,
       email: user.email,
     };
 

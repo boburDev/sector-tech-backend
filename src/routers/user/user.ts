@@ -32,9 +32,9 @@ const router = express.Router();
  *                   type: string
  *                   description: JWT token
  */
-router.get("/google/login",passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google/login", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get("/google/callback",passport.authenticate("google", { failureRedirect: "/" }),loginAttemptLimiter, User.OAuthCallback);
+router.get("/google/callback", passport.authenticate("google", { failureRedirect: "/" }),loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -56,7 +56,7 @@ router.get("/google/callback",passport.authenticate("google", { failureRedirect:
  */
 router.get( "/facebook/login", passport.authenticate("facebook", {   scope: ["email", "public_profile"] }));
 
-router.get("/facebook/callback",passport.authenticate("facebook", { failureRedirect: "/" }),loginAttemptLimiter, User.OAuthCallback);
+router.get("/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/" }),loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -76,9 +76,9 @@ router.get("/facebook/callback",passport.authenticate("facebook", { failureRedir
  *                   type: string
  *                   description: JWT token
  */
-router.get("/linkedin/login",passport.authenticate("linkedin", { scope: ["profile", "email"]}));
+router.get("/linkedin/login", passport.authenticate("linkedin", { scope: ["profile", "email"]}));
 
-router.get("/linkedin/callback",passport.authenticate("linkedin", { failureRedirect: "/" }), loginAttemptLimiter, User.OAuthCallback);
+router.get("/linkedin/callback", passport.authenticate("linkedin", { failureRedirect: "/" }), loginAttemptLimiter, User.OAuthCallback);
 
 /**
  * @swagger
@@ -171,17 +171,13 @@ router.post("/send-otp", User.sendOtp);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               optCode:
  *                 type: string
- *                 example: John Doe
+ *                 example: 123456
  *               email:
  *                 type: string
  *                 format: email
  *                 example: johndoe@example.com
- *               password:
- *                 type: string
- *                 format: password
- *                 example: mySecurePassword
  *     responses:
  *       201:
  *         description: User created successfully

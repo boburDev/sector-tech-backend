@@ -11,6 +11,7 @@ export class Opt {
   @Column()
   optCode: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+  
 }
