@@ -435,7 +435,7 @@ export const togglePopularProduct = async (req: Request, res: Response): Promise
         if (existingPopularProducts.length > 0) {
             await popularProductRepository.delete({ productId: In(productIds) });
             return res.status(200).json({
-                data: { message: 'Popular products deleted successfully' },
+                data: { message: 'Popular product deleted successfully' },
                 error: null,
                 status: 200
             });

@@ -724,7 +724,7 @@ export const togglePopularCategory = async (req: Request, res: Response): Promis
         if (existingPopularCategories.length > 0) {
             await popularCategoryRepository.delete({ categoryId: In(categoryIds) });
             return res.status(200).json({
-                data: { message: 'Popular categories deleted successfully' },
+                data: { message: 'Popular category deleted successfully' },
                 error: null,
                 status: 200
             });

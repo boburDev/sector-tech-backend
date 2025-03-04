@@ -226,7 +226,7 @@ export const togglePopularBrand = async (req: Request, res: Response): Promise<a
         if (existingPopularBrands.length > 0) {
             await popularBrandRepository.delete({ brandId: In(brandIds) });
             return res.status(200).json({
-                data: { message: 'Popular brands deleted successfully' },
+                data: { message: 'Popular brand deleted successfully' },
                 error: null,
                 status: 200
             });
