@@ -20,54 +20,73 @@ const categoryRepository = AppDataSource.getRepository(Category);
 const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
-    const { recommended, popular } = req.query;
-    const whereCondition: any = {
-        deletedAt: IsNull(),
-    };
+    try {
+        const condition = req.query.condition === "true";
+        const revalance = req.query.revalance === "true";
+        const { recommended, popular } = req.query;
 
-    if(recommended === "true"){
-        whereCondition.recommended = true
+        const queryBuilder = productRepository
+            .createQueryBuilder("product")
+            .leftJoin("product.popularProduct", "popularProduct")
+            .where("product.deletedAt IS NULL");
+
+        if (recommended === "true") {
+            queryBuilder.andWhere("product.recommended = :recommended", { recommended: true });
+        } else if (recommended === "false") {
+            queryBuilder.andWhere("product.recommended = :recommended", { recommended: false });
+        }
+
+        if (popular === "true") {
+            queryBuilder.andWhere("popularProduct.id IS NOT NULL"); 
+        } else if (popular === "false") {
+            queryBuilder.andWhere("popularProduct.id IS NULL"); 
+        }
+
+        if (condition) {
+            queryBuilder.leftJoin("product.conditions", "conditions");
+        }
+
+        if (revalance) {
+            queryBuilder.leftJoin("product.relevances", "relevances");
+        }
+
+        queryBuilder.select([
+            "product.id",
+            "product.title",
+            "product.slug",
+            "product.articul",
+            "product.inStock",
+            "product.price",
+            "product.mainImage",
+            "product.recommended",
+            "popularProduct.id",
+        ]);
+
+        if (condition) {
+            queryBuilder.addSelect([
+                "conditions.id",
+                "conditions.slug",
+                "conditions.title",
+            ]);
+        }
+
+        if (revalance) {
+            queryBuilder.addSelect([
+                "relevances.id",
+                "relevances.slug",
+                "relevances.title",
+            ]);
+        }
+
+        const products = await queryBuilder
+            .orderBy("product.createdAt", "DESC")
+            .getMany();
+
+        return res.status(200).json({ data: products, error: null, status: 200 });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({ message: "Internal server error", error });
     }
-
-    if(popular === "true"){
-        whereCondition.popularProduct = { id: Not(IsNull()) };
-    }
-
-    const products = await productRepository.find({
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-            articul: true,
-            productCode: true,
-            description: true,
-            inStock: true,
-            price: true,
-            mainImage: true,
-            fullDescription: true,
-            characteristics: true,
-            fullDescriptionImages: true,
-            images: true,
-            recommended:true,
-            brandId: true,
-            catalogId: true,
-            categoryId: true,
-            conditionId: true,
-            relevanceId: true,
-            subcatalogId: true,
-            popularProduct: {
-                id: true
-            }   
-        },
-        where: whereCondition,
-        relations: ["popularProduct"]
-    });
-
-    res.json({
-        data: products,
-        error: null,
-        status: 200
-    });
 };
 
 export const getProductById = async (req: Request, res: Response): Promise<any> => {
@@ -393,7 +412,7 @@ export const addRecommendedProduct = async (req: Request, res: Response): Promis
     }
 };
 
-export const addPopularProduct = async (req: Request, res: Response): Promise<any> => {
+export const togglePopularProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         let { productIds } = req.body;
 
@@ -401,43 +420,40 @@ export const addPopularProduct = async (req: Request, res: Response): Promise<an
             productIds = [productIds];
         }
 
-        if (productIds.length === 0) {
-            return res.status(400).json({ message: "Invalid or empty productIds" });
+        if (!productIds || productIds.length === 0) {
+            return res.status(400).json({
+                data: null,
+                error: "productIds is required",
+                status: 400
+            });
         }
 
-        const products = await productRepository.find({
-            where: { id: In(productIds), deletedAt: IsNull() }
+        const existingPopularProducts = await popularProductRepository.find({
+            where: { productId: In(productIds) }
         });
 
-        if (products.length === 0) {
-            return res.status(404).json({ message: "No valid products found" });
+        if (existingPopularProducts.length > 0) {
+            await popularProductRepository.delete({ productId: In(productIds) });
+            return res.status(200).json({
+                data: { message: 'Popular products deleted successfully' },
+                error: null,
+                status: 200
+            });
         }
 
-        const updatedProducts = [];
+        const newPopularProducts = popularProductRepository.create(
+            productIds.map((productId: string) => ({
+                productId: productId,
+                updatedAt: new Date()
+            }))
+        );
 
-        for (const product of products) {
-            const existingPopular = await popularProductRepository.findOne({
-                where: { productId: product.id }
-            });
+        await popularProductRepository.save(newPopularProducts);
 
-            if (existingPopular) {
-                continue;
-            }
-
-            const newPopularProduct = popularProductRepository.create({
-                productId: product.id,
-                product: product
-            });
-
-            await popularProductRepository.save(newPopularProduct);
-            updatedProducts.push(newPopularProduct);
-        }
-
-        return res.status(200).json({
-            message: "Popular products created successfully",
-            data: updatedProducts,
+        return res.status(201).json({
+            data: { message: 'Popular products created successfully' },
             error: null,
-            status: 200
+            status: 201
         });
 
     } catch (error) {

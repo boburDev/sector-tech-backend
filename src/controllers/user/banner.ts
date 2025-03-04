@@ -13,6 +13,7 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
         if (!routePath) {
             return res.status(400).json({ message: "Query not found" });
         }
+        
         const whereCondition: any = { deletedAt: IsNull() };
 
         if (routePath) {

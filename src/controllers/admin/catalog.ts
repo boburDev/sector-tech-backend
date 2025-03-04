@@ -701,7 +701,7 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
     }
 };
 
-export const createPopularCategory = async (req: Request, res: Response): Promise<any> => {
+export const togglePopularCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         let { categoryIds } = req.body;
 
@@ -709,43 +709,40 @@ export const createPopularCategory = async (req: Request, res: Response): Promis
             categoryIds = [categoryIds];
         }
 
-        if (categoryIds.length === 0) {
-            return res.status(400).json({ message: "Invalid or empty categoryIds" });
+        if (!categoryIds || categoryIds.length === 0) {
+            return res.status(400).json({
+                data: null,
+                error: "categoryIds is required",
+                status: 400
+            });
         }
 
-        const categories = await categoryRepository.find({
-            where: { id: In(categoryIds), deletedAt: IsNull() }
+        const existingPopularCategories = await popularCategoryRepository.find({
+            where: { categoryId: In(categoryIds) }
         });
 
-        if (categories.length === 0) {
-            return res.status(404).json({ message: "No valid categories found" });
+        if (existingPopularCategories.length > 0) {
+            await popularCategoryRepository.delete({ categoryId: In(categoryIds) });
+            return res.status(200).json({
+                data: { message: 'Popular categories deleted successfully' },
+                error: null,
+                status: 200
+            });
         }
 
-        const updatedCategories = [];
+        const newPopularCategories = popularCategoryRepository.create(
+            categoryIds.map((categoryId: string) => ({
+                categoryId: categoryId,
+                updatedAt: new Date()
+            }))
+        );
 
-        for (const category of categories) {
-            const existingPopular = await popularCategoryRepository.findOne({
-                where: { categoryId: category.id }
-            });
+        await popularCategoryRepository.save(newPopularCategories);
 
-            if (existingPopular) {
-                continue; 
-            }
-
-            const newPopularCategory = popularCategoryRepository.create({
-                categoryId: category.id,
-                category: category
-            });
-
-            await popularCategoryRepository.save(newPopularCategory);
-            updatedCategories.push(newPopularCategory);
-        }
-
-        return res.status(200).json({
-            message: "Popular categories created successfully",
-            data: updatedCategories,
+        return res.status(201).json({
+            data: { message: 'Popular categories created successfully' },
             error: null,
-            status: 200
+            status: 201
         });
 
     } catch (error) {
