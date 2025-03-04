@@ -7,10 +7,15 @@ const promotionRepository = AppDataSource.getRepository(Promotion);
 
 export const getPromotions = async (req: Request, res: Response): Promise<any> => {
     try {
-        const promotions = await promotionRepository.find({ where: { deletedAt: IsNull() } });
-        if (promotions.length === 0) {
-            return res.status(200).json({ message: 'No promotions found' });
-        }
+        const promotions = await promotionRepository.find({
+            where: { deletedAt: IsNull() },
+            select: {
+            id: true,
+            title: true,
+            coverImage: true,
+            slug: true,
+            expireDate: true
+        } });
         return res.status(200).json(promotions);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error });
