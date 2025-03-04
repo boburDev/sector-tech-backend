@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Users } from "../../entities/user.entity";
+import { Opt } from "../../entities/opt.entity";
 import { sign } from "../../utils/jwt";
-
+import { mailService } from "../../utils/mailService";
 const userRepository = AppDataSource.getRepository(Users);
 
 export const OAuthCallback = async (req: Request, res: Response): Promise<any> => {
@@ -42,6 +43,22 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+export const sendOtp = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { email } = req.body;
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await mailService(email, otp);
+
+    return res.status(200).json({
+      message: 'OTP sent successfully'
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error sending OTP", error });
   }
 };
 

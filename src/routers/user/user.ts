@@ -134,6 +134,31 @@ router.post("/login", loginAttemptLimiter, User.login);
 
 /**
  * @swagger
+ * /user/auth/send-otp:
+ *   post:
+ *     summary: Send OTP to user's email
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object 
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *       500:
+ *         description: Error sending OTP
+ */
+router.post("/send-otp", User.sendOtp);
+
+/**
+ * @swagger
  * /user/auth/sign-up:
  *   post:
  *     summary: Create a new user
