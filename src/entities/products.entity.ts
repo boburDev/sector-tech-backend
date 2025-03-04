@@ -61,7 +61,7 @@ export class Product {
   fullDescriptionImages: string[];
 
   @Column({ type:"boolean", default: false})
-  recommended: boolean
+  recommended: boolean;
 
   @Column()
   brandId: string;

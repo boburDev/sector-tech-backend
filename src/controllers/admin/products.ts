@@ -22,7 +22,7 @@ const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
     try {
         const condition = req.query.condition === "true";
-        const revalance = req.query.revalance === "true";
+        const relevance = req.query.relevance === "true";
         const { recommended, popular } = req.query;
 
         const queryBuilder = productRepository
@@ -37,17 +37,17 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         }
 
         if (popular === "true") {
-            queryBuilder.andWhere("popularProduct.id IS NOT NULL"); 
+            queryBuilder.andWhere("popularProduct.id IS NOT NULL");
         } else if (popular === "false") {
-            queryBuilder.andWhere("popularProduct.id IS NULL"); 
+            queryBuilder.andWhere("popularProduct.id IS NULL");
         }
 
         if (condition) {
-            queryBuilder.leftJoin("product.conditions", "conditions");
+            queryBuilder.leftJoinAndSelect("product.conditions", "conditions");
         }
 
-        if (revalance) {
-            queryBuilder.leftJoin("product.relevances", "relevances");
+        if (relevance) {
+            queryBuilder.leftJoinAndSelect("product.relevances", "relevances");
         }
 
         queryBuilder.select([
@@ -70,7 +70,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             ]);
         }
 
-        if (revalance) {
+        if (relevance) {
             queryBuilder.addSelect([
                 "relevances.id",
                 "relevances.slug",
@@ -384,7 +384,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<any> =
     }
 };
 
-export const addRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
+export const toggleRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         const { productId } = req.body;
 
@@ -399,15 +399,16 @@ export const addRecommendedProduct = async (req: Request, res: Response): Promis
         }
 
         if (product.recommended) {
-            return res.status(200).json({ message: "Product is already recommended", id:product.catalogId });
+            product.recommended = false;
+            await productRepository.save(product);
+            return res.status(200).json({ message: "Product removed from recommended", id:product.id });
         }
 
         product.recommended = true;
         await productRepository.save(product);
 
-        return res.status(200).json({ message: "Product recommendation updated successfully", id: product.id });
+        return res.status(200).json({ message: "Product added to recommended", id: product.id });
     } catch (error) {
-        // console.error("Error updating recommended product:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 };
@@ -435,7 +436,7 @@ export const togglePopularProduct = async (req: Request, res: Response): Promise
         if (existingPopularProducts.length > 0) {
             await popularProductRepository.delete({ productId: In(productIds) });
             return res.status(200).json({
-                data: { message: 'Popular products deleted successfully' },
+                data: { message: 'Popular product deleted successfully' },
                 error: null,
                 status: 200
             });

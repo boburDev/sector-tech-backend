@@ -280,9 +280,9 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
 
 /**
  * @swagger
- * /product/recommend/add:
+ * /product/recommend/toggle:
  *   post:  
- *     summary: Mark a product as recommended
+ *     summary: Toggle a recommended product
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -300,7 +300,7 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
  *                 example: "12345"
  *     responses:
  *       200:
- *         description: Product recommendation updated successfully
+ *         description: Product recommendation toggled successfully
  *         content:
  *           application/json:
  *             schema:
@@ -308,9 +308,13 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Product recommendation updated successfully"
+ *                   example: "Product recommendation toggled successfully"
  *                 product:
  *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "12345"
  *       400:
  *         description: Product ID is required
  *       404:
@@ -318,7 +322,7 @@ router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Pro
  *       500:
  *         description: Internal server error
  */
-router.post('/recommend/add',validate(productIdParamsSchema), validateAdminToken, Product.addRecommendedProduct);
+router.post('/recommend/toggle',validate(productIdParamsSchema), validateAdminToken, Product.toggleRecommendedProduct);
 
 /**
  * @swagger

@@ -454,7 +454,7 @@ export const deleteSubcatalog = async (req: Request, res: Response): Promise<any
 export const getCategoriesBySubcatalogId = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-        const { isPopular } = req.query;
+        const { popular } = req.query;
 
         const subcatalog = await subcatalogRepository.findOne({
             where: {
@@ -476,10 +476,10 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
             deletedAt: IsNull(),
         };
 
-        if (isPopular === "true") {
-            whereCondition.isPopular = true;
-        } else if (isPopular === "false") {
-            whereCondition.isPopular = false;
+        if (popular === "true") {
+            whereCondition.popularCategory = { id: Not(IsNull()) };
+        } else if (popular === "false") {
+            whereCondition.popularCategory = { id: IsNull() };
         }
 
         const categories = await categoryRepository.find({
@@ -724,7 +724,7 @@ export const togglePopularCategory = async (req: Request, res: Response): Promis
         if (existingPopularCategories.length > 0) {
             await popularCategoryRepository.delete({ categoryId: In(categoryIds) });
             return res.status(200).json({
-                data: { message: 'Popular categories deleted successfully' },
+                data: { message: 'Popular category deleted successfully' },
                 error: null,
                 status: 200
             });

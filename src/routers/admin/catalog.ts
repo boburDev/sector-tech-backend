@@ -436,7 +436,7 @@ router.delete("/category/delete/:id",validateAdminToken, validateParams(uuidSche
  *       500:
  *         description: Internal server error
  */
-router.post("/category/popular/toggle", validateAdminToken, validate(categoryIdsSchema), Catalog.togglePopularCategory);
+router.post("/category/popular/toggle", validateAdminToken, Catalog.togglePopularCategory);
 
 /**
  * @swagger
