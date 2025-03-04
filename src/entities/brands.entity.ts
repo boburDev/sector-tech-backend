@@ -13,7 +13,7 @@ export class Brand {
     @Column({ length: 255, nullable: true })
     slug: string;
 
-    @Column({ length: 500 })
+    @Column({ length: 500, nullable: true })
     path: string;
 
     @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
