@@ -384,7 +384,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<any> =
     }
 };
 
-export const addRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
+export const toggleRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         const { productId } = req.body;
 
@@ -399,15 +399,16 @@ export const addRecommendedProduct = async (req: Request, res: Response): Promis
         }
 
         if (product.recommended) {
-            return res.status(200).json({ message: "Product is already recommended", id:product.catalogId });
+            product.recommended = false;
+            await productRepository.save(product);
+            return res.status(200).json({ message: "Product removed from recommended", id:product.id });
         }
 
         product.recommended = true;
         await productRepository.save(product);
 
-        return res.status(200).json({ message: "Product recommendation updated successfully", id: product.id });
+        return res.status(200).json({ message: "Product added to recommended", id: product.id });
     } catch (error) {
-        // console.error("Error updating recommended product:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 };
