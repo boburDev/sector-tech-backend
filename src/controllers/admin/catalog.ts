@@ -454,7 +454,7 @@ export const deleteSubcatalog = async (req: Request, res: Response): Promise<any
 export const getCategoriesBySubcatalogId = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-        const { isPopular } = req.query;
+        const { popular } = req.query;
 
         const subcatalog = await subcatalogRepository.findOne({
             where: {
@@ -476,10 +476,10 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
             deletedAt: IsNull(),
         };
 
-        if (isPopular === "true") {
-            whereCondition.isPopular = true;
-        } else if (isPopular === "false") {
-            whereCondition.isPopular = false;
+        if (popular === "true") {
+            whereCondition.popularCategory = { id: Not(IsNull()) };
+        } else if (popular === "false") {
+            whereCondition.popularCategory = { id: IsNull() };
         }
 
         const categories = await categoryRepository.find({

@@ -22,7 +22,7 @@ const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
     try {
         const condition = req.query.condition === "true";
-        const revalance = req.query.revalance === "true";
+        const relevance = req.query.relevance === "true";
         const { recommended, popular } = req.query;
 
         const queryBuilder = productRepository
@@ -37,17 +37,17 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         }
 
         if (popular === "true") {
-            queryBuilder.andWhere("popularProduct.id IS NOT NULL"); 
+            queryBuilder.andWhere("popularProduct.id IS NOT NULL");
         } else if (popular === "false") {
-            queryBuilder.andWhere("popularProduct.id IS NULL"); 
+            queryBuilder.andWhere("popularProduct.id IS NULL");
         }
 
         if (condition) {
-            queryBuilder.leftJoin("product.conditions", "conditions");
+            queryBuilder.leftJoinAndSelect("product.conditions", "conditions");
         }
 
-        if (revalance) {
-            queryBuilder.leftJoin("product.relevances", "relevances");
+        if (relevance) {
+            queryBuilder.leftJoinAndSelect("product.relevances", "relevances");
         }
 
         queryBuilder.select([
@@ -70,7 +70,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             ]);
         }
 
-        if (revalance) {
+        if (relevance) {
             queryBuilder.addSelect([
                 "relevances.id",
                 "relevances.slug",
