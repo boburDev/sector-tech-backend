@@ -68,11 +68,11 @@ export const sendOtp = async (req: Request, res: Response): Promise<any> => {
     newOpt.optCode = otp;
     await optRepository.save(newOpt);
     
-    try {
-        await mailService(email, otp);
-    } catch (error) {
-        await optRepository.delete({ email });
-        return res.status(500).json({ message: "Error sending OTP", error });
+    const mailStatus = await mailService(email, otp);
+    
+    if (!mailStatus.success) {
+      await optRepository.delete({ email });
+      return res.status(500).json({ message: "Error sending OTP", error: mailStatus.message });
     }
 
     return res.status(200).json({
