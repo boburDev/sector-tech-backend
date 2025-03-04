@@ -57,6 +57,10 @@ router.get("/by-id/:id", validateAdminToken, validateParams(uuidSchema), Brands.
  *               logo:
  *                 type: string
  *                 format: binary
+ *               description:
+ *                 type: string
+ *                 required: false
+ *                 description: Brand description
  *     responses:
  *       201:
  *         description: Brand created successfully
@@ -90,11 +94,17 @@ router.post( "/create", validateAdminToken, uploadPhoto.single("logo"), Brands.c
  *               logo:
  *                 type: string
  *                 format: binary
+ *               description:
+ *                 type: string
+ *                 required: false
+ *                 description: Brand description
  *     responses:
  *       200:
  *         description: Brand updated successfully
  *       404:
  *         description: Brand not found
+ *       500:
+ *         description: Internal server error
  */
 router.put("/update/:id", validateAdminToken, uploadPhoto.single("logo"), validateParams(uuidSchema), Brands.updateBrand);
 
@@ -111,6 +121,8 @@ router.put("/update/:id", validateAdminToken, uploadPhoto.single("logo"), valida
  *         description: Unauthorized
  *       200:
  *         description: Brand paths
+ *       500:
+ *         description: Internal server error
  */
 router.get("/get-paths", validateAdminToken, Brands.getBrandPath);
 
@@ -273,6 +285,5 @@ router.delete("/popular/delete/:id", validateAdminToken, validateParams(uuidSche
  *         description: Popular brand not found
  */         
 router.get("/popular/by-id/:id", validateAdminToken, validateParams(uuidSchema), Brands.getPopularBrandById);       
-
 
 export default router;  

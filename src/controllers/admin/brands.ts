@@ -22,7 +22,8 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
                 id: true,
                 path: true,
                 title: true,
-                slug: true
+                slug: true,
+                description: true
             }
         });
 
@@ -46,7 +47,7 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
 
 export const createBrand = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { title } = req.body;
+        const { title, description } = req.body;
         const file = req.file as Express.Multer.File;
 
         if (!title || !file) {
@@ -77,6 +78,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
         brand.title = title;
         brand.slug = createSlug(title);
         brand.path = newPath;
+        brand.description = description || null;
 
         const savedBrand = await brandRepository.save(brand);
         
@@ -95,7 +97,7 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
 export const updateBrand = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id } = req.params;
-        const { title } = req.body;
+        const { title, description } = req.body;
         const file = req.file as Express.Multer.File;
 
         const brand = await brandRepository.findOne({
@@ -131,7 +133,6 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
         }
 
         if (file) {
-            // Delete old file if exists
             deleteFile(brand.path)
             const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
             brand.path = newPath;
@@ -139,6 +140,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
 
         brand.title = title;
         brand.slug = createSlug(title);
+        brand.description = description || null;
 
         const updatedBrand = await brandRepository.save(brand);
         const { createdAt, deletedAt, ...brandData } = updatedBrand;
@@ -244,13 +246,13 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
             .where("brand.deletedAt IS NULL");
 
         if (popular === "true") {
-            queryBuilder.andWhere("popularBrand.id IS NOT NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'popularBrand.id']);
+            queryBuilder.andWhere("popularBrand.id IS NOT NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'brand.description', 'popularBrand.id']);
         } else if (popular === "false") {
-            queryBuilder.andWhere("popularBrand.id IS NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug']);
+            queryBuilder.andWhere("popularBrand.id IS NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'brand.description']);
         }
 
         const brands = await queryBuilder
-            .orderBy("brand.createdAt", "DESC").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'popularBrand.id'])
+            .orderBy("brand.createdAt", "DESC").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'brand.description', 'popularBrand.id'])
             .getMany()
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
@@ -319,7 +321,7 @@ export const getPopularBrandById = async (req: Request, res: Response): Promise<
             relations: ['brand'],
             select: {
                 id: true,
-                brand: { id: true, title: true, path: true, slug: true }
+                brand: { id: true, title: true, path: true, slug: true, description: true }
             }
         });
 
@@ -351,6 +353,7 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response): Pro
                     title: true,
                     path: true,
                     slug: true,
+                    description: true
                 }
             }
         });
