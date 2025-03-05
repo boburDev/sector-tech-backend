@@ -200,4 +200,3 @@ export const deleteCatalogFilter = async (req: Request, res: Response): Promise<
         return res.status(500).json({ message: "Internal server error", error });
     }
 };
-
