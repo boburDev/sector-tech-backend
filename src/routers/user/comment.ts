@@ -37,9 +37,6 @@ const router = Router();
  *               productId:
  *                 type: string
  *                 example: "product-uuid"
- *               userId:
- *                 type: string
- *                 example: "user-uuid"
  *     responses:
  *       201:
  *         description: Product comment created successfully
