@@ -45,7 +45,7 @@ export const createCatalogFilter = async (req: Request, res: Response): Promise<
         }
 
         const existingFilter:any = await catalogFilterRepository.findOne({
-            where: [{ subcatalogId }, { categoryId }]
+            where: [{ categoryId }]
         });
         
         if (existingFilter) {
