@@ -288,6 +288,47 @@ router.post("/comment/reply", validateAdminToken, validate(replyToCommentSchema)
 
 /**
  * @swagger
+ * /product-detail/comment/reply/update/{commentId}/{replyId}:
+ *   patch:
+ *     summary: Update a reply to a product comment
+ *     tags: [productComment]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Comment ID
+ *       - in: path
+ *         name: replyId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Reply ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 example: "Thank you for your feedback!"
+ *     responses:
+ *       200:
+ *         description: Reply updated successfully
+ *       404:
+ *         description: Comment or reply not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch("/comment/reply/update/:commentId/:replyId", validateAdminToken, ProductCondition.updateReplyToComment);
+
+/**
+ * @swagger
  * /product-detail/comment/all:
  *   get:
  *     summary: Get all product comments
