@@ -45,7 +45,7 @@ export const createCatalogFilter = async (req: Request, res: Response): Promise<
         }
 
         const existingFilter:any = await catalogFilterRepository.findOne({
-            where: [{ subcatalogId }, { categoryId }]
+            where: [{ categoryId }]
         });
         
         if (existingFilter) {
@@ -200,4 +200,3 @@ export const deleteCatalogFilter = async (req: Request, res: Response): Promise<
         return res.status(500).json({ message: "Internal server error", error });
     }
 };
-

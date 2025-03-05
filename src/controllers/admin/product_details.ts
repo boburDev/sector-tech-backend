@@ -265,6 +265,31 @@ export const addReplyToComment = async (req:Request, res:Response):Promise<any> 
     }
 }
 
+export const updateReplyToComment = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { commentId, replyId } = req.params;
+    const { message } = req.body;
+
+    const comment = await productCommentRepository.findOneBy({ id: commentId, deletedAt: IsNull() });
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const reply = comment.reply.find(reply => reply.id === replyId);
+    if (!reply) {
+      return res.status(404).json({ message: "Reply not found" });
+    }
+
+    reply.message = message;
+
+    await productCommentRepository.save(comment);
+    return res.status(200).json({ data: comment, error: null, status: 200 });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
 export const getAllProductComments = async (req: Request, res: Response): Promise<any> => {
   try {
     const comments = await productCommentRepository.find({
