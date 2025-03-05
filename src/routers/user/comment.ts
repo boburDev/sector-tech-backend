@@ -28,7 +28,7 @@ const router = Router();
  *           schema:
  *             type: object
  *             properties:
- *               commentBody:
+ *               body:
  *                 type: string
  *                 example: "Great product!"
  *               star:
