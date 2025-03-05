@@ -275,10 +275,10 @@ export const getAllProductComments = async (req: Request, res: Response): Promis
         commentBody:true,
         reply:true,
         star: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
-          name: true,
           phone: true,
         },
         products: {
@@ -310,6 +310,7 @@ export const getProductCommentById = async (req: Request,res: Response): Promise
         commentBody: true,
         reply: true,
         star: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -366,6 +367,7 @@ export const updateProductComment = async (req: Request, res: Response): Promise
         commentBody: true,
         reply: true,
         star: true,
+        createdAt: true,
       }
     });
 
@@ -406,6 +408,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
         star: true,
         reply: true,
         commentBody: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -474,6 +477,7 @@ export const getAllProductQuestions = async (req: Request, res: Response): Promi
         id: true,
         body: true,
         reply: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -511,6 +515,7 @@ export const getProductQuestionById = async (req: Request, res: Response): Promi
         id: true,
         reply: true,
         body: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -569,6 +574,7 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
         id: true,
         reply: true,
         body: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,

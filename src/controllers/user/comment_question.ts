@@ -22,13 +22,13 @@ export const addProductComment = async (req: Request, res: Response): Promise<an
 
     const { deletedAt, ...comment } = savedComment;
 
-    return res.json({
+    return res.status(201).json({
       data: comment,
       error: null,
       status: 201
     });
   } catch (error) {
-    // console.error("Error creating product comment:", error);
+    console.error("Error creating product comment:", error);
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
