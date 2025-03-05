@@ -265,6 +265,31 @@ export const addReplyToComment = async (req:Request, res:Response):Promise<any> 
     }
 }
 
+export const updateReplyToComment = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { commentId, replyId } = req.params;
+    const { message } = req.body;
+
+    const comment = await productCommentRepository.findOneBy({ id: commentId, deletedAt: IsNull() });
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const reply = comment.reply.find(reply => reply.id === replyId);
+    if (!reply) {
+      return res.status(404).json({ message: "Reply not found" });
+    }
+
+    reply.message = message;
+
+    await productCommentRepository.save(comment);
+    return res.status(200).json({ data: comment, error: null, status: 200 });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
 export const getAllProductComments = async (req: Request, res: Response): Promise<any> => {
   try {
     const comments = await productCommentRepository.find({
@@ -275,10 +300,10 @@ export const getAllProductComments = async (req: Request, res: Response): Promis
         commentBody:true,
         reply:true,
         star: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
-          name: true,
           phone: true,
         },
         products: {
@@ -310,6 +335,7 @@ export const getProductCommentById = async (req: Request,res: Response): Promise
         commentBody: true,
         reply: true,
         star: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -366,6 +392,7 @@ export const updateProductComment = async (req: Request, res: Response): Promise
         commentBody: true,
         reply: true,
         star: true,
+        createdAt: true,
       }
     });
 
@@ -406,6 +433,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
         star: true,
         reply: true,
         commentBody: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -474,6 +502,7 @@ export const getAllProductQuestions = async (req: Request, res: Response): Promi
         id: true,
         body: true,
         reply: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -511,6 +540,7 @@ export const getProductQuestionById = async (req: Request, res: Response): Promi
         id: true,
         reply: true,
         body: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -569,6 +599,7 @@ export const getQuestionByProductId = async (req: Request, res: Response): Promi
         id: true,
         reply: true,
         body: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,

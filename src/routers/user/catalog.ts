@@ -13,55 +13,6 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/catalog/category/all:
- *   get:
- *     summary: Get all categories
- *     description: Retrieve a list of all categories.
- *     tags:
- *       - Catalog
- *     responses:
- *       200:
- *         description: Successful response. Returns a list of categories.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         example: "1"
- *                       name:
- *                         type: string
- *                         example: "Electronics"
- *                       slug:
- *                         type: string
- *                         example: "electronics"
- *                 error:
- *                   type: string
- *                   example: null
- *                 status:
- *                   type: number
- *                   example: 200
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal server error"
- */
-router.get("/category/all", Catalog.getAllCategories);
-
-/**
- * @swagger
  * /user/catalog/all:
  *   get:
  *     summary: Get all catalogs with optional subcatalogs and categories
