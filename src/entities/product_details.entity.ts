@@ -95,8 +95,8 @@ export class ProductComment {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
-  commentBody: string;
+  @Column({default: null})
+  body: string;
 
   @Column()
   star: number;

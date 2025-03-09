@@ -10,10 +10,10 @@ const productCommentRepository = AppDataSource.getRepository(ProductComment);
 export const addProductComment = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id: userId } = req.user
-    const { commentBody, star, productId } = req.body;
+    const { body, star, productId } = req.body;
 
     const newComment = new ProductComment();
-    newComment.commentBody = commentBody;
+    newComment.body = body;
     newComment.star = star;
     newComment.productId = productId;
     newComment.userId = userId;
@@ -33,7 +33,7 @@ export const addProductComment = async (req: Request, res: Response): Promise<an
   }
 };
 
-export const getCommentByProductId = async (req: Request, res: Response): Promise<any> => {
+export const getCommentByProductId = async (req: Request, res: Response): Promise<any> => { 
   try {
     const { productId } = req.params;
     
@@ -44,7 +44,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
       select: {
         id: true,
         reply: true,
-        commentBody: true,
+        body: true,
         star: true,
         user: {
           id: true,

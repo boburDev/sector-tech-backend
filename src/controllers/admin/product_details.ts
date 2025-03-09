@@ -241,7 +241,6 @@ export const deleteProductRelavance = async (req: Request, res: Response): Promi
 export const addReplyToComment = async (req:Request, res:Response):Promise<any> =>  {
     try {
         const { commentId, message } = req.body;
-        // console.log(commentId);
         const { id: adminId } = req.admin;
         const comment = await productCommentRepository.findOneBy({ id: commentId });
 
@@ -297,7 +296,7 @@ export const getAllProductComments = async (req: Request, res: Response): Promis
       where: { deletedAt: IsNull() },
       select: {
         id:true,
-        commentBody:true,
+        body:true,
         reply:true,
         star: true,
         createdAt: true,
@@ -332,7 +331,7 @@ export const getProductCommentById = async (req: Request,res: Response): Promise
       relations: ["user", "products"],
       select: {
         id:true,
-        commentBody: true,
+        body: true,
         reply: true,
         star: true,
         createdAt: true,
@@ -370,17 +369,17 @@ export const getProductCommentById = async (req: Request,res: Response): Promise
 export const updateProductComment = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
-    const { commentBody, star } = req.body;
+    const { body, star } = req.body;
 
     const comment = await productCommentRepository.findOneBy({ id, deletedAt: IsNull() });
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    if (commentBody) {
-      comment.commentBody = commentBody;
+    if (body) {
+      comment.body = body;
     }
-    if (star) {
+    if (star) { 
       comment.star = star;
     }
 
@@ -389,7 +388,7 @@ export const updateProductComment = async (req: Request, res: Response): Promise
       where: { id },
       select: {
         id: true,
-        commentBody: true,
+        body: true,
         reply: true,
         star: true,
         createdAt: true,
@@ -432,7 +431,7 @@ export const getCommentByProductId = async (req: Request, res: Response): Promis
         id: true,
         star: true,
         reply: true,
-        commentBody: true,
+        body: true,
         createdAt: true,
         user: {
           id: true,
