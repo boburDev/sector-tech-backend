@@ -59,6 +59,7 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
             "product.price",
             "product.mainImage",
             "product.recommended",
+            "product.productCode",
             "popularProduct.id",
         ]);
 
@@ -102,6 +103,12 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
         inStock: true,
         price: true,
         mainImage: true,
+        recommended: true,
+        images: true,
+        fullDescriptionImages: true,
+        fullDescription: true,
+        characteristics: true,
+        
       },
       where: [
         { id, deletedAt: IsNull() },
