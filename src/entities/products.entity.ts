@@ -19,6 +19,7 @@ import {
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
 import { Cart, SavedProduct } from "./user_details.entity";
 import { PopularProduct } from "./popular.entity";
+import { Garantee } from "./garantee.entity";
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn("uuid")
@@ -119,6 +120,9 @@ export class Product {
 
   @OneToOne(() => PopularProduct, (popularProduct) => popularProduct.product)
   popularProduct: PopularProduct;
+
+  @OneToMany(() => Garantee, (garantee) => garantee.product)
+  garantees: Garantee[];  
 
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

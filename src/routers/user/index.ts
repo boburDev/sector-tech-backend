@@ -9,6 +9,7 @@ import brandRouter from "./brand";
 import bannerRouter from "./banner";
 import promotionRouter from "./promotion";
 import popularRouter from "./popular";
+import regionRouter from "./region";
 
 const router = express.Router();
 
@@ -22,5 +23,5 @@ router.use("/brand", brandRouter)
 router.use("/banner", bannerRouter)
 router.use("/promotion", promotionRouter)
 router.use("/popular", popularRouter)
-
+router.use("/region", regionRouter) 
 export default router;

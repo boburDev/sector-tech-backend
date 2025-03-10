@@ -14,6 +14,8 @@ import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";
 import insertData from "./services";
+import { insertCountryData } from "./services/addCountry";
+
 dotenv.config(); 
 
 
@@ -44,6 +46,7 @@ app.use(passport.session());
 app.get('/', async (req: any, res: any) => {
   try {
     await insertData(req.query);
+    await insertCountryData();  
     res.send('ok')
   } catch (error) {
     console.log(error);
