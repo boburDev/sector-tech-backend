@@ -1,7 +1,7 @@
 import multer, { FileFilterCallback, StorageEngine } from 'multer';
 import fs from 'fs';
 
-const photo = ["image/jpeg", "image/png", "image/gif"];
+const photo = ["image/jpeg", "image/png", "image/gif","image/webp"];    
 const fields = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage', 'coverImage', 'promotionBannerImage', 'promotionDescriptionImages'];
 
 const storage: StorageEngine = multer.diskStorage({

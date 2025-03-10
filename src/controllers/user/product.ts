@@ -101,7 +101,7 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
         images: true,
         comments: {
           id: true,
-          commentBody: true,
+          body: true,
           reply: true,
           star: true,
         },
