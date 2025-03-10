@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Garantee } from "../../entities/garantee.entity";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
-
+import { IsNull } from "typeorm";
 const garanteeRepository = AppDataSource.getRepository(Garantee);
 const productRepository = AppDataSource.getRepository(Product);
 
@@ -12,7 +12,7 @@ export const createGarantee = async (req: Request, res: Response): Promise<any> 
         return res.status(400).json({ message: "Title, price and productId are required" });
     }
 
-    const product = await productRepository.findOne({ where: { id: productId } });
+    const product = await productRepository.findOne({ where: { id: productId, deletedAt: IsNull() } });
     if (!product) {
         return res.status(400).json({ message: "Product not found" });
     }
@@ -22,7 +22,7 @@ export const createGarantee = async (req: Request, res: Response): Promise<any> 
         return res.status(400).json({ message: "Price must be either a number or a string without digits" });
     }
 
-    const existingGarantee = await garanteeRepository.findOne({ where: { title, productId } });
+    const existingGarantee = await garanteeRepository.findOne({ where: { title, productId, deletedAt: IsNull() } });
     if (existingGarantee) {
         return res.status(400).json({ message: "Garantee with this title already exists for the given product" });
     }
@@ -37,7 +37,14 @@ export const createGarantee = async (req: Request, res: Response): Promise<any> 
 };
 
 export const getGarantees = async (req: Request, res: Response): Promise<any> => {
-    const garantees = await garanteeRepository.find();
+    const garantees = await garanteeRepository.find({
+        where: { deletedAt: IsNull() },
+        select: {
+            id: true,
+            title: true,
+            price: true,
+        }
+    });
     res.status(200).json({ data: garantees, error: null, status: 200 });
 }
 
@@ -53,7 +60,7 @@ export const updateGarantee = async (req: Request, res: Response): Promise<any> 
             return res.status(400).json({ message: "Price must be either a number or a string without digits" });
         }
     }
-    const garantee = await garanteeRepository.findOne({ where: { id: id as string } });
+    const garantee = await garanteeRepository.findOne({ where: { id: id as string, deletedAt: IsNull() } });
     if(!garantee) {
         return res.status(400).json({ message: "Garantee not found" });
     }
@@ -70,11 +77,12 @@ export const deleteGarantee = async (req: Request, res: Response): Promise<any> 
         return res.status(400).json({ message: "Id is required" });
     }
 
-    const garantee = await garanteeRepository.findOne({ where: { id } });
+    const garantee = await garanteeRepository.findOne({ where: { id, deletedAt: IsNull() } });
     if(!garantee) {
         return res.status(400).json({ message: "Garantee not found" });
-    }
-    await garanteeRepository.delete(garantee);
+    }   
+    garantee.deletedAt = new Date();    
+    await garanteeRepository.save(garantee);
     res.status(200).json({ message: "Garantee deleted successfully", error: null, status: 200 });
 }
 
