@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
 import { IsNull, Not } from "typeorm";
@@ -8,7 +8,7 @@ const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 const cartProductRepository = AppDataSource.getRepository(Cart);
 
-export const getProducts = async (req: Request, res: Response): Promise<any> => {
+export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { recommended, condition, revalance, popular } = req.query;
     const whereCondition: any = { deletedAt: IsNull() };
@@ -70,11 +70,11 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
 
     return res.status(200).json({ data: products, error: null, status: 200 });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const getProductById = async (req: Request,res: Response): Promise<any> => {
+export const getProductById = async (req: Request,res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
     const product = await productRepository.findOne({
@@ -143,11 +143,11 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
     });
 
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
+export const toggleSaved = async (req: Request,res: Response, next: NextFunction): Promise<any> => {
   try {
     const { productId } = req.body;
     const { id: userId } = req.user;
@@ -173,11 +173,11 @@ export const toggleSaved = async (req: Request,res: Response): Promise<any> => {
     return res.status(201).json({ id:newSavedProduct.id, message: "Product saved successfully." });
   } catch (error) {
     console.error("Error in toggleSaved:", error);
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const getUserSavedProducts = async (req: Request,res: Response): Promise<any> => {
+export const getUserSavedProducts = async (req: Request,res: Response, next: NextFunction ): Promise<any> => {
   try {
     const { id } = req.user;
 
@@ -217,11 +217,11 @@ export const getUserSavedProducts = async (req: Request,res: Response): Promise<
         status: 200
       });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const toggleCart = async (req: Request, res: Response): Promise<any> => {
+export const toggleCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { productId } = req.body;
     const { id: userId } = req.user;
@@ -247,11 +247,11 @@ export const toggleCart = async (req: Request, res: Response): Promise<any> => {
     return res.status(201).json({ id:newCartItem.id, message: "Product added to cart successfully." });
   } catch (error) {
     // console.error("Error in toggleCart:", error);
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const getProductCarts = async (req: Request, res: Response): Promise<any> => {
+export const getProductCarts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.user;
 
@@ -294,11 +294,11 @@ export const getProductCarts = async (req: Request, res: Response): Promise<any>
       status: 200,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const searchProduct = async (req: Request, res: Response): Promise<any> => {
+export const searchProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { title } = req.body;
 
@@ -312,6 +312,6 @@ export const searchProduct = async (req: Request, res: Response): Promise<any> =
 
     return res.status(200).json({ data: products, error: null, status: 200 });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 }

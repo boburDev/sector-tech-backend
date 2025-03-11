@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
 import { IsNull, Not } from 'typeorm';
@@ -25,7 +25,7 @@ interface CatalogSelect {
     };
 }
 
-export const getCatalogs = async (req: Request, res: Response): Promise<any> => {
+export const getCatalogs = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { catalog, subcatalog, category } = req.query;
 
@@ -80,12 +80,11 @@ export const getCatalogs = async (req: Request, res: Response): Promise<any> => 
 
         return res.status(200).json({ data: catalogs, error: null, status: 200  });
     } catch (error) {
-        console.error("Error fetching catalogs:", error);
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): Promise<any> => {
+export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { catalogSlug } = req.params;
         // console.log(catalogSlug);
@@ -108,15 +107,11 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response): P
         return res.status(200).json({ data: subcatalog, error: null, status: 200 });
 
     } catch (error) {
-        // console.error('Error fetching subcatalog:', error);
-        return res.status(500).json({ 
-            message: 'Internal server error',
-            error: error
-        });
+        next(error);
     }
 };
 
-export const getCategoryBySubCatalogSlug = async (req: Request, res: Response): Promise<any> => {
+export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { subCatalogSlug } = req.params;
         // console.log(subCatalogSlug);
@@ -140,10 +135,6 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response): 
         return res.status(200).json({ data: categories, error: null, status: 200 });
 
     } catch (error) {
-        // console.error('Error fetching subcatalog:', error);
-        return res.status(500).json({ 
-            message: 'Internal server error',
-            error: error
-        });
+        next(error);
     }
 };

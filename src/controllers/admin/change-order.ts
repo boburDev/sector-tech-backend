@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { PopularBrand, PopularCategory, PopularProduct } from '../../entities/popular.entity';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
@@ -14,7 +14,7 @@ const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
 
 
-export const changeOrder = async (req: Request, res: Response): Promise<any> => {
+export const changeOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { name } = req.query;
         const { index, id } = req.body;
@@ -222,8 +222,7 @@ export const changeOrder = async (req: Request, res: Response): Promise<any> => 
 
         return res.status(400).json({ message: 'Invalid query parameter: name must be "catalog"' });
     } catch (error) {
-        console.error('Error updating catalog order:', error);
-        return res.status(500).json({ message: 'Internal server error', error });
+        next(error);
     }
 };
 

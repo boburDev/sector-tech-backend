@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
-export const getCatalogFilterById = async (req: Request, res: Response): Promise<any> => {
+export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -32,11 +32,11 @@ export const getCatalogFilterById = async (req: Request, res: Response): Promise
         }
         return res.status(200).json(result);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const createCatalogFilter = async (req: Request, res: Response): Promise<any> => {
+export const createCatalogFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         let { subcatalogId = null, categoryId = null, data = [] } = req.body;
 
@@ -108,11 +108,11 @@ export const createCatalogFilter = async (req: Request, res: Response): Promise<
     } catch (error) {
         console.log(error);
         
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updateCatalogFilter = async (req: Request, res: Response): Promise<any> => {
+export const updateCatalogFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { name, data } = req.body;
@@ -153,11 +153,11 @@ export const updateCatalogFilter = async (req: Request, res: Response): Promise<
         }
         return res.status(200).json(filterResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deleteCatalogFilter = async (req: Request, res: Response): Promise<any> => {
+export const deleteCatalogFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { name, deleteFilter = false } = req.body;
@@ -197,6 +197,6 @@ export const deleteCatalogFilter = async (req: Request, res: Response): Promise<
         }
         return res.status(200).json(filterResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Product } from '../../entities/products.entity';
 import { In, IsNull, Not } from 'typeorm';
@@ -19,7 +19,7 @@ const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
 const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
-export const getProducts = async (req: Request, res: Response): Promise<any> => {
+export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const condition = req.query.condition === "true";
         const relevance = req.query.relevance === "true";
@@ -85,15 +85,15 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
 
         return res.status(200).json({ data: products, error: null, status: 200 });
     } catch (error) {
-        console.error("Error fetching products:", error);
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getProductById = async (req: Request, res: Response): Promise<any> => {
-    const { id } = req.params;
-    const product = await productRepository.findOne({
-      select: {
+export const getProductById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const product = await productRepository.findOne({
+            select: {
         id: true,
         title: true,
         slug: true,
@@ -128,10 +128,13 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
         data: product,
         error: null,
         status: 200
-    });
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const createProduct = async (req: Request, res: Response): Promise<any> => {
+export const createProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     
     const productMainImage = files['productMainImage'][0];
@@ -202,11 +205,11 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
             deleteFile(file.path)
         });
 
-        return res.status(500).json({ error: "Internal server error" });
+        next(error);
     }
 };
 
-export const updateProduct = async (req: Request, res: Response): Promise<any> => {
+export const updateProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     const { id } = req.params;
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
@@ -357,7 +360,6 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
 
         res.json({ message: "Product created", data: sortedData });
     } catch (error) {
-        console.error("Error creating product:", error);
         deleteFileBeforeSave(productMainImage.path)
         productImages.forEach(file => {
             deleteFile(file.path)
@@ -366,11 +368,11 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
             deleteFile(file.path)
         });
 
-        return res.status(500).json({ error: "Internal server error" });
+        next(error);
     }
 };
 
-export const deleteProduct = async (req: Request, res: Response): Promise<any> => {
+export const deleteProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const product = await productRepository.findOne({
@@ -386,12 +388,11 @@ export const deleteProduct = async (req: Request, res: Response): Promise<any> =
 
         return res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
-        console.error("Error deleting product:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        next(error);
     }
 };
 
-export const toggleRecommendedProduct = async (req: Request, res: Response): Promise<any> => {
+export const toggleRecommendedProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { productId } = req.body;
 
@@ -416,11 +417,11 @@ export const toggleRecommendedProduct = async (req: Request, res: Response): Pro
 
         return res.status(200).json({ message: "Product added to recommended", id: product.id });
     } catch (error) {
-        return res.status(500).json({ error: "Internal server error" });
+        next(error);
     }
 };
 
-export const togglePopularProduct = async (req: Request, res: Response): Promise<any> => {
+export const togglePopularProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         let { productIds } = req.body;
 
@@ -465,14 +466,13 @@ export const togglePopularProduct = async (req: Request, res: Response): Promise
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deletePopularProduct = async (req: Request, res: Response): Promise<any> => {
+export const deletePopularProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        console.log(id)
         if (!id) {
             return res.status(400).json({ error: "Product ID is required" });
         }
@@ -487,7 +487,7 @@ export const deletePopularProduct = async (req: Request, res: Response): Promise
 
         return res.status(200).json({ message: "Popular product deleted successfully" });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 

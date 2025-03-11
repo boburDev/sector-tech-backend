@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
 import { IsNull } from "typeorm";
 
 const kontragentRepository = AppDataSource.getRepository(Kontragent);
 
-export const createKontragent = async (req: Request, res: Response): Promise<any> => {
+export const createKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const {
             ownershipForm,
@@ -77,12 +77,11 @@ export const createKontragent = async (req: Request, res: Response): Promise<any
             });
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error creating kontragent", error });
+        next(error);
     }
 };
 
-export const getKontragents = async (req: Request, res: Response): Promise<any> => {
+export const getKontragents = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const userId = req.user.id;
         const kontragents = await kontragentRepository.find({
@@ -113,12 +112,11 @@ export const getKontragents = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error getting kontragents", error, status: 500 });
+        next(error);
     }
 };
 
-export const updateKontragent = async (req: Request, res: Response): Promise<any> => {
+export const updateKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const {
@@ -185,12 +183,11 @@ export const updateKontragent = async (req: Request, res: Response): Promise<any
             status: 200
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error updating kontragent", error });
+        next(error);
     }
 };
 
-export const deleteKontragent = async (req: Request, res: Response): Promise<any> => {
+export const deleteKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
@@ -207,7 +204,6 @@ export const deleteKontragent = async (req: Request, res: Response): Promise<any
             status: 200
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error deleting kontragent", error });
+        next(error);
     }
 };

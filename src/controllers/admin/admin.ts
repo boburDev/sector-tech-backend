@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Admin } from '../../entities/admin.entity';
 import { sign } from '../../utils/jwt';
@@ -8,7 +8,7 @@ import { Users } from '../../entities/user.entity';
 const adminRepository = AppDataSource.getRepository(Admin);
 const userRepository = AppDataSource.getRepository(Users);
 
-export const login = async (req: Request, res: Response): Promise<any> => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { username, password } = req.body;
 
@@ -42,11 +42,11 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const createAdmin = async (req: Request, res: Response): Promise<any> => {
+export const createAdmin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { username, password, role, status } = req.body;
                
@@ -73,11 +73,11 @@ export const createAdmin = async (req: Request, res: Response): Promise<any> => 
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getAdmins = async (req: Request, res: Response): Promise<any> => {
+export const getAdmins = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
@@ -101,11 +101,11 @@ export const getAdmins = async (req: Request, res: Response): Promise<any> => {
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getAdminById = async (req: Request, res: Response): Promise<any> => {
+export const getAdminById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
@@ -136,11 +136,11 @@ export const getAdminById = async (req: Request, res: Response): Promise<any> =>
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updateAdmin = async (req: Request, res: Response): Promise<any> => {
+export const updateAdmin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
@@ -178,11 +178,11 @@ export const updateAdmin = async (req: Request, res: Response): Promise<any> => 
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deleteAdmin = async (req: Request, res: Response): Promise<any> => {
+export const deleteAdmin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         if (req.admin.role !== 'super') {
             return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
@@ -218,11 +218,11 @@ export const deleteAdmin = async (req: Request, res: Response): Promise<any> => 
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getAllUsers = async (req: Request, res: Response): Promise<any> => {
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const users = await userRepository.find();
         return res.json({
@@ -231,6 +231,6 @@ export const getAllUsers = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };

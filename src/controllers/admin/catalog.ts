@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
 import { ILike, In, IsNull, Not } from 'typeorm';
@@ -11,7 +11,7 @@ const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
 const popularCategoryRepository = AppDataSource.getRepository(PopularCategory);
 // Catalog Controllers
-export const getCatalogById = async (req: Request, res: Response): Promise<any> => {
+export const getCatalogById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -41,11 +41,11 @@ export const getCatalogById = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getAllCatalogs = async (req: Request, res: Response): Promise<any> => {
+export const getAllCatalogs = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const catalogs = await catalogRepository
             .createQueryBuilder('catalog')
@@ -65,11 +65,11 @@ export const getAllCatalogs = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const createCatalog = async (req: Request, res: Response): Promise<any> => {
+export const createCatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title } = req.body;
 
@@ -106,11 +106,11 @@ export const createCatalog = async (req: Request, res: Response): Promise<any> =
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updateCatalog = async (req: Request, res: Response): Promise<any> => {
+export const updateCatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { title } = req.body;
@@ -145,11 +145,11 @@ export const updateCatalog = async (req: Request, res: Response): Promise<any> =
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deleteCatalog = async (req: Request, res: Response): Promise<any> => {
+export const deleteCatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -179,12 +179,12 @@ export const deleteCatalog = async (req: Request, res: Response): Promise<any> =
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
 // Subcatalog Controllers
-export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response): Promise<any> => {
+export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -240,11 +240,11 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getSubcatalogById = async (req: Request, res: Response): Promise<any> => {
+export const getSubcatalogById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -279,11 +279,11 @@ export const getSubcatalogById = async (req: Request, res: Response): Promise<an
     } catch (error) {
         console.log(error);
         
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const createSubcatalog = async (req: Request, res: Response): Promise<any> => {
+export const createSubcatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, catalogId } = req.body;
         console.log(req.body);
@@ -357,11 +357,11 @@ export const createSubcatalog = async (req: Request, res: Response): Promise<any
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updateSubcatalog = async (req: Request, res: Response): Promise<any> => {
+export const updateSubcatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, catalogId } = req.body;
@@ -414,11 +414,11 @@ export const updateSubcatalog = async (req: Request, res: Response): Promise<any
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deleteSubcatalog = async (req: Request, res: Response): Promise<any> => {
+export const deleteSubcatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -446,12 +446,12 @@ export const deleteSubcatalog = async (req: Request, res: Response): Promise<any
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
 // Category Controllers
-export const getCategoriesBySubcatalogId = async (req: Request, res: Response): Promise<any> => {
+export const getCategoriesBySubcatalogId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { popular } = req.query;
@@ -510,11 +510,11 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response): 
     } catch (error) {
         console.log(error);
         
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const createCategory = async (req: Request, res: Response): Promise<any> => {
+export const createCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, subCatalogId } = req.body;
 
@@ -579,11 +579,11 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updateCategory = async (req: Request, res: Response): Promise<any> => {
+export const updateCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, subCatalogId } = req.body;
@@ -662,11 +662,11 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deleteCategory = async (req: Request, res: Response): Promise<any> => {
+export const deleteCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -697,11 +697,11 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const togglePopularCategory = async (req: Request, res: Response): Promise<any> => {
+export const togglePopularCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         let { categoryIds } = req.body;
 
@@ -746,11 +746,11 @@ export const togglePopularCategory = async (req: Request, res: Response): Promis
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getCategories = async (req: Request, res: Response): Promise<any> => {
+export const getCategories = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { popular } = req.query;
 
@@ -775,8 +775,7 @@ export const getCategories = async (req: Request, res: Response): Promise<any> =
 
         return res.status(200).json({ data: categories, error: null, status: 200 });
     } catch (error) {
-        console.error("getCategories Error:", error);
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
