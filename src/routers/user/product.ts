@@ -17,30 +17,36 @@ const router = Router();
  * @swagger
  * /user/product/all:
  *   get:
- *     summary: Get all products
+ *     summary: Get all products with filtering options
  *     tags: [Product]
  *     parameters:
  *       - in: query
+ *         name: recommended
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: Filter products by recommended status
+ *       - in: query
  *         name: condition
  *         schema:
- *           type: boolean
- *         description: Include condition relations if true
- *         example: true
+ *           type: string
+ *           enum: [new, seller]
+ *         description: Filter products by condition type
  *       - in: query
  *         name: revalance
  *         schema:
- *           type: boolean
- *         description: Include relevance relations if true
- *         example: false
+ *           type: string
+ *           enum: [active, inactive]
+ *         description: Filter products by relevance status
  *       - in: query
- *         name: recommended
+ *         name: popular
  *         schema:
- *           type: boolean
- *         description: Filter products that are recommended
- *         example: true
+ *           type: string
+ *           enum: [true, false]
+ *         description: Filter products by popularity
  *     responses:
  *       200:
- *         description: List of all products
+ *         description: Successfully retrieved product list
  *         content:
  *           application/json:
  *             schema:
@@ -53,27 +59,71 @@ const router = Router();
  *                     properties:
  *                       id:
  *                         type: string
- *                         example: "12345"
+ *                         format: uuid
+ *                         example: "550e8400-e29b-41d4-a716-446655440000"
  *                       title:
  *                         type: string
- *                         example: "Awesome Product"
+ *                         example: "iPhone 14 Pro"
  *                       slug:
  *                         type: string
- *                         example: "awesome-product"
+ *                         example: "iphone-14-pro"
+ *                       articul:
+ *                         type: string
+ *                         example: "A2650"
  *                       inStock:
  *                         type: boolean
  *                         example: true
  *                       price:
  *                         type: number
- *                         example: 199.99
+ *                         example: 999.99
  *                       mainImage:
  *                         type: string
  *                         example: "https://example.com/image.jpg"
  *                       recommended:
  *                         type: boolean
  *                         example: true
+ *                       conditions:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             example: "1"
+ *                           slug:
+ *                             type: string
+ *                             example: "new"
+ *                           title:
+ *                             type: string
+ *                             example: "New"
+ *                       relevances:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             example: "2"
+ *                           slug:
+ *                             type: string
+ *                             example: "active"
+ *                           title:
+ *                             type: string
+ *                             example: "Active"
+ *                       popularProduct:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             example: "3"
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ *                 error:
+ *                   type: object
  */
 router.get("/all", Product.getProducts);
 
