@@ -1,10 +1,4 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    DeleteDateColumn
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn } from "typeorm";
 
 @Entity()
 export class Promotion {
@@ -23,7 +17,7 @@ export class Promotion {
     @Column()
     slug: string;
 
-    @Column("timestamp")
+    @Column()
     expireDate: Date;
 
     @Column()
