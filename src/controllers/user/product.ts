@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
-import { IsNull } from "typeorm";
+import { IsNull, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
@@ -10,31 +10,41 @@ const cartProductRepository = AppDataSource.getRepository(Cart);
 
 export const getProducts = async (req: Request, res: Response): Promise<any> => {
   try {
-    const condition = req.query.condition === "true";
-    const revalance = req.query.revalance === "true";
-    const { recommended } = req.query;
-    const whereCondition: any = {
-      deletedAt: IsNull(),
+    const { recommended, condition, revalance, popular } = req.query;
+    const whereCondition: any = { deletedAt: IsNull() };
+
+    const conditionMapping: Record<string, string> = {
+      new: "novyy",
+      seller: "seller-rfb"
     };
 
-    if (recommended === "true") {
-      whereCondition.recommended = true
-    }
-    if(recommended === "false"){
-      whereCondition.recommended = "false"
-    }
-    const relation: string[] = [];
-    
-    if (condition) {
-      relation.push("conditions");
+    const revalanceMapping: Record<string, string> = {
+      active: "aktualnoe",
+      inactive: "snyato-s-proizvodstva-eos"
+    };
+
+    if (condition && conditionMapping[condition as string]) {
+      whereCondition.conditions = { slug: conditionMapping[condition as string] };
     }
 
-    if (revalance) {
-      relation.push("relevances");
+    if (revalance && revalanceMapping[revalance as string]) {
+      whereCondition.relevances = { slug: revalanceMapping[revalance as string] };
+    }
+
+    if (recommended !== undefined) {
+      whereCondition.recommended = JSON.parse(recommended as string);
+    }
+
+    const relations: string[] = [];
+    if (popular !== undefined) {
+      relations.push("popularProduct");
+      whereCondition.popularProduct = {
+        id: popular === "true" ? Not(IsNull()) : IsNull(),
+      };
     }
 
     const products = await productRepository.find({
-      relations: relation,
+      relations,
       where: whereCondition,
       order: { createdAt: "DESC" },
       select: {
@@ -45,31 +55,21 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         inStock: true,
         price: true,
         mainImage: true,
-        recommended:true,
+        recommended: true,
         ...(condition && {
-          conditions: {
-            id: true,
-            slug: true,
-            title: true
-          }
+          conditions: { id: true, slug: true, title: true },
         }),
         ...(revalance && {
-          relevances: {
-            id: true,
-            slug: true,
-            title: true
-          }
-        })
-      }
+          relevances: { id: true, slug: true, title: true },
+        }),
+        ...(popular && {
+          popularProduct: { id: true },
+        }),
+      },
     });
 
-    res.json({
-      data: products,
-      error: null,
-      status: 200,
-    });
+    return res.status(200).json({ data: products, error: null, status: 200 });
   } catch (error) {
-    console.error("Error fetching products:", error);
     return res.status(500).json({ message: "Internal server error", error });
   }
 };

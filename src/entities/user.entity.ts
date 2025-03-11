@@ -8,6 +8,7 @@ import {
 import { ProductQuestion, ProductComment } from "./product_details.entity";
 import * as bcrypt from "bcrypt";
 import { Cart, SavedProduct } from "./user_details.entity";
+import { Kontragent } from "./kontragent.entity";
 
 @Entity()
 export class Users {
@@ -37,6 +38,9 @@ export class Users {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   cart: Cart[];
+
+  @OneToMany(() => Kontragent, (kontragent) => kontragent.user)
+  contragents: Kontragent[];
 
   @BeforeInsert()
   async hashPassword() {

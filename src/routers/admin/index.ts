@@ -9,6 +9,8 @@ import bannerRouter from "./banner"
 import promotionRouter from "./promotion"
 import changeOrderRouter from "./change-order"
 import logsRouter from "./logs"
+import garanteeRouter from "./garantee"
+
 const router = express.Router();
 
 router.use('/admin', adminRouter)
@@ -21,5 +23,6 @@ router.use("/banner", bannerRouter)
 router.use("/promotion", promotionRouter)
 router.use("/change-order", changeOrderRouter)
 router.use("/logs", logsRouter)
+router.use("/garantee", garanteeRouter)
 
 export default router
