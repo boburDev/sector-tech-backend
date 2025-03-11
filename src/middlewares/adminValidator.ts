@@ -51,6 +51,5 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
         status: existingAdmin.status
     };
     next();
-
 }
 
