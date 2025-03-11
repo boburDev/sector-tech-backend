@@ -1,4 +1,3 @@
-
 export class CustomError extends Error {
     public status: number;
 

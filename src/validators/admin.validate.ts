@@ -39,8 +39,8 @@ export const adminUpdateValidateSchema = Joi.object({
     "string.max": "Username should have a maximum length of 30",
     "any.required": "Username is required",
   }),
-  role: Joi.string().valid("admin", "superadmin").default("admin").messages({
-    "any.only": "Role must be either admin or superadmin",
+  role: Joi.string().valid("admin", "super").default("admin").messages({
+    "any.only": "Role must be either admin or super",
   }),
   status: Joi.string().valid("active", "inactive").default("active").messages({
     "any.only": "Status must be either active or inactive",

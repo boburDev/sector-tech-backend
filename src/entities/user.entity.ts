@@ -13,9 +13,9 @@ export class Users {
   name?: string;
 
   @Column({ unique: true })
-  email: string;
+  email: string;  
 
-  @Column({ type: "text", nullable: true, default: null }) // ✅ To'g'ri yo'l
+  @Column({ type: "text", nullable: true, default: null })
   password?: string | null;
 
   @Column({ nullable: true, default: null })
