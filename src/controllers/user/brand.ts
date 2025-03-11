@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
-import {  IsNull, Not } from 'typeorm';
+import { NextFunction, Request, Response } from 'express';
+import {  IsNull } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 const brandRepository = AppDataSource.getRepository(Brand);
 
-export const getBrandById = async (req: Request, res: Response): Promise<any> => {
+export const getBrandById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const brand = await brandRepository.findOne({
@@ -28,8 +28,8 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             error: null,
             status: 200
         });
-    } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+    } catch (error: unknown) {
+        next(error);
     }
 };
 

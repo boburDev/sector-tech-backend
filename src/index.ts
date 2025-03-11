@@ -14,6 +14,7 @@ import { setupSwagger } from "./config/swagger";
 import session from "express-session";
 import passport from "passport";
 import insertData from "./services";
+import errorMiddleware from "./middlewares/errorMiddleware";
 dotenv.config(); 
 
 
@@ -52,6 +53,7 @@ app.get('/', async (req: any, res: any) => {
 })
 app.use("/", adminRouter);
 app.use("/user", userRouter);
+app.use(errorMiddleware);
 setupSwagger(app);
 
 
