@@ -1,6 +1,6 @@
 import { insertBrandData } from "./addBrands";
 import { insertCatalogData } from "./addCatalog";
-
+import { insertCountryData } from "./addCountry";
 
 export default async function insertData (query: any) {
     try {
@@ -10,6 +10,8 @@ export default async function insertData (query: any) {
                 await insertCatalogData()
             } else if (name == 'brands') {
                 await insertBrandData()
+            } else if (name == 'countries') {
+                await insertCountryData()
             }
         }
     } catch (error) {
