@@ -9,6 +9,7 @@ import { Brand } from '../../entities/brands.entity';
 import { ProductCondition, ProductRelevance } from '../../entities/product_details.entity';
 import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
 import { PopularProduct } from '../../entities/popular.entity';
+import { CustomError } from '../../error-handling/error-handling';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -116,13 +117,7 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
       ],
     });
 
-    if (!product) {
-        return res.status(404).json({
-            data: null,
-            error: 'Product not found',
-            status: 404
-        });
-    }
+    if (!product) throw new CustomError('Product not found', 404);  
 
     res.json({
         data: product,
@@ -155,7 +150,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             });
             return res.status(400).json({ error: error.details.map(err => err.message) });
         }
-        if (!productImages.length) return res.status(400).json({ error: 'Image must be uploaded' });
+        if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
         
         const images = productImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
         const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
@@ -234,13 +229,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
         const product = await productRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
-        if (!product) {
-            return res.status(404).json({
-                data: null,
-                error: 'Product not found',
-                status: 404
-            });
-        }
+        if (!product) throw new CustomError('Product not found', 404);
 
         product.title = value.title || product.title;
         product.slug = value.title ? createSlug(value.title) : product.slug;
@@ -255,13 +244,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
         if (value.brandId) {
             const brand = await brandRepository.findOne({ where: { id: value.brandId, deletedAt: IsNull() } });
 
-            if (!brand) {
-                return res.json({
-                    data: null,
-                    error: 'Invalid brand ID',
-                    status: 404
-                });
-            }
+            if (!brand) throw new CustomError('Invalid brand ID', 404);
 
             product.brandId = value.brandId;
         }
@@ -269,65 +252,36 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
         if (value.conditionId) {
             const productCondition = await productConditionRepository.findOne({ where: { id: value.conditionId, deletedAt: IsNull() } });
 
-            if (!productCondition) {
-                return res.json({
-                    data: null,
-                    error: 'Invalid condition ID',
-                    status: 404
-                });
-            }
+            if (!productCondition) throw new CustomError('Invalid condition ID', 404);
+
             product.conditionId = value.conditionId;
         }
         
         if (value.relevanceId) {
             const productRelevance = await productRelevanceRepository.findOne({ where: { id: value.relevanceId, deletedAt: IsNull() } });
 
-            if (!productRelevance) {
-                return res.json({
-                    data: null,
-                    error: 'Invalid relevance ID',
-                    status: 404
-                });
-            }
+            if (!productRelevance) throw new CustomError('Invalid relevance ID', 404);
             product.relevanceId = value.relevanceId;
         }
 
         if (product.catalogId) {
             const catalog = await catalogRepository.findOne({ where: { id: product.catalogId, deletedAt: IsNull() } });
 
-            if (!catalog) {
-                return res.json({
-                    data: null,
-                    error: 'Invalid Catalog ID',
-                    status: 400
-                });
-            }
+            if (!catalog) throw new CustomError('Invalid Catalog ID', 400);
             product.catalogId = value.catalogId;
         }
 
         if (value.subcatalogId) {
             const subcatalog = await subcatalogRepository.findOne({ where: { id: value.subcatalogId, deletedAt: IsNull() } });
 
-            if (!subcatalog) {
-                return res.json({
-                    data: null,
-                    error: 'Invalid subcatalog ID',
-                    status: 400
-                });
-            }
-            product.subcatalogId = value.subcatalogId;
+            if (!subcatalog) throw new CustomError('Invalid subcatalog ID', 400);
+            product.subcatalogId = value.subcatalogId;  
         }
 
         if (value.categoryId) {
             const category = await categoryRepository.findOne({ where: { id: value.categoryId, deletedAt: IsNull() } });
 
-            if (!category) {
-                return res.json({
-                    data: null,
-                    error: 'Invalid category ID',
-                    status: 400
-                });
-            }
+            if (!category) throw new CustomError('Invalid category ID', 400);
             product.categoryId = value.categoryId;
         }
 
@@ -379,9 +333,7 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
             where: { id, deletedAt: IsNull() }
         });
 
-        if (!product) {
-            return res.status(404).json({ error: "Product not found or already deleted" });
-        }
+            if (!product) throw new CustomError('Product not found or already deleted', 404);
 
         product.deletedAt = new Date();
         await productRepository.save(product);
@@ -396,15 +348,11 @@ export const toggleRecommendedProduct = async (req: Request, res: Response, next
     try {
         const { productId } = req.body;
 
-        if (!productId) {
-            return res.status(400).json({ error: "Product ID is required" });
-        }
+        if (!productId) throw new CustomError('Product ID is required', 400);
 
         const product = await productRepository.findOne({ where: { id: productId, deletedAt: IsNull() } });
 
-        if (!product) { 
-            return res.status(404).json({ error: "Product not found" });
-        }
+        if (!product) throw new CustomError('Product not found', 404);
 
         if (product.recommended) {
             product.recommended = false;
@@ -429,13 +377,7 @@ export const togglePopularProduct = async (req: Request, res: Response, next: Ne
             productIds = [productIds];
         }
 
-        if (!productIds || productIds.length === 0) {
-            return res.status(400).json({
-                data: null,
-                error: "productIds is required",
-                status: 400
-            });
-        }
+        if (!productIds || productIds.length === 0) throw new CustomError('productIds is required', 400);
 
         const existingPopularProducts = await popularProductRepository.find({
             where: { productId: In(productIds) }
@@ -473,15 +415,11 @@ export const togglePopularProduct = async (req: Request, res: Response, next: Ne
 export const deletePopularProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        if (!id) {
-            return res.status(400).json({ error: "Product ID is required" });
-        }
+        if (!id) throw new CustomError('Product ID is required', 400);
 
         const popularProduct = await popularProductRepository.findOne({ where: { id: id } });
 
-        if (!popularProduct) {
-            return res.status(404).json({ error: "Popular product not found" });
-        }
+        if (!popularProduct) throw new CustomError('Popular product not found', 404);
 
         await popularProductRepository.delete(popularProduct);
 

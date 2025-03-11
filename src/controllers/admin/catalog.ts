@@ -5,6 +5,7 @@ import { ILike, In, IsNull, Not } from 'typeorm';
 import { createSlug } from '../../utils/slug';
 import { deleteFile } from '../../middlewares/removeFiltePath';
 import { PopularCategory } from '../../entities/popular.entity';
+import { CustomError } from '../../error-handling/error-handling';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -25,13 +26,7 @@ export const getCatalogById = async (req: Request, res: Response, next: NextFunc
             }
         });
 
-        if (!catalog) {
-            return res.json({
-                data: null,
-                error: 'Catalog not found',
-                status: 400
-            });
-        }
+        if (!catalog) throw new CustomError('Catalog not found', 404);
 
         const { createdAt, deletedAt, ...catalogData } = catalog;
 
@@ -124,13 +119,7 @@ export const updateCatalog = async (req: Request, res: Response, next: NextFunct
                 createdAt: 'DESC'
             }
         });
-        if (!catalog) {
-            return res.json({
-                data: null,
-                error: 'Catalog not found',
-                status: 400
-            });
-        }
+        if (!catalog) throw new CustomError('Catalog not found', 404);
 
         catalog.title = title;
         catalog.slug = createSlug(title);
@@ -162,13 +151,7 @@ export const deleteCatalog = async (req: Request, res: Response, next: NextFunct
                 createdAt: 'DESC'
             }
         });
-        if (!catalog) {
-            return res.json({
-                data: null,
-                error: 'Catalog not found',
-                status: 400
-            });
-        }
+        if (!catalog) throw new CustomError('Catalog not found', 404);
 
         catalog.deletedAt = new Date();
         await catalogRepository.save(catalog);
@@ -196,13 +179,7 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             }
         });
 
-        if (!catalog) {
-            return res.json({
-                data: null,
-                error: 'Catalog not found',
-                status: 404
-            });
-        }
+        if (!catalog) throw new CustomError('Catalog not found', 404);
         
         // Get subcatalogs with categories for this catalog
         const queryBuilder = subcatalogRepository.createQueryBuilder('subcatalog')
@@ -290,13 +267,7 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
         
 
         // Validate required fields
-        if (!title || !catalogId) {
-            return res.json({
-                data: null,
-                error: 'Title and catalogId are required',
-                status: 400
-            });
-        }
+        if (!title || !catalogId) throw new CustomError('Title and catalogId are required', 400);
 
         // Check if subcatalog already exists
         const existingSubcatalog = await subcatalogRepository
@@ -306,13 +277,7 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
             .andWhere('subcatalog.deletedAt IS NULL')
             .getOne();
 
-        if (existingSubcatalog) {
-            return res.json({
-                data: null,
-                error: 'Subcatalog with this title already exists in this catalog',
-                status: 400
-            });
-        }
+        if (existingSubcatalog) throw new CustomError('Subcatalog with this title already exists in this catalog', 400);
 
         // Verify parent catalog exists
         const catalog = await catalogRepository
@@ -321,13 +286,7 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
             .andWhere('catalog.deletedAt IS NULL')
             .getOne();
 
-        if (!catalog) {
-            return res.json({
-                data: null,
-                error: 'Parent catalog not found',
-                status: 404
-            });
-        }
+        if (!catalog) throw new CustomError('Parent catalog not found', 404);
 
         // Create and save new subcatalog
         const subcatalog = subcatalogRepository.create({
@@ -339,19 +298,13 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
 
         const savedSubcatalog = await subcatalogRepository.save(subcatalog);
 
-        if (!savedSubcatalog) {
-            return res.json({
-                data: null,
-                error: 'Failed to create subcatalog',
-                status: 500
-            });
-        }
+        if (!savedSubcatalog) throw new CustomError('Failed to create subcatalog', 500);
 
         // Format response data
         const { createdAt, deletedAt, ...subcatalogData } = savedSubcatalog;
 
         return res.json({
-            data: subcatalogData,
+            data: subcatalogData,   
             error: null,
             status: 200
         });
@@ -373,13 +326,7 @@ export const updateSubcatalog = async (req: Request, res: Response, next: NextFu
             }
         });
 
-        if (!subcatalog) {
-            return res.json({
-                data: null,
-                error: 'Subcatalog not found',
-                status: 404
-            });
-        }
+        if (!subcatalog) throw new CustomError('Subcatalog not found', 404);
 
         if (catalogId) {
             const catalog = await catalogRepository.findOne({
@@ -389,13 +336,7 @@ export const updateSubcatalog = async (req: Request, res: Response, next: NextFu
                 }
             });
 
-            if (!catalog) {
-                return res.json({
-                    data: null,
-                    error: 'Parent catalog not found',
-                    status: 404
-                });
-            }
+            if (!catalog) throw new CustomError('Parent catalog not found', 404);
             subcatalog.catalogId = catalogId;
         }
 
@@ -429,13 +370,7 @@ export const deleteSubcatalog = async (req: Request, res: Response, next: NextFu
             }
         });
 
-        if (!subcatalog) {
-            return res.json({
-                data: null,
-                error: 'Subcatalog not found',
-                status: 404
-            });
-        }
+            if (!subcatalog) throw new CustomError('Subcatalog not found', 404);
 
         subcatalog.deletedAt = new Date();
         await subcatalogRepository.save(subcatalog);
@@ -463,13 +398,7 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
             }
         });
 
-        if (!subcatalog) {
-            return res.json({
-                data: null,
-                error: 'Subcatalog not found',
-                status: 404
-            });
-        }
+        if (!subcatalog) throw new CustomError('Subcatalog not found', 404);
 
         let whereCondition: any = {
             subCatalogId: id,
@@ -555,13 +484,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
                 createdAt: 'DESC'
             }
         });
-        if (!subcatalog) {
-            return res.json({
-                data: null,
-                error: 'Parent subcatalog not found',
-                status: 400
-            });
-        }
+        if (!subcatalog) throw new CustomError('Parent subcatalog not found', 400);
         const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
         const category = new Category();
@@ -599,13 +522,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
             }
         });
 
-        if (!category) {
-            return res.json({
-                data: null,
-                error: 'Category not found',
-                status: 400
-            });
-        }
+        if (!category) throw new CustomError('Category not found', 404);
 
         if (title !== category.title) {
             const existingCategory = await categoryRepository.findOne({
@@ -634,13 +551,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
                     createdAt: 'DESC'
                 }
             });
-            if (!subcatalog) {
-                return res.json({
-                    data: null,
-                    error: 'Parent subcatalog not found',
-                    status: 400
-                });
-            }
+            if (!subcatalog) throw new CustomError('Parent subcatalog not found', 400);
             category.subCatalogId = subCatalogId;
         }
 
@@ -680,13 +591,7 @@ export const deleteCategory = async (req: Request, res: Response, next: NextFunc
             }
         });
 
-        if (!category) {
-            return res.json({
-                data: null,
-                error: 'Category not found',
-                status: 400
-            });
-        }
+        if (!category) throw new CustomError('Category not found', 404);
 
         category.deletedAt = new Date();
         await categoryRepository.save(category);
@@ -695,7 +600,7 @@ export const deleteCategory = async (req: Request, res: Response, next: NextFunc
             data: { message: 'Category deleted successfully' },
             error: null,
             status: 200
-        });
+        }); 
     } catch (error) {
         next(error);
     }
@@ -709,16 +614,10 @@ export const togglePopularCategory = async (req: Request, res: Response, next: N
             categoryIds = [categoryIds];
         }
 
-        if (!categoryIds || categoryIds.length === 0) {
-            return res.status(400).json({
-                data: null,
-                error: "categoryIds is required",
-                status: 400
-            });
-        }
+        if (!categoryIds || categoryIds.length === 0) throw new CustomError("categoryIds is required", 400);
 
         const existingPopularCategories = await popularCategoryRepository.find({
-            where: { categoryId: In(categoryIds) }
+            where: { categoryId: In(categoryIds) }  
         });
 
         if (existingPopularCategories.length > 0) {

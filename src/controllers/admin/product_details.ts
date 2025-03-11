@@ -4,7 +4,7 @@ import { ProductCondition, ProductQuestion, ProductComment, ProductRelevance } f
 import { v4 } from '../../utils/uuid';
 import { createSlug } from '../../utils/slug';
 import { IsNull } from 'typeorm';
-
+import { CustomError } from '../../error-handling/error-handling';
 const productConditionRepository = AppDataSource.getRepository(ProductCondition);
 const productRelevanceRepository = AppDataSource.getRepository(ProductRelevance);
 const productQuestionRepository = AppDataSource.getRepository(ProductQuestion);
@@ -42,13 +42,7 @@ export const getProductConditionById = async (req: Request, res: Response, next:
            } 
         });
 
-        if (!productCondition) {
-          return res.json({
-            data: null,
-            error: 'Condition not found',
-            status: 404
-          });
-        }
+        if (!productCondition) throw new CustomError('Condition not found', 404);   
 
         return res.json({
             data: productCondition,
@@ -83,9 +77,7 @@ export const updateProductCondition = async (req: Request, res: Response, next: 
 
     try {
         const productCondition = await productConditionRepository.findOne({ where: { id } });
-        if (!productCondition) {
-            return res.status(404).json({ message: 'Product condition not found' });
-        }
+        if (!productCondition) throw new CustomError('Product condition not found', 404);
 
         productCondition.title = title;
         productCondition.slug = createSlug(title);
@@ -105,9 +97,7 @@ export const deleteProductCondition = async (req: Request, res: Response, next: 
 
     try {
         const productCondition = await productConditionRepository.findOne({ where: { id } });
-        if (!productCondition) {
-            return res.status(404).json({ message: 'Product condition not found' });
-        }
+        if (!productCondition) throw new CustomError('Product condition not found', 404);
 
         productCondition.deletedAt = new Date();
         await productConditionRepository.save(productCondition);
@@ -153,13 +143,7 @@ export const getProductRelavanceById = async (req: Request, res: Response, next:
            }
           });
 
-        if (!productRelevance) {
-          return res.json({
-            data: null,
-            error: 'Relevance not found',
-            status: 404
-          });
-        }
+        if (!productRelevance) throw new CustomError('Relevance not found', 404);
         return res.json({
             data: productRelevance,
             error: null,
@@ -199,9 +183,7 @@ export const updateProductRelavance = async (req: Request, res: Response, next: 
               slug: true
            }
           });
-        if (!productRelevance) {
-            return res.status(404).json({ message: 'Product relevance not found' });
-        }
+        if (!productRelevance) throw new CustomError('Product relevance not found', 404);
 
         productRelevance.title = title;
         productRelevance.slug = createSlug(title);
@@ -221,9 +203,7 @@ export const deleteProductRelavance = async (req: Request, res: Response, next: 
 
     try {
         const productRelevance = await productRelevanceRepository.findOne({ where: { id } });
-        if (!productRelevance) {
-            return res.status(404).json({ message: 'Product relevance not found' });
-        }
+        if (!productRelevance) throw new CustomError('Product relevance not found', 404);
 
         productRelevance.deletedAt = new Date();    
         await productRelevanceRepository.save(productRelevance);    
@@ -244,9 +224,7 @@ export const addReplyToComment = async (req:Request, res:Response, next: NextFun
         const { id: adminId } = req.admin;
         const comment = await productCommentRepository.findOneBy({ id: commentId });
 
-        if(!comment) {
-            return res.status(404).json({ message: "Comment not found" });
-        }
+        if(!comment) throw new CustomError('Comment not found', 404);
 
         const newReply = {
             id: v4(),
@@ -259,7 +237,6 @@ export const addReplyToComment = async (req:Request, res:Response, next: NextFun
         let savedComment = await productCommentRepository.save(comment);
         return res.status(200).json({data: savedComment, error:null, status: 200});
     } catch (error) {
-        console.error("Error adding reply to comment:", error);
         next(error);
     }
 }
@@ -271,14 +248,10 @@ export const updateReplyToComment = async (req: Request, res: Response, next: Ne
 
     const comment = await productCommentRepository.findOneBy({ id: commentId, deletedAt: IsNull() });
 
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
+    if (!comment) throw new CustomError('Comment not found', 404);
 
     const reply = comment.reply.find(reply => reply.id === replyId);
-    if (!reply) {
-      return res.status(404).json({ message: "Reply not found" });
-    }
+    if (!reply) throw new CustomError('Reply not found', 404);
 
     reply.message = message;
 
@@ -354,13 +327,10 @@ export const getProductCommentById = async (req: Request,res: Response, next: Ne
       },
     });
 
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
+    if (!comment) throw new CustomError('Comment not found', 404);
 
     return res.status(200).json({data: comment, error: null, status: 200});
   } catch (error) {
-    console.error("Error fetching product comment:", error);
     next(error);
   }
 };
@@ -371,16 +341,10 @@ export const updateProductComment = async (req: Request, res: Response, next: Ne
     const { body, star } = req.body;
 
     const comment = await productCommentRepository.findOneBy({ id, deletedAt: IsNull() });
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
+    if (!comment) throw new CustomError('Comment not found', 404);
 
-    if (body) {
-      comment.body = body;
-    }
-    if (star) { 
-      comment.star = star;
-    }
+    if (body) comment.body = body;
+    if (star) comment.star = star;
 
     await productCommentRepository.save(comment);
     const updatedComment = await productCommentRepository.findOne({
@@ -405,15 +369,12 @@ export const deleteProductComment = async (req: Request, res: Response, next: Ne
     const { id } = req.params;
 
     const comment = await productCommentRepository.findOneBy({ id, deletedAt: IsNull() });
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
-    
+    if (!comment) throw new CustomError('Comment not found', 404);
+
     comment.deletedAt = new Date();
     await productCommentRepository.save(comment);
     return res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
-    console.error("Error deleting product comment:", error);
     next(error);
   }
 };
@@ -451,9 +412,7 @@ export const getCommentByProductId = async (req: Request, res: Response, next: N
       },
     });
 
-    if (comments.length === 0) {
-      return res.status(404).json({ message: "No comments found for this product" });
-    }
+    if (comments.length === 0) throw new CustomError('No comments found for this product', 404);
 
     return res.status(200).json({data: comments, error: null, status: 200});
   } catch (error) {
@@ -468,9 +427,7 @@ export const addReplyToQuestion = async (req: Request, res: Response, next: Next
     const { id: adminId } = req.admin
     const question = await productQuestionRepository.findOneBy({ id: questionId, deletedAt: IsNull() });
 
-    if (!question) {
-      return res.status(404).json({ message: "Question not found" });
-    }
+    if (!question) throw new CustomError('Question not found', 404);
 
     const newReply = {
       id: v4(),
@@ -555,9 +512,7 @@ export const getProductQuestionById = async (req: Request, res: Response, next: 
       },
     });
 
-    if (!question) {
-      return res.status(404).json({ message: "Question not found" });
-    }
+    if (!question) throw new CustomError('Question not found', 404);
 
     return res.status(200).json({ data: question, error: null, status: 200 });
   } catch (error) {
@@ -570,9 +525,8 @@ export const deleteProductQuestion = async (req: Request, res: Response, next: N
     const { id } = req.params;
     const question = await productQuestionRepository.findOneBy({ id });
 
-    if (!question) {
-      return res.status(404).json({ message: "Question not found" });
-    }
+    if (!question) throw new CustomError('Question not found', 404);
+
     question.deletedAt = new Date()
     await productQuestionRepository.save(question);
     return res.status(200).json({ message: "Question deleted successfully" });

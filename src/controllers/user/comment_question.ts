@@ -65,10 +65,6 @@ export const getCommentByProductId = async (req: Request, res: Response, next: N
       },
     });
 
-    if (comments.length === 0) {
-      return res.status(404).json({ message: "No comments found for this product" });
-    }
-
     return res.status(200).json({data: comments, error:null, status: 200 });
   } catch (error) {
     next(error);
@@ -123,9 +119,6 @@ export const getQuestionByProductId = async (req: Request, res: Response, next: 
       },
     });
     
-    if (questions.length === 0) {
-      return res.status(404).json({ message: "No questions found for this product" });
-    }
 
     return res.status(200).json({ data: questions, error: null, status: 200 });
   } catch (error) {

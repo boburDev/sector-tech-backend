@@ -2,24 +2,18 @@ import { NextFunction, Request, Response } from "express";
 import { Garantee } from "../../entities/garantee.entity";
 import AppDataSource from "../../config/ormconfig";
 import { IsNull } from "typeorm";
+import { CustomError } from "../../error-handling/error-handling";
 const garanteeRepository = AppDataSource.getRepository(Garantee);
 
 export const createGarantee = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, price } = req.body;
-        if (!title || !price) {
-            return res.status(400).json({ message: "Title and price are required" });
-    }
-
+        if (!title || !price) throw new CustomError('Title and price are required', 400);
     const regex = /^(?:\d+(?:\.\d{1,2})?|[^\d]+)$/;
-    if (!regex.test(price)) {
-        return res.status(400).json({ message: "Price must be either a number or a string without digits" });
-    }
+    if (!regex.test(price)) throw new CustomError('Price must be either a number or a string without digits', 400);
 
     const existingGarantee = await garanteeRepository.findOne({ where: { title, deletedAt: IsNull() } });
-    if (existingGarantee) {
-        return res.status(400).json({ message: "Garantee with this title already exists" });
-    }
+    if (existingGarantee) throw new CustomError('Garantee with this title already exists', 400);
 
 
     const garantee = new Garantee();
@@ -53,18 +47,12 @@ export const updateGarantee = async (req: Request, res: Response, next: NextFunc
         const { id } = req.params;
         const { title, price } = req.body;
         const regex = /^(?:\d+(?:\.\d{1,2})?|[^\d]+)$/;
-        if(!id){
-            return res.status(400).json({ message: "Id is required" });
-        }
+        if(!id) throw new CustomError('Id is required', 400);
         if(price){
-            if (!regex.test(price)) {
-                return res.status(400).json({ message: "Price must be either a number or a string without digits" });
-            }
+            if (!regex.test(price)) throw new CustomError('Price must be either a number or a string without digits', 400);
         }
     const garantee = await garanteeRepository.findOne({ where: { id: id as string, deletedAt: IsNull() } });
-    if(!garantee) {
-        return res.status(400).json({ message: "Garantee not found" });
-    }
+    if(!garantee) throw new CustomError('Garantee not found', 400);
         garantee.title = title || garantee.title;
         garantee.price = price || garantee.price;
         await garanteeRepository.save(garantee);
@@ -77,17 +65,15 @@ export const updateGarantee = async (req: Request, res: Response, next: NextFunc
 export const deleteGarantee = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        if(!id){
-            return res.status(400).json({ message: "Id is required" });
-        }
+        if(!id) throw new CustomError('Id is required', 400);
 
     const garantee = await garanteeRepository.findOne({ where: { id, deletedAt: IsNull() } });
-    if(!garantee) {
-        return res.status(400).json({ message: "Garantee not found" });
-    }   
+
+    if(!garantee) throw new CustomError('Garantee not found', 400);   
     garantee.deletedAt = new Date();    
+
     await garanteeRepository.save(garantee);
-    res.status(200).json({ message: "Garantee deleted successfully", error: null, status: 200 });
+    return res.status(200).json({ message: "Garantee deleted successfully", error: null, status: 200 });
     } catch (error) {
         next(error);
     }

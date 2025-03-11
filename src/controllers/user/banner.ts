@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Banner } from '../../entities/banner.entity';
 import { IsNull } from 'typeorm';
-
+import { CustomError } from '../../error-handling/error-handling';
 const bannerRepository = AppDataSource.getRepository(Banner);
 
 export const getBanners = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -10,9 +10,7 @@ export const getBanners = async (req: Request, res: Response, next: NextFunction
         const { routePath } = req.query;
 
 
-        if (!routePath) {
-            return res.status(400).json({ message: "Query not found" });
-        }
+        if (!routePath) throw new CustomError('Query not found', 400);
         
         const whereCondition: any = { deletedAt: IsNull() };
 

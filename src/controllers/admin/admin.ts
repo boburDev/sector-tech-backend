@@ -4,7 +4,7 @@ import { Admin } from '../../entities/admin.entity';
 import { sign } from '../../utils/jwt';
 import { IsNull } from 'typeorm';
 import { Users } from '../../entities/user.entity';
-
+import { CustomError } from '../../error-handling/error-handling';
 const adminRepository = AppDataSource.getRepository(Admin);
 const userRepository = AppDataSource.getRepository(Users);
 
@@ -14,19 +14,13 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
         const admin = await adminRepository.findOne({ where: { username } });
         
-        if (!admin) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+        if (!admin) throw new CustomError('Invalid credentials', 401);
 
-        if (admin.status === 'inactive') {
-            return res.status(401).json({ message: 'Account is inactive' });
-        }
+        if (admin.status === 'inactive') throw new CustomError('Account is inactive', 401);
 
         const isValidPassword = await admin.validatePassword(password);
 
-        if (!isValidPassword) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+        if (!isValidPassword) throw new CustomError('Invalid credentials', 401);
 
         const token = sign(
             { id: admin.id, username: admin.username, role: admin.role },
@@ -50,13 +44,9 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
     try {
         const { username, password, role, status } = req.body;
                
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
+        if (req.admin.role !== 'super') throw new CustomError('Your account is not active or you are not a super admin', 400);
 
-        if (req.admin.username === username) {
-            return res.status(400).json({ message: 'Username already exists' });
-        }
+        if (req.admin.username === username) throw new CustomError('Username already exists', 400);
 
         const admin = new Admin();
         admin.username = username;
@@ -79,9 +69,7 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
 
 export const getAdmins = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
+        if (req.admin.role !== 'super') throw new CustomError('Your account is not active or you are not a super admin', 400);
 
         const admins = await adminRepository.find({
             where: { deletedAt: IsNull() },
@@ -107,9 +95,7 @@ export const getAdmins = async (req: Request, res: Response, next: NextFunction)
 
 export const getAdminById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
+        if (req.admin.role !== 'super') throw new CustomError('Your account is not active or you are not a super admin', 400);
 
         const { id } = req.admin;
         const user = await adminRepository.findOne({ 
@@ -125,9 +111,7 @@ export const getAdminById = async (req: Request, res: Response, next: NextFuncti
             }
         });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        if (!user) throw new CustomError('User not found', 404);
 
         return res.json({
             data: user,
@@ -142,9 +126,7 @@ export const getAdminById = async (req: Request, res: Response, next: NextFuncti
 
 export const updateAdmin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
+        if (req.admin.role !== 'super') throw new CustomError('Your account is not active or you are not a super admin', 400);
 
         const { id } = req.admin;
         const { username, role, status } = req.body;
@@ -156,9 +138,7 @@ export const updateAdmin = async (req: Request, res: Response, next: NextFunctio
             }
         });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        if (!user) throw new CustomError('User not found', 404);
 
         if (username) user.username = username;
         if (role) user.role = role;
@@ -184,9 +164,7 @@ export const updateAdmin = async (req: Request, res: Response, next: NextFunctio
 
 export const deleteAdmin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        if (req.admin.role !== 'super') {
-            return res.status(400).json({ message: 'Your account is not active or you are not a super admin' });
-        }
+        if (req.admin.role !== 'super') throw new CustomError('Your account is not active or you are not a super admin', 400);
 
         const { id } = req.admin;
         const user = await adminRepository.findOne({ 
@@ -196,17 +174,11 @@ export const deleteAdmin = async (req: Request, res: Response, next: NextFunctio
             } 
         });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        if (!user) throw new CustomError('User not found', 404);
 
-        if (user.id === req.admin.id) {
-            return res.status(400).json({ message: 'Cannot delete your own account' });
-        }
+        if (user.id === req.admin.id) throw new CustomError('Cannot delete your own account', 400);
 
-        if (user.role === 'super') {
-            return res.status(400).json({ message: 'Cannot delete super admin account' });
-        }
+        if (user.role === 'super') throw new CustomError('Cannot delete super admin account', 400);
 
         user.deletedAt = new Date();
         await adminRepository.save(user);
@@ -224,7 +196,14 @@ export const deleteAdmin = async (req: Request, res: Response, next: NextFunctio
 
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const users = await userRepository.find();
+        const users = await userRepository.find({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+            }
+        });
         return res.json({
             data: users,
             error: null,

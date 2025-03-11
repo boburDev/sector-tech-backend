@@ -3,7 +3,7 @@ import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
 import { IsNull, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
-
+import { CustomError } from "../../error-handling/error-handling";  
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 const cartProductRepository = AppDataSource.getRepository(Cart);
@@ -134,13 +134,9 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
     });
 
 
-    if (!product) res.json({ data: "Not found ", error: null, status: 200 });
+    if (!product) throw new CustomError('Product not found', 404);
 
-    res.json({
-      data: product,
-      error: null,
-      status: 200,
-    });
+    return res.status(200).json({ data: product, error: null, status: 200 });
 
   } catch (error) {
     next(error);
@@ -172,7 +168,6 @@ export const toggleSaved = async (req: Request,res: Response, next: NextFunction
     await savedProductRepository.save(newSavedProduct);
     return res.status(201).json({ id:newSavedProduct.id, message: "Product saved successfully." });
   } catch (error) {
-    console.error("Error in toggleSaved:", error);
     next(error);
   }
 };
@@ -205,17 +200,12 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
         },
       },
     });
-    if (user.length === 0) {
-      return res.status(404).json({
-        message: "In this user no found saved products",
-      });
-    }
 
-    res.status(200).json({message: "Saved products retrived successfully",
+    return res.status(200).json({message: "Saved products retrived successfully",
         data: user,
         error: null,
         status: 200
-      });
+    });
   } catch (error) {
     next(error);
   }
@@ -281,18 +271,13 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
       },
     });
 
-    if (userCart.length === 0) {
-      return res.status(404).json({
-        message: "No products found in the user's cart.",
-      });
-    }
-
-    res.status(200).json({
+    return res.status(200).json({
       message: "Cart products retrieved successfully",
       data: userCart,
       error: null,
       status: 200,
     });
+
   } catch (error) {
     next(error);
   }
@@ -305,10 +290,6 @@ export const searchProduct = async (req: Request, res: Response, next: NextFunct
     const products = await productRepository.find({
       where: { deletedAt: IsNull(), title }
     })
-
-    if(products.length === 0){
-      return res.status(404).json({ message:"Products not found", error:null, status: 404 })
-    }
 
     return res.status(200).json({ data: products, error: null, status: 200 });
   } catch (error) {

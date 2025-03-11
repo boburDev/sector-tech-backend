@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
-import { IsNull, Not } from 'typeorm';
-
+import { IsNull } from 'typeorm';
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
@@ -74,10 +73,6 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
             select,
         });
 
-        if (catalogs.length === 0) {
-            return res.status(404).json({ message: "Catalog not found" });
-        }
-
         return res.status(200).json({ data: catalogs, error: null, status: 200  });
     } catch (error) {
         next(error);
@@ -99,11 +94,6 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, ne
             order: { createdAt : "DESC" },
             relations: ["catalog"]
         });
-
-        if (subcatalog.length === 0) {
-            return res.status(404).json({ message: "Subcatalog not found" });
-        }
-
         return res.status(200).json({ data: subcatalog, error: null, status: 200 });
 
     } catch (error) {
@@ -126,11 +116,6 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
             order: { createdAt: "DESC" },
             relations: ["subCatalog"]
         });
-
-
-        if (categories.length === 0) {
-            return res.status(404).json({ message: "categories not found" });
-        }
 
         return res.status(200).json({ data: categories, error: null, status: 200 });
 

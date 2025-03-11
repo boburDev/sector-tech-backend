@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
-
+import { CustomError } from '../../error-handling/error-handling';
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -15,9 +15,7 @@ export const getCatalogFilterById = async (req: Request, res: Response, next: Ne
             .where('filter.subcatalogId = :id OR filter.categoryId = :id', { id })
             .getOne();
 
-        if (!filter) {
-            return res.status(404).json({ message: "Catalog filter not found" });
-        }
+        if (!filter) throw new CustomError('Catalog filter not found', 404);
 
         filter.data = filter.data.map((item: any) => {
             const { productsId, ...rest } = item;
@@ -40,9 +38,7 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
     try {
         let { subcatalogId = null, categoryId = null, data = [] } = req.body;
 
-        if (!subcatalogId && !categoryId) {
-            return res.status(400).json({ message: "Either subcatalogId or categoryId must be provided." });
-        }
+        if (!subcatalogId && !categoryId) throw new CustomError('Either subcatalogId or categoryId must be provided.', 400);
 
         const existingFilter:any = await catalogFilterRepository.findOne({
             where: [{ categoryId }]
@@ -52,9 +48,7 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
             const existingNames = new Set(existingFilter.data.map((item: any) => item.name));
             
             for (const item of data) {
-                if (existingNames.has(item.name)) {
-                    return res.status(400).json({ message: `You can't create the same element: ${item.name}` });
-                }
+                if (existingNames.has(item.name)) throw new CustomError(`You can't create the same element: ${item.name}`, 400);    
             }
 
             existingFilter.data = [...existingFilter.data, ...data];
@@ -119,18 +113,14 @@ export const updateCatalogFilter = async (req: Request, res: Response, next: Nex
 
         const filter: any = await catalogFilterRepository.findOneBy({ id });
 
-        if (!filter) {
-            return res.status(404).json({ message: "Catalog filter not found" });
-        }
+        if (!filter) throw new CustomError('Catalog filter not found', 404);
 
         const itemIndex = filter.data.findIndex((item: any) => item.name === name );
 
-        if (itemIndex === -1) {
-            return res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
-        }
+        if (itemIndex === -1) throw new CustomError(`Item with name "${name}" not found in filter data`, 404);
 
         if(filter.data[itemIndex].name === data.name){
-          return res.status(404) .json({message: `You can't update the same element: ${data.name}`});
+          throw new CustomError(`You can't update the same element: ${data.name}`, 404);
         }
         filter.data[itemIndex] = {
             ...data,
@@ -164,9 +154,7 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
 
         const filter: any = await catalogFilterRepository.findOneBy({ id });
 
-        if (!filter) {
-            return res.status(404).json({ message: "Catalog filter not found" });
-        }
+        if (!filter) throw new CustomError('Catalog filter not found', 404);
 
         if (deleteFilter) {
             filter.deletedAt = new Date();
@@ -174,15 +162,11 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
             return res.status(200).json({ message: "Catalog filter deleted successfully." });
         }
 
-        if (!name) {
-            return res.status(400).json({ message: "Name is required to delete a specific item." });
-        }
+        if (!name) throw new CustomError('Name is required to delete a specific item.', 400);
 
         const itemIndex = filter.data.findIndex((item: any) => item.name === name);
 
-        if (itemIndex === -1) {
-            return res.status(404).json({ message: `Item with name "${name}" not found in filter data` });
-        }
+        if (itemIndex === -1) throw new CustomError(`Item with name "${name}" not found in filter data`, 404);
 
         filter.data.splice(itemIndex, 1);
 

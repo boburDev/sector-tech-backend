@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import {  IsNull } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
+import { CustomError } from '../../error-handling/error-handling';
 const brandRepository = AppDataSource.getRepository(Brand);
 
 export const getBrandById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -14,13 +15,7 @@ export const getBrandById = async (req: Request, res: Response, next: NextFuncti
             }
         });
 
-        if (!brand) {
-            return res.json({
-                data: null,
-                error: 'Brand not found',
-                status: 404
-            });
-        }
+        if (!brand) throw new CustomError('Brand not found', 404);
 
         const { createdAt, deletedAt, ...brandData } = brand;
         return res.json({

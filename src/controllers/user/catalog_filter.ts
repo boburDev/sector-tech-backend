@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
-
+import { CustomError } from '../../error-handling/error-handling';
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -15,9 +15,7 @@ export const getCatalogFilterById = async (req: Request, res: Response, next: Ne
             .where('filter.subcatalogId = :id OR filter.categoryId = :id', { id })
             .getOne();
 
-        if (!filter) {
-            return res.status(404).json({ message: "Catalog filter not found" });
-        }
+        if (!filter) throw new CustomError('Catalog filter not found', 404);
 
         filter.data = filter.data.map((item: any) => {
             const { productsId, ...rest } = item;
