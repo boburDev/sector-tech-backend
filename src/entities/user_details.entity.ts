@@ -1,13 +1,4 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    DeleteDateColumn,
-} from "typeorm";
-
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn } from "typeorm";
 import { Users } from "./user.entity";
 import { Product } from "./products.entity";
 
@@ -52,7 +43,7 @@ export class Cart {
 
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
-    
+        
     @DeleteDateColumn()
     deletedAt: Date;
 }

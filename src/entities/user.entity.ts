@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  BeforeInsert,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from "typeorm";
 import { ProductQuestion, ProductComment } from "./product_details.entity";
 import * as bcrypt from "bcrypt";
 import { Cart, SavedProduct } from "./user_details.entity";
