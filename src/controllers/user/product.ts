@@ -43,6 +43,8 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
       };
     }
 
+    relations.push("category", "subcatalog", "catalog");
+
     const products = await productRepository.find({
       relations,
       where: whereCondition,
@@ -56,6 +58,18 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
         price: true,
         mainImage: true,
         recommended: true,
+        catalog: {
+          slug: true,
+          title: true,
+        },
+        subcatalog: {
+          slug: true,
+          title: true,
+        },
+        category: {
+          slug: true,
+          title: true,
+        },
         ...(condition && {
           conditions: { id: true, slug: true, title: true },
         }),
@@ -76,14 +90,17 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
 
 export const getProductById = async (req: Request,res: Response): Promise<any> => {
   try {
-    const { id } = req.params;
+    const { slug } = req.params;
     const product = await productRepository.findOne({
       relations: [
         "comments",
         "questions",
         "brand",
         "conditions",
-        "relevances"
+        "relevances",
+        "catalog",
+        "subcatalog",
+        "category"
       ],
       select: {
         id: true,
@@ -125,10 +142,25 @@ export const getProductById = async (req: Request,res: Response): Promise<any> =
           id: true,
           title: true,
           slug: true
+        },
+        catalog: {
+          id: true,
+          slug: true,
+          title: true,
+        },
+        subcatalog: {
+          id: true,
+          slug: true,
+          title: true,
+        },
+        category: {
+          id: true,
+          slug: true,
+          title: true,
         }
       },
       where: {
-        id,
+        slug,
         deletedAt: IsNull()
       }
     });

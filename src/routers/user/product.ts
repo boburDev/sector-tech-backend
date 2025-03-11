@@ -17,14 +17,13 @@ const router = Router();
  * @swagger
  * /user/product/all:
  *   get:
- *     summary: Get all products with filtering options
+ *     summary: Retrieve all products with optional filters
  *     tags: [Product]
  *     parameters:
  *       - in: query
  *         name: recommended
  *         schema:
- *           type: string
- *           enum: [true, false]
+ *           type: boolean
  *         description: Filter products by recommended status
  *       - in: query
  *         name: condition
@@ -41,8 +40,7 @@ const router = Router();
  *       - in: query
  *         name: popular
  *         schema:
- *           type: string
- *           enum: [true, false]
+ *           type: boolean
  *         description: Filter products by popularity
  *     responses:
  *       200:
@@ -112,6 +110,33 @@ const router = Router();
  *                           id:
  *                             type: string
  *                             example: "3"
+ *                       catalog:
+ *                         type: object
+ *                         properties:
+ *                           slug:  
+ *                             type: string
+ *                             example: "catalog-slug"
+ *                           title:
+ *                             type: string
+ *                             example: "Catalog Title"
+ *                       subcatalog:
+ *                         type: object
+ *                         properties:
+ *                           slug:          
+ *                             type: string
+ *                             example: "subcatalog-slug"
+ *                           title:
+ *                             type: string
+ *                             example: "Subcatalog Title"
+ *                       category:
+ *                         type: object
+ *                         properties:
+ *                           slug:
+ *                             type: string
+ *                             example: "category-slug"
+ *                           title:
+ *                             type: string
+ *                             example: "Category Title"
  *       500:
  *         description: Internal server error
  *         content:
@@ -129,30 +154,38 @@ router.get("/all", Product.getProducts);
 
 /**
  * @swagger
- * /user/product/by-id/{id}:
+ * /user/product/by-slug/{slug}:
  *   get:
- *     summary: Get a product by ID
+ *     summary: Retrieve a product by its SLUG
  *     tags: [Product]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: slug
  *         required: true
  *         schema:
  *           type: string
- *         description: Product ID
+ *         description: The unique identifier of the product
  *     responses:
  *       200:
- *         description: Product details
+ *         description: Product details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   description: Product details
  *       404:
  *         description: Product not found
  */
-router.get('/by-id/:id', Product.getProductById);
+router.get('/by-slug/:slug', Product.getProductById);
 
 /**
  * @swagger
  * /user/product/toggle-saved:
  *   post:
- *     summary: Toggle saved product status
+ *     summary: Toggle the saved status of a product for the user
  *     tags: [savedProduct]
  *     security:
  *       - bearerAuth: []
@@ -168,29 +201,29 @@ router.get('/by-id/:id', Product.getProductById);
  *                 example: "product-uuid"
  *     responses:
  *       200:
- *         description: Product removed from saved.
+ *         description: Product removed from saved list
  *       201:
- *         description: Product saved successfully.
+ *         description: Product added to saved list
  *       500:
  *         description: Internal server error
  */
-router.post('/toggle-saved', validateUserToken,validate(productIdParamsSchema), Product.toggleSaved);
+router.post('/toggle-saved', validateUserToken, validate(productIdParamsSchema), Product.toggleSaved);
 
 /**
  * @swagger
  * /user/product/saved-products:
  *   get:
- *     summary: Get saved products
+ *     summary: Retrieve all saved products for the user
  *     tags: [savedProduct]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Saved product found.
+ *         description: List of saved products retrieved successfully
  *       401:
- *         description: Unauthorized. Token is missing or invalid.
+ *         description: Unauthorized access. Token is missing or invalid.
  *       404:
- *         description: Product not found.
+ *         description: No saved products found.
  *       500:
  *         description: Internal server error
  */
