@@ -8,6 +8,7 @@ import productDetailRouter from "./product_detail";
 import bannerRouter from "./banner"
 import promotionRouter from "./promotion"
 import changeOrderRouter from "./change-order"
+import logsRouter from "./logs"
 const router = express.Router();
 
 router.use('/admin', adminRouter)
@@ -19,6 +20,6 @@ router.use('/product', productRouter)
 router.use("/banner", bannerRouter)
 router.use("/promotion", promotionRouter)
 router.use("/change-order", changeOrderRouter)
-
+router.use("/logs", logsRouter)
 
 export default router
