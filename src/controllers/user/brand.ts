@@ -6,10 +6,10 @@ const brandRepository = AppDataSource.getRepository(Brand);
 
 export const getBrandById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { id } = req.params;
+        const { slug } = req.params;
         const brand = await brandRepository.findOne({
             where: {
-                id,
+                slug,
                 deletedAt: IsNull()
             }
         });

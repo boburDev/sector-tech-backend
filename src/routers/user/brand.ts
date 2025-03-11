@@ -62,18 +62,18 @@ router.get("/all", Brands.getBrands);
 
 /**
  * @swagger
- * /user/brand/{id}:
+ * /user/brand/{slug}:
  *   get:
- *     summary: Get brand by ID
+ *     summary: Get brand by SLUG
  *     tags: [Brands]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: slug
  *         required: true
  *         schema:
  *           type: string
- *         description: The brand ID
- *         example: "123"
+ *         description: The brand SLUG
+ *         example: "nike"
  *     responses:
  *       200:
  *         description: Brand details
@@ -105,6 +105,6 @@ router.get("/all", Brands.getBrands);
  *       500:
  *         description: Internal server error
  */
-router.get("/:id", Brands.getBrandById);
+router.get("/:slug", Brands.getBrandById);
 
 export default router;
