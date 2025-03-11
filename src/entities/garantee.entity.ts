@@ -1,5 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, DeleteDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { Product } from "./products.entity";
+import { Column, Entity, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
 
 @Entity('garantee')
 export class Garantee {
@@ -11,13 +10,6 @@ export class Garantee {
 
     @Column()
     price: string;
-
-    @Column()
-    productId: string;
-
-    @ManyToOne(() => Product, (product) => product.garantees)
-    @JoinColumn({ name: 'productId' })
-    product: Product;
 
     @Column({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

@@ -31,16 +31,12 @@ const router = Router();
  *               price:
  *                 type: string
  *                 description: A numeric value as string or a text without digits.
- *               productId:
- *                 type: string
  *             required:
  *               - title
  *               - price
- *               - productId
  *             example:
  *               title: "Garantee 1"
  *               price: "100"
- *               productId: "123e4567-e89b-12d3-a456-426614174000"
  *     responses:
  *       201:
  *         description: Garantee created successfully
@@ -59,8 +55,6 @@ const router = Router();
  *                     price:
  *                       type: string
  *                       description: A numeric value as string or a text without digits.
- *                     productId:
- *                       type: string
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -102,8 +96,6 @@ router.post("/add", validateAdminToken, Garantee.createGarantee);
  *                       price:
  *                         type: string
  *                         description: A numeric value as string or a text without digits.
- *                       productId:
- *                         type: string
  *                       createdAt:
  *                         type: string
  *                         format: date-time
@@ -146,12 +138,9 @@ router.get("/all", validateAdminToken, Garantee.getGarantees);
  *               price:
  *                 type: string
  *                 description: A numeric value as string or a text without digits.
- *               productId:
- *                 type: string
  *             example:
  *               title: "Garantee Updated"
  *               price: "150"
- *               productId: "123e4567-e89b-12d3-a456-426614174000"
  *     responses:
  *       200:
  *         description: Garantee updated successfully
@@ -170,8 +159,6 @@ router.get("/all", validateAdminToken, Garantee.getGarantees);
  *                     price:
  *                       type: string
  *                       description: A numeric value as string or a text without digits.
- *                     productId:
- *                       type: string
  *                     createdAt:
  *                       type: string
  *                       format: date-time

@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
 import { Garantee } from "../../entities/garantee.entity";
 import AppDataSource from "../../config/ormconfig";
-import { Product } from "../../entities/products.entity";
 import { IsNull } from "typeorm";
 const garanteeRepository = AppDataSource.getRepository(Garantee);
-const productRepository = AppDataSource.getRepository(Product);
 
 export const createGarantee = async (req: Request, res: Response): Promise<any> => {
-    const { title, price, productId } = req.body;
-    if (!title || !price || !productId) {
-        return res.status(400).json({ message: "Title, price and productId are required" });
-    }
-
-    const product = await productRepository.findOne({ where: { id: productId, deletedAt: IsNull() } });
-    if (!product) {
-        return res.status(400).json({ message: "Product not found" });
+    const { title, price } = req.body;
+    if (!title || !price) {
+        return res.status(400).json({ message: "Title and price are required" });
     }
 
     const regex = /^(?:\d+(?:\.\d{1,2})?|[^\d]+)$/;
@@ -22,16 +15,15 @@ export const createGarantee = async (req: Request, res: Response): Promise<any> 
         return res.status(400).json({ message: "Price must be either a number or a string without digits" });
     }
 
-    const existingGarantee = await garanteeRepository.findOne({ where: { title, productId, deletedAt: IsNull() } });
+    const existingGarantee = await garanteeRepository.findOne({ where: { title, deletedAt: IsNull() } });
     if (existingGarantee) {
-        return res.status(400).json({ message: "Garantee with this title already exists for the given product" });
+        return res.status(400).json({ message: "Garantee with this title already exists" });
     }
 
 
     const garantee = new Garantee();
     garantee.title = title;
     garantee.price = price;
-    garantee.productId = productId;
     await garanteeRepository.save(garantee);
     res.status(201).json({ data: garantee, error: null, status: 201 });
 };
@@ -50,7 +42,7 @@ export const getGarantees = async (req: Request, res: Response): Promise<any> =>
 
 export const updateGarantee = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
-    const { title, price, productId } = req.body;
+    const { title, price } = req.body;
     const regex = /^(?:\d+(?:\.\d{1,2})?|[^\d]+)$/;
     if(!id){
         return res.status(400).json({ message: "Id is required" });
@@ -66,7 +58,6 @@ export const updateGarantee = async (req: Request, res: Response): Promise<any> 
     }
     garantee.title = title || garantee.title;
     garantee.price = price || garantee.price;
-    garantee.productId = productId || garantee.productId;
     await garanteeRepository.save(garantee);
     res.status(200).json({ data: garantee, error: null, status: 200 });
 }

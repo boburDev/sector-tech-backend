@@ -74,7 +74,6 @@ export const getProducts = async (req: Request, res: Response): Promise<any> => 
   }
 };
 
-
 export const getProductById = async (req: Request,res: Response): Promise<any> => {
   try {
     const { id } = req.params;
