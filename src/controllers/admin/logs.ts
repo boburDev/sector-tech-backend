@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
-
+import { CustomError } from "../../error-handling/error-handling";
 const logDir = "./logs";
 const logFilePath = path.join(logDir, "errors.log");
 
@@ -33,9 +33,7 @@ export const getLogById = (req: Request, res: Response) => {
     const logs = readLogs();
     const log = logs.find((l) => l.id === parseInt(req.params.id));
 
-    if (!log) {
-        res.status(404).json({ success: false, message: "Log not found" });
-    }
+    if (!log) throw new CustomError('Log not found', 404);
 
     res.json({ success: true, log });
 };
@@ -44,9 +42,7 @@ export const resolveLog = (req: Request, res: Response) => {
     const logs = readLogs();
     const logIndex = logs.findIndex((l) => l.id === parseInt(req.params.id));
 
-    if (logIndex === -1) {
-        res.status(404).json({ success: false, message: "Log not found" });
-    }
+    if (logIndex === -1) throw new CustomError('Log not found', 404);
 
     logs[logIndex].resolvedAt = new Date().toISOString();
     writeLogs(logs);
@@ -58,9 +54,7 @@ export const deleteLog = (req: Request, res: Response) => {
     let logs = readLogs();
     const logIndex = logs.findIndex((l) => l.id === parseInt(req.params.id));
 
-    if (logIndex === -1) {
-        res.status(404).json({ success: false, message: "Log not found" });
-    }
+    if (logIndex === -1) throw new CustomError('Log not found', 404);
 
     logs.splice(logIndex, 1);
     writeLogs(logs);

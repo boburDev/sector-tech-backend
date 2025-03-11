@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
 import { IsNull } from "typeorm";
-
+import { CustomError } from "../../error-handling/error-handling";
 const kontragentRepository = AppDataSource.getRepository(Kontragent);
 
 export const createKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -19,19 +19,13 @@ export const createKontragent = async (req: Request, res: Response, next: NextFu
         } = req.body;
         const userId = req.user.id;
 
-        if (!ownershipForm) {
-            return res.status(400).json({ message: "ownershipForm is required" });
-        }
-        if (ownershipForm === "Индивидуальный предприниматель" && !pinfl) {
-            return res.status(400).json({ message: "pinfl is required for Индивидуальный предприниматель" });
-        }
+        if (!ownershipForm) throw new CustomError('ownershipForm is required', 400);
+        if (ownershipForm === "Индивидуальный предприниматель" && !pinfl) throw new CustomError('pinfl is required for Индивидуальный предприниматель', 400);
         if (
             (ownershipForm === "Юридическое лицо" ||
                 ownershipForm === "Юридическое лицо, обособленное подразделение") &&
             !inn
-        ) {
-            return res.status(400).json({ message: "inn is required for Юридическое лицо" });
-        }
+        ) throw new CustomError('inn is required for Юридическое лицо', 400);
 
         let existingCondition: any = { userId, deletedAt: IsNull() };
         if (ownershipForm === "Индивидуальный предприниматель") {
@@ -41,9 +35,7 @@ export const createKontragent = async (req: Request, res: Response, next: NextFu
         }
         if (existingCondition.inn || existingCondition.pinfl) {
             const existingKontragent = await kontragentRepository.findOne({ where: existingCondition });
-            if (existingKontragent) {
-                return res.status(400).json({ message: "Kontragent with this INN/PINFL already exists for this user" });
-            }
+            if (existingKontragent) throw new CustomError('Kontragent with this INN/PINFL already exists for this user', 400);
         }
 
         await AppDataSource.transaction(async (manager) => {
@@ -131,9 +123,7 @@ export const updateKontragent = async (req: Request, res: Response, next: NextFu
         } = req.body;
         const userId = req.user.id;
         const kontragent = await kontragentRepository.findOne({ where: { id, userId, deletedAt: IsNull() } });
-        if (!kontragent) {
-            return res.status(404).json({ message: "Kontragent not found" });
-        }
+        if (!kontragent) throw new CustomError('Kontragent not found', 404);
 
         if (ownershipForm !== undefined) {
             kontragent.ownershipForm = ownershipForm;
@@ -192,9 +182,9 @@ export const deleteKontragent = async (req: Request, res: Response, next: NextFu
         const { id } = req.params;
         const userId = req.user.id;
         const kontragent = await kontragentRepository.findOne({ where: { id, userId, deletedAt: IsNull() } });
-        if (!kontragent) {
-            return res.status(404).json({ message: "Kontragent not found" });
-        }
+
+        if (!kontragent) throw new CustomError('Kontragent not found', 404);
+        
         kontragent.deletedAt = new Date();
         await kontragentRepository.save(kontragent);
         return res.status(200).json({

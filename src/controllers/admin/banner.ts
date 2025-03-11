@@ -3,7 +3,7 @@ import AppDataSource from '../../config/ormconfig';
 import { Banner } from '../../entities/banner.entity';
 import { IsNull } from 'typeorm';
 import { deleteFile } from '../../middlewares/removeFiltePath';
-
+import { CustomError } from '../../error-handling/error-handling';
 const bannerRepository = AppDataSource.getRepository(Banner);
 
 export const createBanner = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -11,13 +11,7 @@ export const createBanner = async (req: Request, res: Response, next: NextFuncti
         const { routePath, redirectUrl } = req.body;
         const file = req.file as Express.Multer.File;
 
-        if (!redirectUrl || !routePath || !file) {
-            return res.json({
-                data: null,
-                error: 'All fields are required',
-                status: 400
-            });
-        }
+        if (!redirectUrl || !routePath || !file) throw new CustomError('All fields are required', 400);
 
         const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
@@ -61,9 +55,7 @@ export const getBannerById = async (req: Request, res: Response, next: NextFunct
             where: { id, deletedAt: IsNull() }
         });
 
-        if (!banner) {
-            return res.status(404).json({ message: "Banner not found" });
-        }
+        if (!banner) throw new CustomError('Banner not found', 404);
 
         return res.status(200).json({ data: banner, error: null, status: 200 });
     } catch (error) {
@@ -79,9 +71,7 @@ export const updateBanner = async (req: Request, res: Response, next: NextFuncti
 
         const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
-        if (!banner) {
-            return res.status(404).json({ message: "Banner not found" });
-        }
+        if (!banner) throw new CustomError('Banner not found', 404);
 
         if (file) {
             deleteFile(banner.imagePath)
@@ -105,9 +95,7 @@ export const deleteBanner = async (req: Request, res: Response, next: NextFuncti
         const { id } = req.params;
         const banner = await bannerRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
-        if (!banner) {
-            return res.status(404).json({ message: "Banner not found" });
-        }
+        if (!banner) throw new CustomError('Banner not found', 404);
 
         banner.deletedAt = new Date();
         await bannerRepository.save(banner);

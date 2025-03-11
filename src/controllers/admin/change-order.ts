@@ -3,6 +3,7 @@ import AppDataSource from '../../config/ormconfig';
 import { PopularBrand, PopularCategory, PopularProduct } from '../../entities/popular.entity';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
 import { Brand } from '../../entities/brands.entity';
+import { CustomError } from '../../error-handling/error-handling';
 
 const catalogRepository = AppDataSource.getRepository(Catalog); 
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
@@ -23,17 +24,11 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             const elements = await catalogRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Catalog not found' });
-            }
+            if (elementIndex === -1) throw new CustomError('Catalog not found', 404);
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
-            }
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) {
-                return res.status(200).json({ message: 'Catalog already in this index' });
-            }
+            if (elementIndex === index) throw new CustomError('Catalog already in this index', 200);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -54,17 +49,11 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             const elements = await subcatalogRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Subcatalog not found' });
-            }
+            if (elementIndex === -1) throw new CustomError('Subcatalog not found', 404);
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
-            }
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) {
-                return res.status(200).json({ message: 'Subcatalog already in this index' });
-            }
+            if (elementIndex === index) throw new CustomError('Subcatalog already in this index', 200);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -85,17 +74,11 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             const elements = await categoryRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Category not found' });
-            }
+            if (elementIndex === -1) throw new CustomError('Category not found', 404);
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
-            }
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) {
-                return res.status(200).json({ message: 'Category already in this index' });
-            }
+            if (elementIndex === index) throw new CustomError('Category already in this index', 200);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -116,17 +99,11 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             const elements = await brandRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Brand not found' });
-            }
+            if (elementIndex === -1) throw new CustomError('Brand not found', 404);
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
-            }
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) {
-                return res.status(200).json({ message: 'Brand already in this index' });
-            }       
+            if (elementIndex === index) throw new CustomError('Brand already in this index', 200);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -147,31 +124,35 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             const elements = await popularBrandRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Popular brand not found' });
+            if (elementIndex === -1) throw new CustomError('Popular brand not found', 404);
+
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
+
+            if (elementIndex === index) throw new CustomError('Popular brand already in this index', 200);
+
+            const [movedElement] = elements.splice(elementIndex, 1);
+
+            if (elementIndex > index) {
+                elements.splice(index, 0, movedElement);
+            } else {
+                elements.splice(index, 0, movedElement);
             }
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
+            for (const i of elements) {
+                i.updatedAt = new Date();
+                await popularBrandRepository.save(i);
             }
-            return res.status(400).json({ message: 'Invalid query parameter: name must be "catalog"' });
-        }   
-
+            return res.status(200).json({ message: 'Popular brand updated successfully' });
+        }
         if (name === 'popularCategory') {
             const elements = await popularCategoryRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Popular category not found' });
-            }
+            if (elementIndex === -1) throw new CustomError('Popular category not found', 404);
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
-            }
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) {
-                return res.status(200).json({ message: 'Popular category already in this index' });
-            }
+            if (elementIndex === index) throw new CustomError('Popular category already in this index', 200);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -193,17 +174,11 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             const elements = await popularProductRepository.find({ order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
-            if (elementIndex === -1) {
-                return res.status(404).json({ message: 'Popular product not found' });
-            }
+            if (elementIndex === -1) throw new CustomError('Popular product not found', 404);
 
-            if (index < 0 || index >= elements.length) {
-                return res.status(400).json({ message: 'Invalid index' });
-            }
+            if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) {
-                return res.status(200).json({ message: 'Popular product already in this index' });
-            }
+            if (elementIndex === index) throw new CustomError('Popular product already in this index', 200);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -220,7 +195,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             return res.status(200).json({ message: 'Popular product updated successfully' });
         }    
 
-        return res.status(400).json({ message: 'Invalid query parameter: name must be "catalog"' });
+            return res.status(400).json({ message: 'Invalid query parameter: name must be "catalog"' });
     } catch (error) {
         next(error);
     }

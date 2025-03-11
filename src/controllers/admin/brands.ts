@@ -6,6 +6,7 @@ import { createSlug } from '../../utils/slug';
 import listContents from '../../utils/readFolders';
 import { deleteFile } from '../../middlewares/removeFiltePath';
 import { PopularBrand } from '../../entities/popular.entity';
+import { CustomError } from '../../error-handling/error-handling';
 const brandRepository = AppDataSource.getRepository(Brand);
 const popularBrandRepository = AppDataSource.getRepository(PopularBrand);
 
@@ -27,13 +28,7 @@ export const getBrandById = async (req: Request, res: Response, next: NextFuncti
             }
         });
 
-        if (!brand) {
-            return res.json({
-                data: null,
-                error: 'Brand not found',
-                status: 404
-            });
-        }
+        if (!brand) throw new CustomError('Brand not found', 404);
 
         return res.json({
             data: brand,
@@ -107,13 +102,7 @@ export const updateBrand = async (req: Request, res: Response, next: NextFunctio
             }
         });
 
-        if (!brand) {
-            return res.json({
-                data: null,
-                error: 'Brand not found',
-                status: 404
-            });
-        }
+        if (!brand) throw new CustomError('Brand not found', 404);
 
         if (title !== brand.title) {
             const existingBrand = await brandRepository.findOne({
@@ -123,13 +112,7 @@ export const updateBrand = async (req: Request, res: Response, next: NextFunctio
                 }
             });
 
-            if (existingBrand) {
-                return res.json({
-                    data: null,
-                    error: 'Brand with this title already exists',
-                    status: 400
-                });
-            }
+            if (existingBrand) throw new CustomError('Brand with this title already exists', 400);
         }
 
         if (file) {
@@ -190,13 +173,8 @@ export const updateBrandPath = async (req: Request, res: Response, next: NextFun
                 deletedAt: IsNull()
             }
         });
-        if (!brand) {
-            return res.json({
-                data: null,
-                error: 'Brand not found',
-                status: 404
-            });
-        }
+        if (!brand) throw new CustomError('Brand not found', 404);
+
         brand.path = path;
         await brandRepository.save(brand);
         return res.json({
@@ -218,13 +196,8 @@ export const deleteBrand = async (req: Request, res: Response, next: NextFunctio
                 deletedAt: IsNull()
             }
         });
-        if (!brand) {
-            return res.json({
-                data: null,
-                error: 'Brand not found', 
-                status: 404
-            });
-        }
+        if (!brand) throw new CustomError('Brand not found', 404);
+        
         brand.deletedAt = new Date();
         await brandRepository.save(brand);
         return res.json({
@@ -325,13 +298,8 @@ export const getPopularBrandById = async (req: Request, res: Response, next: Nex
             }
         });
 
-        if (!popularBrand) {
-            return res.status(404).json({
-                data: null,
-                error: 'Popular brand not found',
-                status: 404
-            });     
-        }   
+        if (!popularBrand) throw new CustomError('Popular brand not found', 404);
+
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
         next(error);
@@ -357,13 +325,8 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response, next
                 }
             }
         });
-        if (!popularBrand) {
-            return res.json({
-                data: null,
-                error: 'Popular brand not found',
-                status: 404
-            }); 
-        }       
+        if (!popularBrand) throw new CustomError('Popular brand not found', 404);
+
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
         next(error);
@@ -379,15 +342,9 @@ export const deletePopularBrand = async (req: Request, res: Response, next: Next
                 brand: { deletedAt: IsNull() }
             }
         });
-        if (!popularBrand) {
-            return res.json({
-                data: null,
-                error: 'Popular brand not found',
-                status: 404
-            });
-        }
+        if (!popularBrand) throw new CustomError('Popular brand not found', 404);
 
-        await popularBrandRepository.delete(id);
+        await popularBrandRepository.delete(id);    
 
         return res.json({
             data: { message: 'Popular brand deleted successfully' },

@@ -4,7 +4,7 @@ import { Users } from "../../entities/user.entity";
 import { Opt } from "../../entities/opt.entity";
 import { sign } from "../../utils/jwt";
 import { mailService } from "../../utils/mailService";
-
+import { CustomError } from "../../error-handling/error-handling";
 const userRepository = AppDataSource.getRepository(Users);
 const optRepository = AppDataSource.getRepository(Opt);
 
@@ -56,11 +56,8 @@ export const sendOtp = async (req: Request, res: Response, next: NextFunction): 
         const createdAt = new Date(opt.createdAt);
         const timeDifference = (currentTime.getTime() - createdAt.getTime()) / 1000;
         
-        if (timeDifference < 180) {
-            return res.status(400).json({ message: 'OTP already sent, please try again' });
-        } else {
-            await optRepository.delete(opt.id);
-        }
+        if (timeDifference < 180) throw new CustomError('OTP already sent, please try again', 400);
+        else await optRepository.delete(opt.id);
     }
     
     const newOpt = new Opt();
@@ -72,7 +69,7 @@ export const sendOtp = async (req: Request, res: Response, next: NextFunction): 
     
     if (!mailStatus.success) {
       await optRepository.delete({ email });
-      return res.status(500).json({ message: "Error sending OTP", error: mailStatus.message });
+      throw new CustomError("Error sending OTP", 500);
     }
 
     return res.status(200).json({
@@ -88,14 +85,13 @@ export const signup = async (req: Request, res: Response, next: NextFunction): P
     const { email, optCode } = req.body;
 
     const opt = await optRepository.findOne({ where: { email } });
-    if (!opt) return res.status(400).json({ message: "OTP not found" });
+    if (!opt) throw new CustomError("OTP not found", 400);
 
-    if (opt.optCode !== optCode) return res.status(400).json({ message: "Invalid OTP" });
+    if (opt.optCode !== optCode) throw new CustomError("Invalid OTP", 400);
 
     const existingUser = await userRepository.findOne({ where: { email } });
 
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists" });
+    if (existingUser) throw new CustomError("User already exists", 400);
 
     const newUser = new Users();
     newUser.email = email;
@@ -122,11 +118,10 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   try {
     const { email, password } = req.body;
     const user = await userRepository.findOne({ where: { email } });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) throw new CustomError("Invalid credentials", 400);
     
     const isValidPassword = await user.validatePassword(password);
-    if (!isValidPassword)
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!isValidPassword) throw new CustomError("Invalid credentials", 400);
 
     const token = sign(
       { id: user.id, email: user.email },
@@ -155,7 +150,7 @@ export const updateProfile = async ( req: Request, res: Response, next: NextFunc
     const { name, email } = req.body;
 
     const user = await userRepository.findOne({ where: { id: userId } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) throw new CustomError("User not found", 404);
 
     user.name = name || user.name;
     user.email = email || user.email;
@@ -197,9 +192,7 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
             }
         });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        if (!user) throw new CustomError('User not found', 404);
 
         return res.json({
             data:user,
