@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ILike, In, IsNull, Not } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
@@ -10,7 +10,7 @@ const brandRepository = AppDataSource.getRepository(Brand);
 const popularBrandRepository = AppDataSource.getRepository(PopularBrand);
 
 
-export const getBrandById = async (req: Request, res: Response): Promise<any> => {
+export const getBrandById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const brand = await brandRepository.findOne({
@@ -41,11 +41,11 @@ export const getBrandById = async (req: Request, res: Response): Promise<any> =>
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const createBrand = async (req: Request, res: Response): Promise<any> => {
+export const createBrand = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, description } = req.body;
         const file = req.file as Express.Multer.File;
@@ -90,11 +90,11 @@ export const createBrand = async (req: Request, res: Response): Promise<any> => 
             status: 201
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updateBrand = async (req: Request, res: Response): Promise<any> => {
+export const updateBrand = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, description } = req.body;
@@ -150,11 +150,11 @@ export const updateBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getBrandPath = async (req: Request, res: Response): Promise<any> => {
+export const getBrandPath = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         let path = await listContents('brands');
         if (!path) {
@@ -176,11 +176,11 @@ export const getBrandPath = async (req: Request, res: Response): Promise<any> =>
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 }
 
-export const updateBrandPath = async (req: Request, res: Response): Promise<any> => {
+export const updateBrandPath = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { path } = req.body;
@@ -205,11 +205,11 @@ export const updateBrandPath = async (req: Request, res: Response): Promise<any>
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 }
 
-export const deleteBrand = async (req: Request, res: Response): Promise<any> => {
+export const deleteBrand = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const brand = await brandRepository.findOne({
@@ -233,11 +233,11 @@ export const deleteBrand = async (req: Request, res: Response): Promise<any> => 
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getBrands = async (req: Request, res: Response): Promise<any> => {
+export const getBrands = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { popular } = req.query;
 
@@ -257,11 +257,11 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const togglePopularBrand = async (req: Request, res: Response): Promise<any> => {
+export const togglePopularBrand = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         let { brandIds } = req.body;
 
@@ -306,11 +306,11 @@ export const togglePopularBrand = async (req: Request, res: Response): Promise<a
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getPopularBrandById = async (req: Request, res: Response): Promise<any> => {
+export const getPopularBrandById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const popularBrand = await popularBrandRepository.findOne({
@@ -334,11 +334,11 @@ export const getPopularBrandById = async (req: Request, res: Response): Promise<
         }   
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };      
 
-export const getPopularBrandByBrandId = async (req: Request, res: Response): Promise<any> => {
+export const getPopularBrandByBrandId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const popularBrand = await popularBrandRepository.findOne({
@@ -366,11 +366,11 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response): Pro
         }       
         return res.status(200).json({ data: popularBrand, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deletePopularBrand = async (req: Request, res: Response): Promise<any> => {
+export const deletePopularBrand = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const popularBrand = await popularBrandRepository.findOne({
@@ -395,6 +395,6 @@ export const deletePopularBrand = async (req: Request, res: Response): Promise<a
             status: 200
         });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };  

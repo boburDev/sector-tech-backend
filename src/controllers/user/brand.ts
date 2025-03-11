@@ -33,7 +33,7 @@ export const getBrandById = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-export const getBrands = async (req: Request, res: Response): Promise<any> => {
+export const getBrands = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { popular } = req.query;
 
@@ -53,6 +53,6 @@ export const getBrands = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({ data: brands, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };

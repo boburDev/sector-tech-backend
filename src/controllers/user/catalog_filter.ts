@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
-export const getCatalogFilterById = async (req: Request, res: Response): Promise<any> => {
+export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -32,6 +32,6 @@ export const getCatalogFilterById = async (req: Request, res: Response): Promise
         }
         return res.status(200).json(result);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };

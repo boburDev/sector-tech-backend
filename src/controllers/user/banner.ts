@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Banner } from '../../entities/banner.entity';
 import { IsNull } from 'typeorm';
 
 const bannerRepository = AppDataSource.getRepository(Banner);
 
-export const getBanners = async (req: Request, res: Response): Promise<any> => {
+export const getBanners = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { routePath } = req.query;
 
@@ -34,8 +34,7 @@ export const getBanners = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({ data: banners, error: null, status: 200 });
     } catch (error) {
-        console.error("Get Banners Error:", error);
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 

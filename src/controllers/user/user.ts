@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Users } from "../../entities/user.entity";
 import { Opt } from "../../entities/opt.entity";
@@ -8,7 +8,7 @@ import { mailService } from "../../utils/mailService";
 const userRepository = AppDataSource.getRepository(Users);
 const optRepository = AppDataSource.getRepository(Opt);
 
-export const OAuthCallback = async (req: Request, res: Response): Promise<any> => {
+export const OAuthCallback = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { name, email } = req.user as { email: string; name: string };
 
@@ -39,11 +39,11 @@ export const OAuthCallback = async (req: Request, res: Response): Promise<any> =
       return res.status(201).redirect(`http://localhost:3000?token=${token}`);
     }
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    next(error);
   }
 };
 
-export const sendOtp = async (req: Request, res: Response): Promise<any> => {
+export const sendOtp = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { email } = req.body;
 
@@ -79,11 +79,11 @@ export const sendOtp = async (req: Request, res: Response): Promise<any> => {
       message: 'OTP sent successfully'
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error sending OTP", error });
+    next(error);
   }
 };
 
-export const signup = async (req: Request, res: Response): Promise<any> => {
+export const signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { email, optCode } = req.body;
 
@@ -114,13 +114,11 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
     return res.status(201).json({ message: "User created successfully", token, user: userData });
   } catch (error: any) {
-    // console.log(error?.message);
-
-    return res.status(500).json({ message: "Error creating user", error });
+    next(error);
   }
 };
 
-export const login = async (req: Request, res: Response): Promise<any> => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { email, password } = req.body;
     const user = await userRepository.findOne({ where: { email } });
@@ -147,12 +145,11 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       user: userData,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Error logging in", error });
+    next(error);
   }
 };
 
-export const updateProfile = async ( req: Request, res: Response): Promise<any> => {
+export const updateProfile = async ( req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const userId = req.user.id;
     const { name, email } = req.body;
@@ -181,11 +178,11 @@ export const updateProfile = async ( req: Request, res: Response): Promise<any> 
       user: userData,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error updating profile", error });
+    next(error);
   }
 };
 
-export const getUserById = async (req: Request, res: Response): Promise<any> => {
+export const getUserById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.user;
         const user = await userRepository.findOne({ 
@@ -211,6 +208,6 @@ export const getUserById = async (req: Request, res: Response): Promise<any> => 
         });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };

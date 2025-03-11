@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Promotion } from '../../entities/promotion.entity';
 import { createSlug } from '../../utils/slug';
@@ -7,7 +7,7 @@ import { deleteFile } from '../../middlewares/removeFiltePath';
 
 const promotionRepository = AppDataSource.getRepository(Promotion);
 
-export const createPromotion = async (req: Request, res: Response): Promise<any> => {
+export const createPromotion = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, expireDate, fullDescription } = req.body;
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -36,11 +36,11 @@ export const createPromotion = async (req: Request, res: Response): Promise<any>
         const { createdAt, deletedAt, ...promotionData } = savedProdmotion;
         return res.status(201).json({ data: promotionData, message: 'Promotion created successfully' });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getPromotions = async (req: Request, res: Response): Promise<any> => {
+export const getPromotions = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const promotions = await promotionRepository.find({ where: { deletedAt: IsNull() } });
         if (promotions.length === 0) {
@@ -48,11 +48,11 @@ export const getPromotions = async (req: Request, res: Response): Promise<any> =
         }
         return res.status(200).json(promotions);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const getPromotionById = async (req: Request, res: Response): Promise<any> => {
+export const getPromotionById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const promotion = await promotionRepository.findOne({ where: { id, deletedAt: IsNull() } });
@@ -61,11 +61,11 @@ export const getPromotionById = async (req: Request, res: Response): Promise<any
         }
         return res.status(200).json({data: promotion,error: null, status: 200});
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const updatePromotion = async (req: Request, res: Response): Promise<any> => {
+export const updatePromotion = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, expireDate, fullDescription } = req.body;
@@ -99,11 +99,11 @@ export const updatePromotion = async (req: Request, res: Response): Promise<any>
         const { createdAt, deletedAt, ...promotionData } = updatedPromotion;
         return res.status(200).json({ data: promotionData, message: 'Promotion updated successfully' });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
 
-export const deletePromotion = async (req: Request, res: Response): Promise<any> => {
+export const deletePromotion = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const promotion = await promotionRepository.findOne({ where: { id, deletedAt: IsNull() } });
@@ -114,6 +114,6 @@ export const deletePromotion = async (req: Request, res: Response): Promise<any>
         await promotionRepository.save(promotion);
         return res.status(204).send({ message: 'Promotion deleted successfully' });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };

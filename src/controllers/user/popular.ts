@@ -1,12 +1,12 @@
 import { IsNull, Not } from "typeorm";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Category } from "../../entities/catalog.entity";
 import { Brand } from "../../entities/brands.entity";
 const categoryRepository = AppDataSource.getRepository(Category);
 const brandRepository = AppDataSource.getRepository(Brand);
 
-export const getPopular = async (req: Request, res: Response): Promise<any> => {
+export const getPopular = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
 
         let whereCondition: any = { deletedAt: IsNull(), popularCategory: { id: Not(IsNull()) } };
@@ -43,6 +43,6 @@ export const getPopular = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({ categories, brands, error: null, status: 200 });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        next(error);
     }
 };
