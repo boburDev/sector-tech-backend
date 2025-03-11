@@ -10,6 +10,7 @@ const promotionRepository = AppDataSource.getRepository(Promotion);
 export const createPromotion = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, expireDate, fullDescription } = req.body;
+        
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
         const coverImage = files['coverImage'][0];
         const bannerImage = files["promotionBannerImage"][0];
@@ -62,31 +63,45 @@ export const updatePromotion = async (req: Request, res: Response, next: NextFun
         const { id } = req.params;
         const { title, expireDate, fullDescription } = req.body;
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-        const coverImage = files['coverImage'][0] || null;
-        const bannerImage = files["promotionBannerImage"][0] || null;
+
+        const coverImage = files['coverImage']?.[0] || null;
+        const bannerImage = files["promotionBannerImage"]?.[0] || null;
         const fullDescriptionImages = files["promotionDescriptionImages"] || [];
-        
+
         const promotion = await promotionRepository.findOne({ where: { id, deletedAt: IsNull() } });
         if (!promotion) throw new CustomError('Promotion not found', 404);
-        if(coverImage){
+
+        // Cover Image
+        if (coverImage) {
             deleteFile(promotion.coverImage);
+            promotion.coverImage = coverImage.path.replace(/\\/g, "/").replace(/^public\//, "");
         }
-        if(bannerImage){
+
+        // Banner Image
+        if (bannerImage) {
             deleteFile(promotion.bannerImage);
+            promotion.bannerImage = bannerImage.path.replace(/\\/g, "/").replace(/^public\//, "");
         }
-        if(fullDescriptionImages.length > 0){
-            fullDescriptionImages.forEach(file => deleteFile(file.path));
+
+        // Full Description Images
+        if (fullDescriptionImages.length > 0) {
+            promotion.fullDescriptionImages?.forEach(file => deleteFile(file));
+            promotion.fullDescriptionImages = fullDescriptionImages.map(file =>
+                file.path.replace(/\\/g, "/").replace(/^public\//, "")
+            );
         }
-        
-        promotion.title = title;
-        promotion.coverImage = coverImage.path.replace(/\\/g, "/").replace(/^public\//, "");
-        promotion.bannerImage = bannerImage.path.replace(/\\/g, "/").replace(/^public\//, "");
-        promotion.fullDescription = fullDescription;
-        promotion.expireDate = expireDate;
-        promotion.fullDescriptionImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
-        promotion.slug = createSlug(title)
+
+        // Faqat kelgan ma'lumotlarni yangilash
+        if (title) {
+            promotion.title = title;
+            promotion.slug = createSlug(title);
+        }
+        if (expireDate) promotion.expireDate = expireDate;
+        if (fullDescription) promotion.fullDescription = fullDescription;
+
         const updatedPromotion = await promotionRepository.save(promotion);
         const { createdAt, deletedAt, ...promotionData } = updatedPromotion;
+
         return res.status(200).json({ data: promotionData, message: 'Promotion updated successfully' });
     } catch (error) {
         next(error);
