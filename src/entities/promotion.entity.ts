@@ -20,7 +20,7 @@ export class Promotion {
     @Column()
     expireDate: Date;
 
-    @Column()
+    @Column({ nullable: true , default: null})
     fullDescription: string;
 
     @Column("json", { nullable: true })

@@ -50,7 +50,6 @@ const router = express.Router();
  *                 status:
  *                   type: integer
  */
-
 router.get("/all", Popular.getPopular);
 
 export default router;

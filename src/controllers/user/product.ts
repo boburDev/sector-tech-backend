@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
-import { IsNull, Not } from "typeorm";
+import { IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";  
 const productRepository = AppDataSource.getRepository(Product);
@@ -315,16 +315,70 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
   }
 };
 
-export const searchProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { title } = req.body;
+    const { catalogSlug, subcatalogSlug, categorySlug, page, limit, inStock, title } = req.query;
+    const pageNumber = parseInt(page as string) || 1;
+    const limitNumber = parseInt(limit as string) || 10;
+    const offset = (pageNumber - 1) * limitNumber;
 
-    const products = await productRepository.find({
-      where: { deletedAt: IsNull(), title }
-    })
+    const filter: any = { deletedAt: IsNull() };
 
-    return res.status(200).json({ data: products, error: null, status: 200 });
+    if (catalogSlug) {
+      filter.catalog = { slug: catalogSlug as string, deletedAt: IsNull() };
+    }
+    if (subcatalogSlug) {
+      filter.subcatalog = { slug: subcatalogSlug as string, deletedAt: IsNull() };
+    }
+    if (categorySlug) {
+      filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
+    }
+    if (inStock === "true") {
+      filter.inStock = MoreThan(0);
+    } else if (inStock === "false") {
+      filter.inStock = IsNull();
+    } else if (!isNaN(parseInt(inStock as string))) {
+      filter.inStock = parseInt(inStock as string);
+    }
+
+    if (title) {  
+      filter.title = Like(`%${title}%`);
+    }
+
+    const [products, total] = await Promise.all([
+      productRepository.find({
+        where: filter,
+        skip: offset,
+        take: limitNumber,
+        relations: ["relevances", "conditions"],
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          articul: true,
+          inStock: true,
+          price: true,
+          mainImage: true,
+          productCode: true,
+          relevances: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          conditions: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      }),
+      productRepository.count({ where: filter })
+    ]);
+
+    const totalPages = Math.ceil(total / limitNumber);
+
+    return res.status(200).json({ data: { products, total, pageNumber, limitNumber, totalPages }, error: null, status: 200 });
   } catch (error) {
     next(error);
   }
-}
+};

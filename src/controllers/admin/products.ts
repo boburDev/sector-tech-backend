@@ -22,67 +22,76 @@ const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
 export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const condition = req.query.condition === "true";
-        const relevance = req.query.relevance === "true";
-        const { recommended, popular } = req.query;
+        const { recommended, condition, revalance, popular } = req.query;
+        const whereCondition: any = { deletedAt: IsNull() };
 
-        const queryBuilder = productRepository
-            .createQueryBuilder("product")
-            .leftJoin("product.popularProduct", "popularProduct")
-            .where("product.deletedAt IS NULL");
+        const conditionMapping: Record<string, string> = {
+            new: "novyy",
+            seller: "seller-rfb"
+        };
 
-        if (recommended === "true") {
-            queryBuilder.andWhere("product.recommended = :recommended", { recommended: true });
-        } else if (recommended === "false") {
-            queryBuilder.andWhere("product.recommended = :recommended", { recommended: false });
+        const revalanceMapping: Record<string, string> = {
+            active: "aktualnoe",
+            inactive: "snyato-s-proizvodstva-eos"
+        };
+
+        if (condition && conditionMapping[condition as string]) {
+            whereCondition.conditions = { slug: conditionMapping[condition as string] };
         }
 
-        if (popular === "true") {
-            queryBuilder.andWhere("popularProduct.id IS NOT NULL");
-        } else if (popular === "false") {
-            queryBuilder.andWhere("popularProduct.id IS NULL");
+        if (revalance && revalanceMapping[revalance as string]) {
+            whereCondition.relevances = { slug: revalanceMapping[revalance as string] };
         }
 
-        if (condition) {
-            queryBuilder.leftJoinAndSelect("product.conditions", "conditions");
+        if (recommended !== undefined) {
+            whereCondition.recommended = JSON.parse(recommended as string);
         }
 
-        if (relevance) {
-            queryBuilder.leftJoinAndSelect("product.relevances", "relevances");
+        const relations: string[] = [];
+        if (popular !== undefined) {
+            relations.push("popularProduct");
+            whereCondition.popularProduct = {
+                id: popular === "true" ? Not(IsNull()) : IsNull(),
+            };
         }
 
-        queryBuilder.select([
-            "product.id",
-            "product.title",
-            "product.slug",
-            "product.articul",
-            "product.inStock",
-            "product.price",
-            "product.mainImage",
-            "product.recommended",
-            "product.productCode",
-            "popularProduct.id",
-        ]);
+        relations.push("brand");
 
-        if (condition) {
-            queryBuilder.addSelect([
-                "conditions.id",
-                "conditions.slug",
-                "conditions.title",
-            ]);
-        }
-
-        if (relevance) {
-            queryBuilder.addSelect([
-                "relevances.id",
-                "relevances.slug",
-                "relevances.title",
-            ]);
-        }
-
-        const products = await queryBuilder
-            .orderBy("product.createdAt", "DESC")
-            .getMany();
+        const products = await productRepository.find({
+            relations,
+            where: whereCondition,
+            order: { createdAt: "DESC" },
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                articul: true,
+                inStock: true,
+                price: true,
+                mainImage: true,
+                recommended: true,
+                catalogId: true,
+                subcatalogId: true,
+                categoryId: true,
+                brandId: true,
+                conditionId: true,
+                relevanceId: true,
+                description: true,
+                fullDescription: true,
+                fullDescriptionImages: true,
+                characteristics: true,
+                productCode: true,
+                images: true,
+                brand: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                },
+                ...(popular && {
+                    popularProduct: { id: true },
+                }),
+            },
+        });
 
         return res.status(200).json({ data: products, error: null, status: 200 });
     } catch (error) {
@@ -94,28 +103,84 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
     try {
         const { id } = req.params;
         const product = await productRepository.findOne({
+            relations: [
+                "comments",
+                "questions",
+                "brand",
+                "conditions",
+                "relevances",
+                "catalog",
+                "subcatalog",
+                "category"
+            ],
             select: {
-        id: true,
-        title: true,
-        slug: true,
-        articul: true,
-        productCode: true,
-        description: true,
-        inStock: true,
-        price: true,
-        mainImage: true,
-        recommended: true,
-        images: true,
-        fullDescriptionImages: true,
-        fullDescription: true,
-        characteristics: true,
-        
-      },
-      where: [
-        { id, deletedAt: IsNull() },
-        { slug: id, deletedAt: IsNull() },
-      ],
-    });
+                id: true,
+                title: true,
+                slug: true,
+                articul: true,
+                productCode: true,
+                description: true,
+                inStock: true,
+                price: true,
+                mainImage: true,
+                fullDescription: true,
+                fullDescriptionImages: true,
+                characteristics: true,
+                catalogId: true,
+                subcatalogId: true,
+                categoryId: true,
+                brandId: true,
+                conditionId: true,
+                relevanceId: true,
+                images: true,
+                comments: {
+                    id: true,
+                    body: true,
+                    reply: true,
+                    star: true,
+                },
+                questions: {
+                    id: true,
+                    body: true,
+                    reply: true,
+                },
+                brand: {
+                    id: true,
+                    path: true,
+                    title: true,
+                    slug: true,
+                },
+                conditions: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                },
+                relevances: {
+                    id: true,
+                    title: true,
+                    slug: true
+                },
+                catalog: {
+                    id: true,
+                    slug: true,
+                    title: true,
+                },
+                subcatalog: {
+                    id: true,
+                    slug: true,
+                    title: true,
+                },
+                category: {
+                    id: true,
+                    slug: true,
+                    title: true,
+                }
+            },
+            where: {
+                id,
+                deletedAt: IsNull()
+            }
+        });
 
     if (!product) throw new CustomError('Product not found', 404);  
 
