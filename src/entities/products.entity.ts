@@ -24,7 +24,7 @@ export class Product {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   inStock: string;
 
   @Column()

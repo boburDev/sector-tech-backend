@@ -229,4 +229,108 @@ router.post('/toggle-saved', validateUserToken, validate(productIdParamsSchema),
  */
 router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
 
+/**
+ * @swagger
+ * /user/product/by-slug:
+ *   get:
+ *     summary: Get products by catalog, subcatalog, and category slug
+ *     description: Fetch products based on catalog, subcatalog, and category slugs with pagination.
+ *     tags: [Product]
+ *     parameters:
+ *       - in: query
+ *         name: catalogSlug
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The slug of the catalog
+ *       - in: query
+ *         name: subcatalogSlug
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The slug of the subcatalog
+ *       - in: query
+ *         name: categorySlug
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The slug of the category
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The page number (default is 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The number of products per page (default is 10)
+ *       - in: query
+ *         name: inStock
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: Filter products by in stock status  
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Search products by title
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     products:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           title:
+ *                             type: string
+ *                             example: "Awesome Product"
+ *                           slug:
+ *                             type: string
+ *                             example: "awesome-product"
+ *                           articul:
+ *                             type: string
+ *                             example: "ART12345"
+ *                           inStock:
+ *                             type: boolean
+ *                             example: true
+ *                           price:
+ *                             type: number
+ *                             example: 99.99
+ *                           mainImage:
+ *                             type: string
+ *                             example: "https://example.com/image.jpg"
+ *                     total:
+ *                       type: integer
+ *                       example: 100
+ *                     pageNumber:
+ *                       type: integer
+ *                       example: 1
+ *                     limitNumber:
+ *                       type: integer
+ *                       example: 10
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 10        
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/by-slug', Product.getProductsByCatalogSubcatalogCategory);
+
 export default router;
