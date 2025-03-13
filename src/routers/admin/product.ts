@@ -385,5 +385,35 @@ router.post('/popular/toggle', validateAdminToken, Product.togglePopularProduct)
  */
 router.delete('/delete/popular/:id', validateAdminToken, validateParams(uuidSchema), Product.deletePopularProduct);
 
+/**
+ * @swagger
+ * /product/by-slug:
+ *   get:
+ *     summary: Get products by catalog, subcatalog, and category
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: catalogSlug
+ *         required: false
+ *         description: Catalog slug
+ *       - in: query
+ *         name: subcatalogSlug
+ *         required: false
+ *         description: Subcatalog slug
+ *       - in: query
+ *         name: categorySlug
+ *         required: false  
+ *     responses:
+ *       200:
+ *         description: Products fetched successfully
+ *       400:
+ *         description: Invalid query parameters
+ *       500:   
+ *         description: Internal server error
+ */
+router.get('/by-slug', validateAdminToken, Product.getProductsByCatalogSubcatalogCategory);
+
 export default router;
 

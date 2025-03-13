@@ -350,7 +350,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
         where: filter,
         skip: offset,
         take: limitNumber,
-        relations: ["relevances", "conditions"],
+        relations: ["category", "relevances", "conditions","catalog","subcatalog"], 
         select: {
           id: true,
           title: true,
@@ -360,6 +360,9 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
           price: true,
           mainImage: true,
           productCode: true,
+          category: { slug: true }, 
+          catalog: { slug: true },
+          subcatalog: { slug: true },
           relevances: {
             id: true,
             slug: true,
@@ -372,13 +375,15 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
           },
         },
       }),
-      productRepository.count({ where: filter })
+      productRepository.count({ where: filter }),
     ]);
+
 
     const totalPages = Math.ceil(total / limitNumber);
 
     return res.status(200).json({ data: { products, total, pageNumber, limitNumber, totalPages }, error: null, status: 200 });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
