@@ -494,3 +494,52 @@ export const deletePopularProduct = async (req: Request, res: Response, next: Ne
     }
 };
 
+export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { catalogSlug, subcatalogSlug, categorySlug } = req.query;
+        const filter: any = { deletedAt: IsNull() };
+
+        if (catalogSlug) {
+            filter.catalog = { slug: catalogSlug as string, deletedAt: IsNull() };
+        }
+        if (subcatalogSlug) {
+            filter.subcatalog = { slug: subcatalogSlug as string, deletedAt: IsNull() };
+        }
+        if (categorySlug) {
+            filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
+        }
+     
+        const products = await productRepository.find({
+            where: filter,
+            order: { createdAt: "DESC" },
+            select: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                    articul: true,
+                    inStock: true,
+                    price: true,
+                    mainImage: true,
+                    productCode: true,
+                    description: true,
+                    fullDescription: true,
+                    fullDescriptionImages: true,
+                    characteristics: true,
+                    catalogId: true,
+                    subcatalogId: true,
+                    categoryId: true,
+                    brandId: true,
+                    conditionId: true,
+                    relevanceId: true,
+                    images: true,
+                    recommended: true,
+                    popularProduct: { id: true },
+                },
+            },
+        );
+
+        return res.status(200).json({ data: products , error: null, status: 200 });
+    } catch (error) {
+        next(error);
+    }
+};
