@@ -81,6 +81,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
                 fullDescriptionImages: true,
                 characteristics: true,
                 productCode: true,
+                garanteeIds: true,  
                 images: true,
                 brand: {
                     id: true,
@@ -200,10 +201,9 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
     const productMainImage = files['productMainImage'][0];
     const productImages = files["productImages"] || [];
     const fullDescriptionImages = files["fullDescriptionImages"] || [];
-    
+
     try {
         const { error, value } = productSchema.validate(req.body);
-        
         if (error) {
             deleteFileBeforeSave(productMainImage.path)
 
@@ -216,7 +216,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             return res.status(400).json({ error: error.details.map(err => err.message) });
         }
         if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
-        
+        const garanteeIds = value.garanteeIds || [];
         const images = productImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
         const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
         const mainImage = productMainImage.path.replace(/\\/g, "/").replace(/^public\//, "");
@@ -241,6 +241,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             product.fullDescriptionImages = descImages;
         }
         product.mainImage = mainImage
+        product.garanteeIds = garanteeIds;
         let savedProduct = await productRepository.save(product);
         
         const sortedData = {
@@ -276,6 +277,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     const productMainImage = files["productMainImage"]?.[0] || null;
     const productImages = files["productImages"] || [];
     const fullDescriptionImages = files["fullDescriptionImages"] || [];
+    const garanteeIds = req.body.garanteeIds || [];
 
     try {
         const { error, value } = productSchema.validate(req.body);
@@ -305,6 +307,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
         product.fullDescription = value.fullDescription || product.fullDescription;
         product.price = value.price || product.price;
         product.inStock = value.inStock || product.inStock;
+        product.garanteeIds = garanteeIds;
 
         if (value.brandId) {
             const brand = await brandRepository.findOne({ where: { id: value.brandId, deletedAt: IsNull() } });
