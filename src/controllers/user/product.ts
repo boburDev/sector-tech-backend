@@ -57,6 +57,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
         inStock: true,
         price: true,
         mainImage: true,
+        garanteeIds: true,
         recommended: true,
         catalog: {
           slug: true,
@@ -115,6 +116,7 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
         fullDescription: true,
         fullDescriptionImages: true,
         characteristics: true,
+        garanteeIds: true,
         images: true,
         comments: {
           id: true,
@@ -292,6 +294,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           images: true,
           price: true,
           articul: true,
+          garanteeIds: true,
           slug: true,
         },
         user: {

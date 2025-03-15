@@ -66,6 +66,9 @@ export class Product {
   @Column()
   relevanceId: string;
 
+  @Column("json", { default: []})
+  garanteeIds: string[];
+
   @ManyToOne(() => ProductRelevance, (relevance) => relevance.products)
   @JoinColumn({ name: "relevanceId" })
   relevances: ProductRelevance;
