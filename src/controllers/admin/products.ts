@@ -206,16 +206,18 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
         const { error, value } = productSchema.validate(req.body);
         if (error) {
             deleteFileBeforeSave(productMainImage.path)
+            if(productImages.length){
 
             productImages.forEach(file => {
                 deleteFile(file.path)
             });
+        }
             fullDescriptionImages.forEach(file => {
                 deleteFile(file.path)
             });
             return res.status(400).json({ error: error.details.map(err => err.message) });
         }
-        if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
+        // if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
         const garanteeIds = value.garanteeIds || [];
         const images = productImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
         const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
