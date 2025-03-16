@@ -206,18 +206,16 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
         const { error, value } = productSchema.validate(req.body);
         if (error) {
             deleteFileBeforeSave(productMainImage.path)
-            if(productImages.length){
 
             productImages.forEach(file => {
                 deleteFile(file.path)
             });
-        }
             fullDescriptionImages.forEach(file => {
                 deleteFile(file.path)
             });
             return res.status(400).json({ error: error.details.map(err => err.message) });
         }
-        // if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
+        if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
         const garanteeIds = value.garanteeIds || [];
         const images = productImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
         const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
@@ -282,19 +280,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     const garanteeIds = req.body.garanteeIds || [];
 
     try {
-        const { error, value } = productSchema.validate(req.body);
-
-        if (error) {
-            deleteFileBeforeSave(productMainImage.path)
-
-            productImages.forEach(file => {
-                deleteFile(file.path)
-            });
-            fullDescriptionImages.forEach(file => {
-                deleteFile(file.path)
-            });
-            return res.status(400).json({ error: error.details.map(err => err.message) });
-        }
+        const value = req.body
 
         const product = await productRepository.findOne({ where: { id, deletedAt: IsNull() } });
 
@@ -360,7 +346,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
             product.images = images;
         }
 
-        if (productImages.length) {
+        if (fullDescriptionImages.length) {
             const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
             product.fullDescriptionImages = descImages;
         }
@@ -384,6 +370,8 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
         res.json({ message: "Product created", data: sortedData });
     } catch (error) {
+        console.log(error);
+        
         deleteFileBeforeSave(productMainImage.path)
         productImages.forEach(file => {
             deleteFile(file.path)
