@@ -217,7 +217,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
         }
         if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
 
-        const existsProduct = await productRepository.findOne({ where: { articul: value.articul, productCode: value.productCode }})
+        const existsProduct = await productRepository.findOne({ where: { title: value.title }})
         if(!existsProduct){
             throw new CustomError("Product already exist", 400)
         }
