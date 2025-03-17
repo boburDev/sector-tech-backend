@@ -17,7 +17,7 @@ const ensureLogFileExists = () => {
     }
 };
 
-const getLastNginxErrors = (lines: number = 2): string[] => {
+const getLastNginxErrors = (lines: number = 10): string[] => {
     try {
         if (fs.existsSync(nginxErrorLogPath)) {
             const output = execSync(`tail -n ${lines} ${nginxErrorLogPath}`).toString();
