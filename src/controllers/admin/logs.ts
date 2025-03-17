@@ -2,8 +2,11 @@ import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import { CustomError } from "../../error-handling/error-handling";
+import { execSync } from "child_process";
+
 const logDir = "./logs";
 const logFilePath = path.join(logDir, "errors.log");
+const nginxErrorLogPath = "/var/log/nginx/error.log"; // Ensure correct path
 
 const ensureLogFileExists = () => {
     if (!fs.existsSync(logDir)) {
@@ -12,6 +15,18 @@ const ensureLogFileExists = () => {
     if (!fs.existsSync(logFilePath)) {
         fs.writeFileSync(logFilePath, "[]", "utf-8");
     }
+};
+
+const getLastNginxErrors = (lines: number = 2): string[] => {
+    try {
+        if (fs.existsSync(nginxErrorLogPath)) {
+            const output = execSync(`tail -n ${lines} ${nginxErrorLogPath}`).toString();
+            return output.trim().split("\n");
+        }
+    } catch (err) {
+        console.error("Failed to read Nginx error log:", err);
+    }
+    return [];
 };
 
 const readLogs = (): any[] => {
@@ -26,7 +41,9 @@ const writeLogs = (logs: any[]) => {
 
 export const getAllLogs = (req: Request, res: Response) => {
     const logs = readLogs();
-    res.json({ success: true, logs });
+    const nginxErrors = getLastNginxErrors(2);
+
+    res.json({ success: true, nginxErrors, logs });
 };
 
 export const getLogById = (req: Request, res: Response) => {
