@@ -42,7 +42,8 @@ const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunc
     const status = isCustomError ? (err as CustomError).status : 500;
     const message = err.message || "Internal Server Error";
 
-    if (!isCustomError) {
+    
+    if (![400].includes(status)) {
         const errorEntry = {
             createdAt: new Date().toISOString(),
             status,
