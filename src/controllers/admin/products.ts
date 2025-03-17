@@ -215,7 +215,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             });
             return res.status(400).json({ error: error.details.map(err => err.message) });
         }
-        if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
+        // if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
 
         const existsProduct = await productRepository.findOne({ where: { title: value.title }})
         if(existsProduct){

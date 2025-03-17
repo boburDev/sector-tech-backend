@@ -27,7 +27,7 @@ export class Product {
   @Column({ default: null, nullable: true })
   inStock: string;
 
-  @Column()
+  @Column({ type:"varchar", length: 5000, default: null})
   fullDescription: string;
 
   @Column("json")
