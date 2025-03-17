@@ -32,7 +32,7 @@ const getLastNginxErrors = (lines: number = 2): string[] => {
 const readLogs = (): any[] => {
     ensureLogFileExists();
     const fileContent = fs.readFileSync(logFilePath, "utf-8");
-    return fileContent.trim() ? JSON.parse(fileContent) : [];
+    return fileContent.trim() ? [...JSON.parse(fileContent)].reverse() : [];
 };
 
 const writeLogs = (logs: any[]) => {
