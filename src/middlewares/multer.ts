@@ -49,7 +49,7 @@ const storage: StorageEngine = multer.diskStorage({
 export const uploadPhoto = multer({
     storage: storage,
     limits: {
-        files: 5,
+        files: 10,
         fileSize: 10 * 1024 * 1024
     }, // 1MB limits
     fileFilter: (req, file: Express.Multer.File, cb: FileFilterCallback) => {
