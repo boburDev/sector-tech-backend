@@ -6,7 +6,7 @@ export const productSchema = Joi.object({
     productCode: Joi.string().min(1).max(50).required(),
     characteristics: Joi.string().required(),
     description: Joi.string().min(0).max(1000).required(),
-    fullDescription: Joi.string().min(10).max(5000).required(),
+    fullDescription: Joi.string().min(10).max(10000).required(),
     price: Joi.number().min(0).required(),
     inStock: Joi.string().required(),
     brandId: Joi.string().uuid().required(),
