@@ -17,6 +17,6 @@ export default new DataSource({
         path.resolve(__dirname, "..", "entities", "*.entity.{ts,js}")
     ],
     migrations: [],
-    logging: true,
+    logging: false,
     synchronize: true
 })
