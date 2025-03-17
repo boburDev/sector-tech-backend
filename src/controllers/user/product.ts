@@ -339,7 +339,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
     if (inStock === "true") {
       filter.inStock = MoreThan(0);
     } else if (inStock === "false") {
-      filter.inStock = IsNull();
+      filter.inStock = "Под заказ"
     } else if (!isNaN(parseInt(inStock as string))) {
       filter.inStock = parseInt(inStock as string);
     }
