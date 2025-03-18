@@ -244,12 +244,6 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *         required: false
  *         description: The slug of the catalog
  *       - in: query
- *         name: subcatalogSlug
- *         schema:
- *           type: string
- *         required: false
- *         description: The slug of the subcatalog
- *       - in: query
  *         name: categorySlug
  *         schema:
  *           type: string

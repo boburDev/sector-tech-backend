@@ -320,7 +320,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
 
 export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { catalogSlug, subcatalogSlug, categorySlug, page, limit, inStock, title } = req.query;
+    const { catalogSlug, categorySlug, page, limit, inStock, title } = req.query;
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
     const offset = (pageNumber - 1) * limitNumber;
@@ -329,9 +329,6 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
 
     if (catalogSlug) {
       filter.catalog = { slug: catalogSlug as string, deletedAt: IsNull() };
-    }
-    if (subcatalogSlug) {
-      filter.subcatalog = { slug: subcatalogSlug as string, deletedAt: IsNull() };
     }
     if (categorySlug) {
       filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
