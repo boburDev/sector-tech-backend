@@ -320,12 +320,13 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
 
 export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { catalogSlug, categorySlug, page, limit, inStock, title } = req.query;
+    const { catalogSlug, categorySlug, page, limit, inStock, title, popular, price, name } = req.query;
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
     const offset = (pageNumber - 1) * limitNumber;
 
     const filter: any = { deletedAt: IsNull() };
+    const order: any = {};
 
     if (catalogSlug) {
       filter.catalog = { slug: catalogSlug as string, deletedAt: IsNull() };
@@ -345,12 +346,31 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
       filter.title = Like(`%${title}%`);
     }
 
+    if (popular === "true") {
+      order.createdAt = "DESC"; 
+    } else if (popular === "false") {
+      order.createdAt = "ASC";
+    }
+
+    if (price === "asc") {
+      order.price = "ASC";
+    } else if (price === "desc") {
+      order.price = "DESC"; 
+    }
+
+    if (name === "asc") {
+      order.title = "ASC";
+    } else if (name === "desc") {
+      order.title = "DESC"; 
+    }
+
     const [products, total] = await Promise.all([
       productRepository.find({
         where: filter,
         skip: offset,
         take: limitNumber,
         relations: ["category", "relevances", "conditions","catalog","subcatalog"], 
+        order,
         select: {
           id: true,
           title: true,
@@ -363,6 +383,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
           category: { slug: true }, 
           catalog: { slug: true },
           subcatalog: { slug: true },
+          createdAt: true,
           relevances: {
             id: true,
             slug: true,
