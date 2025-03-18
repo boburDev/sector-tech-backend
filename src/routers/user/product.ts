@@ -233,8 +233,8 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  * @swagger
  * /user/product/by-slug:
  *   get:
- *     summary: Get products by catalog, subcatalog, and category slug
- *     description: Fetch products based on catalog, subcatalog, and category slugs with pagination.
+ *     summary: Get products by catalog and category slug with sorting and pagination
+ *     description: Fetch products based on catalog, category slugs with additional filters like popular, price, and name sorting.
  *     tags: [Product]
  *     parameters:
  *       - in: query
@@ -264,15 +264,37 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *       - in: query
  *         name: inStock
  *         schema:
- *           type: boolean
+ *           type: string
+ *           enum: ["true", "false"]
  *         required: false
- *         description: Filter products by in stock status  
+ *         description: Filter products by stock availability ("true" for in stock, "false" for out of stock)
  *       - in: query
  *         name: title
  *         schema:
  *           type: string
  *         required: false
  *         description: Search products by title
+ *       - in: query
+ *         name: popular
+ *         schema:
+ *           type: string
+ *           enum: ["true", "false"]
+ *         required: false
+ *         description: Sort products by popularity (true for descending, false for ascending)
+ *       - in: query
+ *         name: price
+ *         schema:
+ *           type: string
+ *           enum: ["asc", "desc"]
+ *         required: false
+ *         description: Sort products by price (asc for ascending, desc for descending)
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *           enum: ["asc", "desc"]
+ *         required: false
+ *         description: Sort products by name (asc for A-Z, desc for Z-A)
  *     responses:
  *       200:
  *         description: Successfully retrieved products
@@ -310,6 +332,24 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *                           mainImage:
  *                             type: string
  *                             example: "https://example.com/image.jpg"
+ *                           category:
+ *                             type: object
+ *                             properties:
+ *                               slug:
+ *                                 type: string
+ *                                 example: "electronics"
+ *                           catalog:
+ *                             type: object
+ *                             properties:
+ *                               slug:
+ *                                 type: string
+ *                                 example: "home-appliances"
+ *                           subcatalog:
+ *                             type: object
+ *                             properties:
+ *                               slug:
+ *                                 type: string
+ *                                 example: "kitchen"
  *                     total:
  *                       type: integer
  *                       example: 100
