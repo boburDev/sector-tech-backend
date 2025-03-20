@@ -43,7 +43,7 @@ const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunc
     const message = err.message || "Internal Server Error";
 
     
-    if (![400].includes(status)) {
+    if (![400, 401, 404].includes(status)) {
         const errorEntry = {
             createdAt: new Date().toISOString(),
             status,

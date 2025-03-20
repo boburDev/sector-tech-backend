@@ -298,7 +298,7 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
 
         const savedSubcatalog = await subcatalogRepository.save(subcatalog);
 
-        if (!savedSubcatalog) throw new CustomError('Failed to create subcatalog', 500);
+        if (!savedSubcatalog) throw new CustomError('Failed to create subcatalog', 400);
 
         // Format response data
         const { createdAt, deletedAt, ...subcatalogData } = savedSubcatalog;
