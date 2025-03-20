@@ -52,7 +52,7 @@ export const updateGarantee = async (req: Request, res: Response, next: NextFunc
             if (!regex.test(price)) throw new CustomError('Price must be either a number or a string without digits', 400);
         }
     const garantee = await garanteeRepository.findOne({ where: { id: id as string, deletedAt: IsNull() } });
-    if(!garantee) throw new CustomError('Garantee not found', 400);
+    if(!garantee) throw new CustomError('Garantee not found', 404);
         garantee.title = title || garantee.title;
         garantee.price = price || garantee.price;
         await garanteeRepository.save(garantee);
