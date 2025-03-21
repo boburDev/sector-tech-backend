@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import axios from 'axios'
-import cheerio from 'cheerio'
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 import { CustomError } from "../../error-handling/error-handling";
 
 interface ProductCharacteristic {
@@ -123,7 +123,7 @@ export const fetchDataFromShopNag = async (req: Request, res: Response, next: Ne
         
         const htmlCode = await getFullHtml(url);
 
-        if (htmlCode) throw new CustomError('Body not exist', 400);
+        if (!htmlCode) throw new CustomError('Body not exist', 400);
 
         const productInfo = extractProductData(htmlCode);
         res.status(201).json({ data: productInfo, error: null, status: 201 });

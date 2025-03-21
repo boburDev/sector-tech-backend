@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @swagger
- * /shopnag/extract:
+ * /fetch-data/extract:
  *   post:
  *     summary: Extract product data from shopnag.uz by URL
  *     tags: [ShopNag]
@@ -88,7 +88,7 @@ const router = Router();
  *                 status:
  *                   type: number
  */
-router.post("/extract", validateAdminToken, fetchData.fetchDataFromShopNag);
+router.post("/extract", fetchData.fetchDataFromShopNag);
 
 export default router;
 
