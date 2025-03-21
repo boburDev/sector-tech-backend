@@ -10,6 +10,7 @@ import promotionRouter from "./promotion"
 import changeOrderRouter from "./change-order"
 import logsRouter from "./logs"
 import garanteeRouter from "./garantee"
+import fetchDataRouter from "./fetch_data"
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.use("/promotion", promotionRouter)
 router.use("/change-order", changeOrderRouter)
 router.use("/logs", logsRouter)
 router.use("/garantee", garanteeRouter)
+router.use("/fetch-data", fetchDataRouter)
 
 export default router
