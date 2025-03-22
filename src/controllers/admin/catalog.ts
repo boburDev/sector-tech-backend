@@ -87,9 +87,17 @@ export const createCatalog = async (req: Request, res: Response, next: NextFunct
             });
         }
 
+        const catalogCount = await catalogRepository.count({
+            withDeleted: true
+        });
+
+        const numberPrefix = String(catalogCount + 1).padStart(4, '0'); // 0001, 0002, ...
+        const slug = `${numberPrefix}.${createSlug(title)}`;
+
+
         const catalog = new Catalog();
         catalog.title = title;
-        catalog.slug = createSlug(title)
+        catalog.slug = slug;
 
         const savedCatalog = await catalogRepository.save(catalog);
 
@@ -288,10 +296,17 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
 
         if (!catalog) throw new CustomError('Parent catalog not found', 404);
 
+        const subcatalogCount = await subcatalogRepository.count({
+            withDeleted: true
+        });
+
+        const numberPrefix = String(subcatalogCount + 100).padStart(4, '0'); // 0100, 0101, ...
+        const slug = `${numberPrefix}.${createSlug(title.trim())}`;
+
         // Create and save new subcatalog
         const subcatalog = subcatalogRepository.create({
             title: title.trim(),
-            slug:createSlug(title.trim()),
+            slug: slug,
             catalogId: catalogId,
             catalog: catalog
         });
