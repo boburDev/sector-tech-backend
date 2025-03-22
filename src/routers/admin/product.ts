@@ -110,6 +110,73 @@ router.post('/create', validateAdminToken, uploadPhoto.fields([{ name: "productM
 
 /**
  * @swagger
+ * /product/create-functional:
+ *   post:
+ *     summary: Create a functional product (from parsed + modified data)
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               articul:
+ *                 type: string
+ *               productCode:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               fullDescription:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               stock:
+ *                 type: string
+ *               brandId:
+ *                 type: integer
+ *               conditionId:
+ *                 type: integer
+ *               relevanceId:
+ *                 type: integer
+ *               catalogId:
+ *                 type: integer
+ *               subcatalogId:
+ *                 type: integer
+ *               categoryId:
+ *                 type: integer
+ *               garanteeIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *               characteristics:
+ *                 type: string
+ *                 description: JSON stringified array of characteristics
+ *               images:
+ *                 type: array
+ *                 description: Array of image paths from `shopnag/` (will be moved to `products/`)
+ *                 items:
+ *                   type: string
+ *               fullDescriptionImages:
+ *                 type: array
+ *                 description: Additional images for full description (uploaded as files)
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Product created successfully
+ *       400:
+ *         description: Invalid request
+ */
+router.post('/create-functional', validateAdminToken, uploadPhoto.fields([{ name: "fullDescriptionImages", maxCount: 10 }]), Product.createProductFunctional);
+
+/**
+ * @swagger
  * /product/update/{id}:
  *   put:
  *     summary: Update a product by ID

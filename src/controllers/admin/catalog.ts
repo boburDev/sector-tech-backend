@@ -470,10 +470,10 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
 
         const file = req.file as Express.Multer.File;
 
-        if (!title || !file || !subCatalogId) {
+        if (!title || !subCatalogId) {
             return res.json({
                 data: null,
-                error: 'Title, logo file and subCatalogId are required',
+                error: 'Title and subCatalogId are required',
                 status: 400
             });
         }
