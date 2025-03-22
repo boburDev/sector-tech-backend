@@ -279,7 +279,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             fullDescriptionImages.forEach(file => {
                 deleteFile(file.path)
             });
-            return res.status(400).json({ error: error.details.map(err => err.message) });
+            throw error;
         }
         // if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
 

@@ -467,60 +467,58 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
 export const createCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, subCatalogId } = req.body;
-
-        const file = req.file as Express.Multer.File;
+        const file = req.file as Express.Multer.File | undefined; 
 
         if (!title || !subCatalogId) {
             return res.json({
                 data: null,
-                error: 'Title and subCatalogId are required',
-                status: 400
+                error: "Title and subCatalogId are required",
+                status: 400,
             });
         }
-        
+
         const existingCategory = await categoryRepository.findOne({
             where: {
                 title: ILike(title.toLowerCase()),
-                deletedAt: IsNull()
+                deletedAt: IsNull(),
             },
-            order: {
-                createdAt: 'DESC'
-            }
+            order: { createdAt: "DESC" },
         });
 
         if (existingCategory) {
             return res.json({
                 data: null,
-                error: 'Category with this title already exists',
-                status: 400
+                error: "Category with this title already exists",
+                status: 400,
             });
         }
 
         const subcatalog = await subcatalogRepository.findOne({
             where: {
                 id: subCatalogId,
-                deletedAt: IsNull()
+                deletedAt: IsNull(),
             },
-            order: {
-                createdAt: 'DESC'
-            }
+            order: { createdAt: "DESC" },
         });
-        if (!subcatalog) throw new CustomError('Parent subcatalog not found', 400);
-        const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
+
+        if (!subcatalog) throw new CustomError("Parent subcatalog not found", 400);
 
         const category = new Category();
         category.title = title;
         category.slug = createSlug(title);
-
-        category.path = newPath;
         category.subCatalogId = subCatalogId;
+
+        if (file) {
+            category.path = file.path.replace(/\\/g, "/").replace(/^public\//, ""); 
+        }
 
         const savedCategory = await categoryRepository.save(category);
         const { createdAt, deletedAt, ...categoryData } = savedCategory;
+
         return res.json({
             data: categoryData,
             error: null,
-            status: 200
+            status: 200,
         });
     } catch (error) {
         next(error);
