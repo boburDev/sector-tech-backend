@@ -243,10 +243,10 @@ export const getSubcatalogById = async (req: Request, res: Response, next: NextF
                 id: true,
                 title: true,
                 slug: true,
+                catalogId: true,
                 catalog: {
                     title: true,
                     slug: true,
-                    id: true
                 }
             }
         });
