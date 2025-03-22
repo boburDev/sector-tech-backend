@@ -233,37 +233,43 @@ export const getSubcatalogById = async (req: Request, res: Response, next: NextF
     try {
         const { id } = req.params;
 
-        const subcatalogs = await subcatalogRepository.find({
+        const subcatalog = await subcatalogRepository.findOne({
+            relations: ['catalog'],
             where: {
-                catalogId: id,
+                id,
                 deletedAt: IsNull()
             },
-            order: {
-                createdAt: 'DESC'
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                catalogId: true,
+                catalog: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                }
             }
         });
 
-        if (!subcatalogs.length) {
-            return res.json({
-                data: [],
-                error: null,
-                status: 200
+        if (!subcatalog) {
+            return res.status(404).json({
+                data: null,
+                error: "Subcatalog not found",
+                status: 404
             });
         }
 
-        const formattedSubcatalogs = subcatalogs.map(subcatalog => {
-            const { createdAt, deletedAt, ...subcatalogData } = subcatalog;
-            return subcatalogData;
-        });
+        // `createdAt` va `deletedAt` ni olib tashlash
+        const { createdAt, deletedAt, ...filteredSubcatalog } = subcatalog;
 
         return res.json({
-            data: formattedSubcatalogs,
+            data: filteredSubcatalog,
             error: null,
             status: 200
         });
     } catch (error) {
-        console.log(error);
-        
+        console.error("Error fetching subcatalog:", error);
         next(error);
     }
 };
