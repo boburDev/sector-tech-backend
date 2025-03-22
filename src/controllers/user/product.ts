@@ -333,28 +333,20 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
     const order: any = {};
 
     // 🔍 Katalog yoki subkatalog aniqlash
-    if (slug) {
-      const catalog = await catalogRepository.findOne({
-        where: { slug: slug as string, deletedAt: IsNull() }
-      });
+    if (typeof slug === "string") {
+      const numericPrefix = parseInt(slug.split('.')[0]); 
 
-      if (catalog) {
-        filter.catalog = { id: catalog.id };
-      } else {
-        const subcatalog = await subcatalogRepository.findOne({
-          where: { slug: slug as string, deletedAt: IsNull() }
-        });
-
-        if (subcatalog) {
-          filter.subcatalog = { id: subcatalog.id };
-        } else {
-          return res.status(404).json({
-            data: null,
-            error: 'Catalog or Subcatalog not found',
-            status: 404
-          });
+      if (!isNaN(numericPrefix)) {
+        if (numericPrefix < 100) {
+          filter.catalog = { slug: slug as string, deletedAt: IsNull() };
+        } else if (numericPrefix >= 100 && numericPrefix < 1000) {
+          filter.subcatalog = { slug: slug as string, deletedAt: IsNull() };
         }
       }
+    }
+
+    if (categorySlug) {
+      filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
     }
 
     if (categorySlug) {
