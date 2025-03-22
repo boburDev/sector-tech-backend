@@ -245,6 +245,7 @@ export const getSubcatalogById = async (req: Request, res: Response, next: NextF
                 slug: true,
                 catalogId: true,
                 catalog: {
+                    id: true,
                     title: true,
                     slug: true,
                 }
