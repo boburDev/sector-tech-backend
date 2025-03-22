@@ -3,7 +3,11 @@ import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
 import { IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
-import { CustomError } from "../../error-handling/error-handling";  
+import { CustomError } from "../../error-handling/error-handling";
+import { Catalog, Subcatalog } from "../../entities/catalog.entity";
+
+const catalogRepository = AppDataSource.getRepository(Catalog);
+const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 const cartProductRepository = AppDataSource.getRepository(Cart);
@@ -320,7 +324,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
 
 export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { catalogSlug, categorySlug, page, limit, inStock, title, popular, price, name } = req.query;
+    const { slug, categorySlug, page, limit, inStock, title, popular, price, name } = req.query;
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
     const offset = (pageNumber - 1) * limitNumber;
@@ -328,26 +332,49 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
     const filter: any = { deletedAt: IsNull() };
     const order: any = {};
 
-    if (catalogSlug) {
-      filter.catalog = { slug: catalogSlug as string, deletedAt: IsNull() };
+    // 🔍 Katalog yoki subkatalog aniqlash
+    if (slug) {
+      const catalog = await catalogRepository.findOne({
+        where: { slug: slug as string, deletedAt: IsNull() }
+      });
+
+      if (catalog) {
+        filter.catalog = { id: catalog.id };
+      } else {
+        const subcatalog = await subcatalogRepository.findOne({
+          where: { slug: slug as string, deletedAt: IsNull() }
+        });
+
+        if (subcatalog) {
+          filter.subcatalog = { id: subcatalog.id };
+        } else {
+          return res.status(404).json({
+            data: null,
+            error: 'Catalog or Subcatalog not found',
+            status: 404
+          });
+        }
+      }
     }
+
     if (categorySlug) {
       filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
     }
+
     if (inStock === "true") {
       filter.inStock = MoreThan(0);
     } else if (inStock === "false") {
-      filter.inStock = "Под заказ"
+      filter.inStock = "Под заказ";
     } else if (!isNaN(parseInt(inStock as string))) {
       filter.inStock = parseInt(inStock as string);
     }
 
-    if (title) {  
+    if (title) {
       filter.title = Like(`%${title}%`);
     }
 
     if (popular === "true") {
-      order.createdAt = "DESC"; 
+      order.createdAt = "DESC";
     } else if (popular === "false") {
       order.createdAt = "ASC";
     }
@@ -355,13 +382,13 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
     if (price === "asc") {
       order.price = "ASC";
     } else if (price === "desc") {
-      order.price = "DESC"; 
+      order.price = "DESC";
     }
 
     if (name === "asc") {
       order.title = "ASC";
     } else if (name === "desc") {
-      order.title = "DESC"; 
+      order.title = "DESC";
     }
 
     const [products, total] = await Promise.all([
@@ -369,7 +396,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
         where: filter,
         skip: offset,
         take: limitNumber,
-        relations: ["category", "relevances", "conditions","catalog","subcatalog"], 
+        relations: ["category", "relevances", "conditions", "catalog", "subcatalog"],
         order,
         select: {
           id: true,
@@ -380,7 +407,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
           price: true,
           mainImage: true,
           productCode: true,
-          category: { slug: true }, 
+          category: { slug: true },
           catalog: { slug: true },
           subcatalog: { slug: true },
           createdAt: true,
@@ -399,10 +426,13 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
       productRepository.count({ where: filter }),
     ]);
 
-
     const totalPages = Math.ceil(total / limitNumber);
 
-    return res.status(200).json({ data: { products, total, pageNumber, limitNumber, totalPages }, error: null, status: 200 });
+    return res.status(200).json({
+      data: { products, total, pageNumber, limitNumber, totalPages },
+      error: null,
+      status: 200
+    });
   } catch (error) {
     console.log(error);
     next(error);

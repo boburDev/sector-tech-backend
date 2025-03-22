@@ -233,34 +233,34 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  * @swagger
  * /user/product/by-slug:
  *   get:
- *     summary: Get products by catalog and category slug with sorting and pagination
- *     description: Fetch products based on catalog, category slugs with additional filters like popular, price, and name sorting.
+ *     summary: Get products by catalog or subcatalog slug with sorting and pagination
+ *     description: Fetch products based on catalog or subcatalog slug with additional filters like category, stock availability, title search, and sorting options.
  *     tags: [Product]
  *     parameters:
  *       - in: query
- *         name: catalogSlug
+ *         name: slug
  *         schema:
  *           type: string
- *         required: false
- *         description: The slug of the catalog
+ *         required: true
+ *         description: Slug of the catalog or subcatalog (e.g. "0001.laptops" or "0100.smartphones")
  *       - in: query
  *         name: categorySlug
  *         schema:
  *           type: string
  *         required: false
- *         description: The slug of the category
+ *         description: The slug of the category to further filter products
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
  *         required: false
- *         description: The page number (default is 1)
+ *         description: Page number (default is 1)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
  *         required: false
- *         description: The number of products per page (default is 10)
+ *         description: Number of products per page (default is 10)
  *       - in: query
  *         name: inStock
  *         schema:
@@ -273,28 +273,28 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *         schema:
  *           type: string
  *         required: false
- *         description: Search products by title
+ *         description: Search products by title (partial match)
  *       - in: query
  *         name: popular
  *         schema:
  *           type: string
  *           enum: ["true", "false"]
  *         required: false
- *         description: Sort products by popularity (true for descending, false for ascending)
+ *         description: Sort products by popularity (true = newest first)
  *       - in: query
  *         name: price
  *         schema:
  *           type: string
  *           enum: ["asc", "desc"]
  *         required: false
- *         description: Sort products by price (asc for ascending, desc for descending)
+ *         description: Sort products by price
  *       - in: query
  *         name: name
  *         schema:
  *           type: string
  *           enum: ["asc", "desc"]
  *         required: false
- *         description: Sort products by name (asc for A-Z, desc for Z-A)
+ *         description: Sort products by name
  *     responses:
  *       200:
  *         description: Successfully retrieved products
@@ -312,26 +312,29 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *                         type: object
  *                         properties:
  *                           id:
- *                             type: integer
- *                             example: 1
+ *                             type: string
+ *                             example: "a1b2c3"
  *                           title:
  *                             type: string
  *                             example: "Awesome Product"
  *                           slug:
  *                             type: string
- *                             example: "awesome-product"
+ *                             example: "0001.awesome-product"
  *                           articul:
  *                             type: string
  *                             example: "ART12345"
  *                           inStock:
- *                             type: boolean
- *                             example: true
+ *                             type: integer
+ *                             example: 12
  *                           price:
  *                             type: number
  *                             example: 99.99
  *                           mainImage:
  *                             type: string
  *                             example: "https://example.com/image.jpg"
+ *                           productCode:
+ *                             type: string
+ *                             example: "PC-001"
  *                           category:
  *                             type: object
  *                             properties:
@@ -343,13 +346,13 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *                             properties:
  *                               slug:
  *                                 type: string
- *                                 example: "home-appliances"
+ *                                 example: "0001.laptops"
  *                           subcatalog:
  *                             type: object
  *                             properties:
  *                               slug:
  *                                 type: string
- *                                 example: "kitchen"
+ *                                 example: "0100.smartphones"
  *                     total:
  *                       type: integer
  *                       example: 100
@@ -361,7 +364,9 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *                       example: 10
  *                     totalPages:
  *                       type: integer
- *                       example: 10        
+ *                       example: 10
+ *       404:
+ *         description: Catalog or Subcatalog not found
  *       500:
  *         description: Internal Server Error
  */
