@@ -30,3 +30,23 @@ export default async function listContents(subPath: string = '') {
         console.error('Error reading folder contents:', error);
     }
 }
+
+export function moveFileToProducts(imagePath: string): string {
+    const filename = imagePath.split("/").pop(); // fayl nomini ajrat
+    const sourcePath = path.join("public", "shopnag", filename || "");
+    const destDir = path.join("public", "products");
+    const destPath = path.join(destDir, filename || "");
+
+    // target papkani yaratish
+    if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+    }
+
+    // fayl mavjud bo‘lsa, ko‘chirish
+    if (fs.existsSync(sourcePath)) {
+        fs.renameSync(sourcePath, destPath); // move (cut-paste)
+    }
+
+    return `products/${filename}`;
+}
+

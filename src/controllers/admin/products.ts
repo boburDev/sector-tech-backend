@@ -10,6 +10,7 @@ import { ProductCondition, ProductRelevance } from '../../entities/product_detai
 import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
 import { PopularProduct } from '../../entities/popular.entity';
 import { CustomError } from '../../error-handling/error-handling';
+import { moveFileToProducts } from '../../utils/readFolders';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -191,6 +192,71 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
         status: 200
         });
     } catch (error) {
+        next(error);
+    }
+};
+
+export const createProductFunctional = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const fullDescriptionImages = files["fullDescriptionImages"] || [];
+
+    try {
+        const { error, value } = productSchema.validate(req.body);
+        if (error) {
+            fullDescriptionImages.forEach(file => deleteFile(file.path));
+            throw error;
+        }
+        
+        const existsProduct = await productRepository.findOne({ where: { title: value.title } });
+        if (existsProduct) {
+            throw new CustomError("Product already exists", 400);
+        }
+
+        const rawImages: string[] = value.images || []; // frontdan kelgan
+        const newImagePaths = rawImages.map(moveFileToProducts); // shopnag -> products
+
+        const mainImage = newImagePaths[0] || "";
+        const images = newImagePaths.slice(1);
+
+        const garanteeIds = value.garanteeIds || [];
+        const descImages = fullDescriptionImages.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
+
+        const product = new Product();
+        product.title = value.title;
+        product.slug = createSlug(value.title);
+        product.articul = value.articul;
+        product.productCode = value.productCode;
+        product.characteristics = JSON.parse(value.characteristics);
+        product.description = value.description;
+        product.fullDescription = value.fullDescription;
+        product.price = value.price;
+        product.inStock = value.inStock;
+        product.brandId = value.brandId;
+        product.conditionId = value.conditionId;
+        product.relevanceId = value.relevanceId;
+        product.catalogId = value.catalogId;
+        product.subcatalogId = value.subcatalogId;
+        product.categoryId = value.categoryId;
+        product.mainImage = mainImage;
+        product.images = images;
+        if (descImages.length) {
+            product.fullDescriptionImages = descImages;
+        }
+        product.garanteeIds = garanteeIds;
+        let savedProduct = await productRepository.save(product);
+        
+        const sortedData = {
+            title: savedProduct.title,
+            articul: savedProduct.articul,
+            price: savedProduct.price,
+            mainImage: savedProduct.mainImage
+        };
+
+        sortedData.mainImage = sortedData.mainImage.replace(/^public\//, "")
+
+        res.json({ message: "Product created", data: sortedData });
+    } catch (error) {
+        console.error("Error creating product:", error);
         next(error);
     }
 };
