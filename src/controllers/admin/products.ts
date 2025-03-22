@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Product } from '../../entities/products.entity';
 import { In, IsNull, Not } from 'typeorm';
-import { productSchema } from '../../validators/product.validator';
+import { productFunctionalSchema, productSchema } from '../../validators/product.validator';
 import { createSlug } from '../../utils/slug';
 import { deleteFile, deleteFileBeforeSave } from '../../middlewares/removeFiltePath';
 import { Brand } from '../../entities/brands.entity';
@@ -11,6 +11,8 @@ import { Catalog, Category, Subcatalog } from '../../entities/catalog.entity';
 import { PopularProduct } from '../../entities/popular.entity';
 import { CustomError } from '../../error-handling/error-handling';
 import { moveFileToProducts } from '../../utils/readFolders';
+import path from 'path';
+import fs from 'fs';
 
 const productRepository = AppDataSource.getRepository(Product);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -201,7 +203,8 @@ export const createProductFunctional = async (req: Request, res: Response, next:
     const fullDescriptionImages = files["fullDescriptionImages"] || [];
 
     try {
-        const { error, value } = productSchema.validate(req.body);
+        const { error, value } = productFunctionalSchema.validate(req.body);
+        
         if (error) {
             fullDescriptionImages.forEach(file => deleteFile(file.path));
             throw error;
@@ -210,6 +213,12 @@ export const createProductFunctional = async (req: Request, res: Response, next:
         const existsProduct = await productRepository.findOne({ where: { title: value.title } });
         if (existsProduct) {
             throw new CustomError("Product already exists", 400);
+        }
+
+        const SAVE_PATH = path.join(__dirname, "..", "..", "..", "public", "products");
+        
+        if (!fs.existsSync(SAVE_PATH)) {
+            fs.mkdirSync(SAVE_PATH, { recursive: true });
         }
 
         const rawImages: string[] = value.images || []; // frontdan kelgan
