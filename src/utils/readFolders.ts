@@ -33,8 +33,8 @@ export default async function listContents(subPath: string = '') {
 
 export function moveFileToProducts(imagePath: string): string {
     const filename = imagePath.split("/").pop(); // fayl nomini ajrat
-    const sourcePath = path.join("public", "shopnag", filename || "");
-    const destDir = path.join("public", "products");
+    const sourcePath = path.join(__dirname, "..", "..", "public", "shopnag", filename || "");
+    const destDir = path.join(__dirname, "..", "..", "public", "products");
     const destPath = path.join(destDir, filename || "");
 
     // target papkani yaratish

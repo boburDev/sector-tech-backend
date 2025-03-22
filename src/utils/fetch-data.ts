@@ -3,12 +3,6 @@ import * as cheerio from 'cheerio';
 import fs from "fs";
 import path from "path";
 
-const SAVE_PATH = path.join(__dirname, "..", "..", "public", "shopnag");
-
-if (!fs.existsSync(SAVE_PATH)) {
-    fs.mkdirSync(SAVE_PATH, { recursive: true });
-}
-
 interface ProductCharacteristic {
     title: string;
     option: {
@@ -69,14 +63,26 @@ export async function extractProductData(htmlContent: string): Promise<ProductDa
     const imageContainer = $(".ImagesCarousel_itemThumbList__fMexZ");
     const images = imageContainer.find("img.Picture_image__qGkYa").toArray();
     const imageUrls: string[] = [];
+    
+    if (images.length) {
+        for (const img of images) {
+            const src = $(img).attr("src");
 
-    for (const img of images) {
-        const src = $(img).attr("src");
-        
-        if (src) {
-            const fullUrl = src.startsWith("http") ? src : `https://shop.nag.uz${src}`;
-            imageUrls.push(fullUrl);
+            if (src) {
+                const fullUrl = src.startsWith("http") ? src : `https://shop.nag.uz${src}`;
+                imageUrls.push(fullUrl);
+            }
         }
+    } else {
+        const imageContainer = $(".ImagesCarousel_wrapper__G5F1z");
+        const images = imageContainer.find("img.ImagesCarousel_itemImage__2PjMC");
+        images.each((_, img) => {
+            const src = $(img).attr("src");
+            if (src) {
+                const fullUrl = src.startsWith("http") ? src : `https://shop.nag.uz${src}`;
+                imageUrls.push(fullUrl);
+            }
+        });
     }
 
     const downloadedImages = await downloadImages(imageUrls, title);
@@ -130,6 +136,12 @@ export async function extractProductData(htmlContent: string): Promise<ProductDa
 export async function downloadImages(imageUrls: string[], title: string): Promise<any> {
     const downloadedFiles: string[] = [];
     const imgTitle = title.replace(/[\\/*?:"<>|]/g, "").replace(/\s+/g, "_");
+
+    const SAVE_PATH = path.join(__dirname, "..", "..", "public", "shopnag");
+
+    if (!fs.existsSync(SAVE_PATH)) {
+        fs.mkdirSync(SAVE_PATH, { recursive: true });
+    }
 
     for (let i = 0; i < imageUrls.length; i++) {
         const imageUrl = imageUrls[i];
