@@ -3,6 +3,7 @@ import { verify } from '../utils/jwt';
 import AppDataSource from '../config/ormconfig';
 import { Admin } from '../entities/admin.entity';
 import { IsNull } from 'typeorm';
+import { CustomError } from '../error-handling/error-handling';
 
 declare global {
     namespace Express {
@@ -19,8 +20,7 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        res.status(401).json({ message: 'No token provided' })
-        return;
+        throw new CustomError("No token provided", 401);
     }
 
     const token = authHeader.split(' ')[1];
@@ -28,20 +28,17 @@ export async function validateAdminToken(req: Request, res: Response, next: Next
     const decoded = verify(token);
 
     if (!decoded) {
-        res.status(401).json({ message: 'Invalid or expired token' })
-        return;
+        throw new CustomError("Invalid or expired token", 401);
     }
 
     const existingAdmin = await adminRepository.findOne({ where: { username: decoded.username, id: decoded.id, deletedAt: IsNull() } });
 	
     if (!existingAdmin) {
-        res.status(401).json({ message: 'Admin not found' })
-        return;
+        throw new CustomError("Admin not found", 401);
     }
 
     if (existingAdmin && existingAdmin.status !== 'active') {
-        res.status(400).json({ message: 'Your account is not active' });
-        return;
+        throw new CustomError("Your account is not active", 400);
     }
 
     req.admin = {

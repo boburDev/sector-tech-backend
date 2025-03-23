@@ -20,7 +20,7 @@ export const OAuthCallback = async (req: Request, res: Response, next: NextFunct
         86400000, // 1 kun (24 soat)
         "user"
       );
-      return res.status(201).redirect(`http://localhost:3000?token=${accessToken}`);
+      return res.status(200).redirect(`http://localhost:3000?token=${accessToken}`);
 
     } else {
       const newUser = new Users();

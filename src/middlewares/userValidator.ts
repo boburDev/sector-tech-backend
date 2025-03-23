@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { verify } from '../utils/jwt';
 import AppDataSource from '../config/ormconfig';
 import { Users } from '../entities/user.entity';
-
+import { CustomError } from '../error-handling/error-handling';
 declare global {
     namespace Express {
         interface Request {
@@ -18,8 +18,7 @@ export async function validateUserToken(req: Request, res: Response, next: NextF
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        res.status(401).json({ message: 'No token provided' })
-        return;
+        throw new CustomError("No token provided", 401);
     }
 
     const token = authHeader.split(' ')[1];
@@ -27,15 +26,13 @@ export async function validateUserToken(req: Request, res: Response, next: NextF
     const decoded = verify(token, 'user');
 
     if (!decoded) {
-        res.status(401).json({ message: 'Invalid or expired token' })
-        return;
+        throw new CustomError("Invalid or expired token", 401);
     }
 
     const existingUser = await userRepository.findOne({ where: { email: decoded.email, id: decoded.id } });
 	
     if (!existingUser) {
-        res.status(401).json({ message: 'User not found' })
-        return;
+        throw new CustomError("User not found", 401);
     }
 
     req.user = {
@@ -46,4 +43,3 @@ export async function validateUserToken(req: Request, res: Response, next: NextF
     next();
 
 }
-

@@ -188,10 +188,10 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
 
     if (!product) throw new CustomError('Product not found', 404);  
 
-    res.json({
-        data: product,
-        error: null,
-        status: 200
+        return res.json({
+            data: product,
+            error: null,
+            status: 200
         });
     } catch (error) {
         next(error);
@@ -290,7 +290,6 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             });
             throw error;
         }
-        // if (!productImages.length) throw new CustomError('Image must be uploaded', 400);
 
         const existsProduct = await productRepository.findOne({ where: { title: value.title }})
         if(existsProduct){
@@ -335,7 +334,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
 
         res.json({ message: "Product created", data: sortedData });
     } catch (error) {
-        console.error("Error creating product:", error);
+        // console.error("Error creating product:", error);
 
         deleteFileBeforeSave(productMainImage.path)
 
@@ -448,7 +447,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
         sortedData.mainImage = sortedData.mainImage.replace(/^public\//, "")
 
-        res.json({ message: "Product created", data: sortedData });
+        return res.json({ message: "Product created", data: sortedData });
     } catch (error) {
         console.log(error);
         

@@ -1,5 +1,6 @@
 import multer, { FileFilterCallback, StorageEngine } from 'multer';
 import fs from 'fs';
+import { logErrorToFile } from './errorMiddleware';
 
 const photo = ["image/jpeg", "image/png", "image/gif","image/webp"];    
 const fields = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage', 'coverImage', 'promotionBannerImage', 'promotionDescriptionImages'];
@@ -31,6 +32,16 @@ const storage: StorageEngine = multer.diskStorage({
             cb(null, uploadPath);
         } catch (error) {
             console.error("Destination Error:", error);
+            logErrorToFile({
+                createdAt: new Date().toISOString(),
+                status: 500,
+                error: "Destination Error",
+                method: req?.method,
+                url: req?.url,
+                details: (error as Error).message,
+                stack: (error as Error).stack || "No stack trace",
+                fullError: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+            });
             cb(error as Error, "");
         }
     },
@@ -41,6 +52,16 @@ const storage: StorageEngine = multer.diskStorage({
             cb(null, `${Date.now()}-${safeOriginalName}`);
         } catch (error) {
             console.error("Filename Error:", error);
+            logErrorToFile({
+                createdAt: new Date().toISOString(),
+                status: 500,
+                error: "Filename Error",
+                method: req?.method,
+                url: req?.url,
+                details: (error as Error).message,
+                stack: (error as Error).stack || "No stack trace",
+                fullError: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+            }); 
             cb(error as Error, "");
         }
     },
@@ -65,6 +86,16 @@ export const uploadPhoto = multer({
             }
         } catch (error) {
             console.error("File Filter Error:", error);
+            logErrorToFile({
+                createdAt: new Date().toISOString(),
+                status: 500,
+                error: "File Filter Error",
+                method: req?.method,
+                url: req?.url,
+                details: (error as Error).message,
+                stack: (error as Error).stack || "No stack trace",
+                fullError: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+            });
             cb(error as Error);
         }
     },

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import dotenv from "dotenv";
 import path from "path";
 import AppDataSource from "./config/ormconfig";
@@ -45,13 +45,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', async (req: any, res: any) => {
+app.get('/', async (req: any, res: any, next: any) => {
   try {
     await insertData(req.query);
     res.send('ok')
   } catch (error) {
-    console.log(error);
-    res.status(500).send('error')
+    next(error)
   }
 })
 app.use("/", adminRouter);

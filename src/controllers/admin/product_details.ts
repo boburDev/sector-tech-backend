@@ -57,11 +57,12 @@ export const getProductConditionById = async (req: Request, res: Response, next:
 export const createProductCondition = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title } = req.body;
+        if (!title) throw new CustomError('Title is required', 400)
         const newProductCondition = productConditionRepository.create({ title });
         newProductCondition.slug = createSlug(title);
         await productConditionRepository.save(newProductCondition);
         
-        return res.json({
+          return res.json({
             data: newProductCondition,
             error: null,
             status: 201
@@ -157,6 +158,7 @@ export const getProductRelavanceById = async (req: Request, res: Response, next:
 export const createProductRelavance = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title } = req.body;
+        if (!title) throw new CustomError('Title is required', 400)
         const newProductRelevance = productRelevanceRepository.create({ title });
         newProductRelevance.slug = createSlug(title);
         await productRelevanceRepository.save(newProductRelevance);

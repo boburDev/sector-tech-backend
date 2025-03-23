@@ -195,7 +195,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             return res.status(200).json({ message: 'Popular product updated successfully' });
         }    
 
-            return res.status(400).json({ message: 'Invalid query parameter: name must be "catalog"' });
+        throw new CustomError('Invalid query parameter: name must be "catalog"', 400)
     } catch (error) {
         next(error);
     }

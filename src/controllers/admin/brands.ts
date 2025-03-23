@@ -46,11 +46,7 @@ export const createBrand = async (req: Request, res: Response, next: NextFunctio
         const file = req.file as Express.Multer.File;
 
         if (!title || !file) {
-            return res.json({
-                data: null, 
-                error: 'Title and logo file are required',
-                status: 400
-            });
+            throw new CustomError('Title and logo file are required', 400)
         }
 
         const existingBrand = await brandRepository.findOne({
@@ -61,11 +57,7 @@ export const createBrand = async (req: Request, res: Response, next: NextFunctio
         });
 
         if (existingBrand) {
-            return res.json({
-                data: null,
-                error: 'Brand with this title already exists',
-                status: 400
-            });
+            throw new CustomError('Brand with this title already exists', 400 )
         }
         const newPath = file.path.replace(/\\/g, "/").replace(/^public\//, "");
 
@@ -243,11 +235,7 @@ export const togglePopularBrand = async (req: Request, res: Response, next: Next
         }
 
         if (!brandIds || brandIds.length === 0) {
-            return res.status(400).json({
-                data: null,
-                error: "brandIds is required",
-                status: 400
-            });
+            throw new CustomError('brandIds is required', 400)
         }
 
         const existingPopularBrands = await popularBrandRepository.find({
@@ -311,7 +299,7 @@ export const getPopularBrandByBrandId = async (req: Request, res: Response, next
         const { id } = req.params;
         const popularBrand = await popularBrandRepository.findOne({
             where: {
-                brand: { id },
+                brand: { id }
             },
             relations: ['brand'],
             select: {

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-
+import { CustomError } from '../error-handling/error-handling';
 interface LoginAttempts {
     [ip: string]: {
         attempts: number;
@@ -30,10 +30,7 @@ export async function loginAttemptLimiter(req: Request, res: Response, next: Nex
 
     if (userAttempts.blockedUntil && userAttempts.blockedUntil > currentTime) {
         const blockTimeLeft = Math.ceil((userAttempts.blockedUntil - currentTime) / 1000);
-        res.status(429).json({
-            message: `Too many login attempts. Try again in ${blockTimeLeft} seconds.`,
-        });
-        return;
+        throw new CustomError(`Too many login attempts. Try again in ${blockTimeLeft} seconds.`, 429);
     }
 
     if (currentTime - userAttempts.firstAttemptTime < attemptWindow) {
@@ -45,10 +42,7 @@ export async function loginAttemptLimiter(req: Request, res: Response, next: Nex
 
     if (userAttempts.attempts > loginLimit) {
         userAttempts.blockedUntil = currentTime + blockDuration;
-        res.status(429).json({
-            message: 'Too many login attempts. Please try again in 5 minutes.',
-        });
-        return;
+        throw new CustomError('Too many login attempts. Please try again in 5 minutes.', 429);
     }
 
 

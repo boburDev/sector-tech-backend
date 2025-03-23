@@ -6,12 +6,7 @@ export const validate = (schema: Schema) => {
        const { error } = schema.validate(req.body, { abortEarly: false });
 
         if (error) {
-            res.status(400).json({
-                success: false,
-                message: "Validation error",
-                error: error.details.map((err) => err.message),
-            });
-            return;
+            throw error
         }
         next();
     };
@@ -23,14 +18,8 @@ export const validateParams = (schema: Schema) => {
         const { error } = schema.validate(req.params, { abortEarly: false });
 
         if (error) {
-            res.status(400).json({
-                success: false,
-                message: "Params validation error",
-                error: error.details.map((err) => err.message),
-            });
-            return;
+            throw error
         }
-
         next();
     };
 };
@@ -40,14 +29,8 @@ export const validateQuery = (schema: Schema) => {
         const { error } = schema.validate(req.query, { abortEarly: false });
 
         if (error) {
-            res.status(400).json({
-                success: false,
-                message: "Query validation error",
-                error: error.details.map((err) => err.message),
-                    }); 
-            return;
+            throw error
         }
-
         next();
         };  
 };

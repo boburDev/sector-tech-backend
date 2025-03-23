@@ -4,10 +4,7 @@ import { Product } from "../../entities/products.entity";
 import { IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";
-import { Catalog, Subcatalog } from "../../entities/catalog.entity";
 
-const catalogRepository = AppDataSource.getRepository(Catalog);
-const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 const cartProductRepository = AppDataSource.getRepository(Cart);
@@ -343,10 +340,6 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
           filter.subcatalog = { slug: slug as string, deletedAt: IsNull() };
         }
       }
-    }
-
-    if (categorySlug) {
-      filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
     }
 
     if (categorySlug) {

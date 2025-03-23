@@ -80,11 +80,7 @@ export const createCatalog = async (req: Request, res: Response, next: NextFunct
             }
         });
         if (existingCatalog) {
-            return res.json({
-                data: null,
-                error: 'Catalog with this title already exists',
-                status: 400
-            });
+            throw new CustomError('Catalog with this title already exists', 400)
         }
 
         const catalogCount = await catalogRepository.count({
@@ -253,11 +249,7 @@ export const getSubcatalogById = async (req: Request, res: Response, next: NextF
         });
 
         if (!subcatalog) {
-            return res.status(404).json({
-                data: null,
-                error: "Subcatalog not found",
-                status: 404
-            });
+            throw new CustomError("Subcatalog not found", 404)
         }
 
         // `createdAt` va `deletedAt` ni olib tashlash
@@ -269,7 +261,6 @@ export const getSubcatalogById = async (req: Request, res: Response, next: NextF
             status: 200
         });
     } catch (error) {
-        console.error("Error fetching subcatalog:", error);
         next(error);
     }
 };
@@ -277,13 +268,9 @@ export const getSubcatalogById = async (req: Request, res: Response, next: NextF
 export const createSubcatalog = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, catalogId } = req.body;
-        console.log(req.body);
-        
 
-        // Validate required fields
         if (!title || !catalogId) throw new CustomError('Title and catalogId are required', 400);
 
-        // Check if subcatalog already exists
         const existingSubcatalog = await subcatalogRepository
             .createQueryBuilder('subcatalog')
             .where('LOWER(subcatalog.title) = LOWER(:title)', { title })
@@ -293,7 +280,6 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
 
         if (existingSubcatalog) throw new CustomError('Subcatalog with this title already exists in this catalog', 400);
 
-        // Verify parent catalog exists
         const catalog = await catalogRepository
             .createQueryBuilder('catalog')
             .where('catalog.id = :id', { id: catalogId })
@@ -309,7 +295,6 @@ export const createSubcatalog = async (req: Request, res: Response, next: NextFu
         const numberPrefix = String(subcatalogCount + 100).padStart(4, '0'); // 0100, 0101, ...
         const slug = `${numberPrefix}.${createSlug(title.trim())}`;
 
-        // Create and save new subcatalog
         const subcatalog = subcatalogRepository.create({
             title: title.trim(),
             slug: slug,
@@ -470,11 +455,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
         const file = req.file as Express.Multer.File | undefined; 
 
         if (!title || !subCatalogId) {
-            return res.json({
-                data: null,
-                error: "Title and subCatalogId are required",
-                status: 400,
-            });
+            throw new CustomError('Title and subCatalogId are required', 400)
         }
 
         const existingCategory = await categoryRepository.findOne({
@@ -486,11 +467,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
         });
 
         if (existingCategory) {
-            return res.json({
-                data: null,
-                error: "Category with this title already exists",
-                status: 400,
-            });
+            throw new CustomError('Category with this title already exists',400)
         }
 
         const subcatalog = await subcatalogRepository.findOne({
@@ -552,11 +529,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
             });
 
             if (existingCategory) {
-                return res.json({
-                    data: null,
-                    error: 'Category with this title already exists',
-                    status: 400
-                });
+                throw new CustomError('Category with this title already exists', 400 )
             }
         }
 
