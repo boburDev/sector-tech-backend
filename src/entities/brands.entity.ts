@@ -16,7 +16,7 @@ export class Brand {
     @Column({ length: 500, nullable: true })
     path: string;
 
-    @Column({ length: 1000, default: null })
+    @Column({ length: 10000, default: null })
     description: string;
 
     @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
