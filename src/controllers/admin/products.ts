@@ -210,7 +210,7 @@ export const createProductFunctional = async (req: Request, res: Response, next:
             throw error;
         }
         
-        const existsProduct = await productRepository.findOne({ where: { title: value.title } });
+        const existsProduct = await productRepository.findOne({ where: { title: value.title, productCode: value.productCode, deletedAt: IsNull() } });
         if (existsProduct) {
             throw new CustomError("Product already exists", 400);
         }
@@ -291,7 +291,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             throw error;
         }
 
-        const existsProduct = await productRepository.findOne({ where: { title: value.title }})
+        const existsProduct = await productRepository.findOne({ where: { title: value.title, productCode: value.productCode, deletedAt: IsNull() }})
         if(existsProduct){
             throw new CustomError("Product already exist", 400)
         }
