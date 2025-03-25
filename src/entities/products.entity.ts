@@ -4,6 +4,7 @@ import { ProductComment, ProductCondition, ProductQuestion, ProductRelevance } f
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
 import { Cart, SavedProduct } from "./user_details.entity";
 import { PopularProduct } from "./popular.entity";
+
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn("uuid")
@@ -27,7 +28,7 @@ export class Product {
   @Column({ default: null, nullable: true })
   inStock: string;
 
-  @Column({ type: "varchar", length: 20000, default: null})
+  @Column({ type: "text", default: null, nullable: true })
   fullDescription: string;
 
   @Column("json")
