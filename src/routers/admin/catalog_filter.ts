@@ -138,4 +138,25 @@ router.put("/update/:id",validateAdminToken,validateParams(uuidSchema), CatalogF
  */
 router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), CatalogFilter.deleteCatalogFilter);
 
+/**
+ * @swagger
+ * /catalog-filter/test:
+ *   get:
+ *     summary: Get test filter by subcatalogId or categoryId
+ *     tags: [CatalogFilter]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: subcatalog
+ *         required: true
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Test filter details
+ *       404:
+ *         description: Test filter not found   
+ */
+router.get("/test", validateAdminToken, CatalogFilter.getTestFilterSubcatalogIdCategoryId); 
 export default router;

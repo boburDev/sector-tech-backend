@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 import { CustomError } from '../../error-handling/error-handling';
+import { IsNull } from 'typeorm';
+import { Not } from 'typeorm';
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -180,6 +182,35 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
             data: result.data
         }
         return res.status(200).json(filterResult);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getTestFilterSubcatalogIdCategoryId = async ( req: Request, res: Response, next: NextFunction ): Promise<any> => {
+    try {
+        const { subcatalog } = req.query;
+        let filter: any;
+
+        if (subcatalog === "true") {
+            filter = await catalogFilterRepository.find({
+                where: {
+                    subcatalogId: Not(IsNull()),
+                    categoryId: IsNull(),
+                    deletedAt: IsNull(),
+                },
+            });
+        } else {
+            filter = await catalogFilterRepository.find({
+                where: {
+                    categoryId: Not(IsNull()),
+                    subcatalogId: IsNull(),
+                    deletedAt: IsNull(),
+                },
+            });
+        }
+
+        return res.status(200).json({ data: filter, error: null, status: 200 });
     } catch (error) {
         next(error);
     }
