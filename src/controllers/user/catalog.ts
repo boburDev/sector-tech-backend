@@ -142,10 +142,13 @@ export const getFilterBySubcatalogCategoryId = async (req: Request, res: Respons
             select: ['id', 'data']
         });
 
-        const updatedCategoryFilter = categoryFilter?.data.map((filter: any) => ({
-            ...filter,
-            productCount: filter.productsId?.length || 0
-        }));
+        const updatedCategoryFilter = categoryFilter?.data.map((filters: any) => {
+            const { productsId, ...filter } = filters
+            return {
+                ...filter,
+                productCount: productsId.length || 0
+            }
+        });
 
         return res.status(200).json({ data: updatedCategoryFilter, error: null, status: 200 });
     } catch (error) {
