@@ -11,6 +11,7 @@ import promotionRouter from "./promotion";
 import popularRouter from "./popular";
 import regionRouter from "./region";
 import kontragentRouter from "./kontragent";
+import filterRouter from "./filter";
 const router = express.Router();
 
 router.use("/auth", userRouter);
@@ -25,4 +26,6 @@ router.use("/promotion", promotionRouter)
 router.use("/popular", popularRouter)
 router.use("/region", regionRouter) 
 router.use("/kontragent", kontragentRouter)
+router.use("/filter", filterRouter)
+
 export default router;

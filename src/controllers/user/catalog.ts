@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
 import { IsNull } from 'typeorm';
+import { CatalogFilter } from '../../entities/catalog_filter.entity';
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
+const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 // Catalog Controllers
 
@@ -119,6 +121,33 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
 
         return res.status(200).json({ data: categories, error: null, status: 200 });
 
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getFilterBySubcatalogCategoryId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { subcatalogId, categoryId } = req.query;
+
+        const whereCondition: any = {
+            deletedAt: IsNull()
+        };
+
+        if (subcatalogId) whereCondition.subcatalogId = subcatalogId;
+        if (categoryId) whereCondition.categoryId = categoryId;
+
+        const categoryFilter = await catalogFilterRepository.findOne({
+            where: whereCondition,
+            select: ['id', 'data']
+        });
+
+        const updatedCategoryFilter = categoryFilter?.data.map((filter: any) => ({
+            ...filter,
+            productCount: filter.productsId?.length || 0
+        }));
+
+        return res.status(200).json({ data: updatedCategoryFilter, error: null, status: 200 });
     } catch (error) {
         next(error);
     }
