@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { ILike, In, IsNull, Not } from 'typeorm';
+import { ILike, In, IsNull, Like, Not } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 import { createSlug } from '../../utils/slug';
@@ -204,23 +204,62 @@ export const deleteBrand = async (req: Request, res: Response, next: NextFunctio
 
 export const getBrands = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { popular } = req.query;
+        const { popular, limit, page, title } = req.query;
+        const pageNumber = parseInt(page as string) || 1;
+        const limitNumber = parseInt(limit as string) || 10;
+        const offset = (pageNumber - 1) * limitNumber;  
 
-        const queryBuilder = brandRepository.createQueryBuilder("brand")
-            .leftJoinAndSelect("brand.popularBrand", "popularBrand")
-            .where("brand.deletedAt IS NULL");
+        const filter: any = { deletedAt: IsNull() };
 
         if (popular === "true") {
-            queryBuilder.andWhere("popularBrand.id IS NOT NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'brand.description', 'popularBrand.id']);
+            filter.popularBrand = { id: Not(IsNull()) };
         } else if (popular === "false") {
-            queryBuilder.andWhere("popularBrand.id IS NULL").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'brand.description']);
+            filter.popularBrand = { id: IsNull() };
         }
 
-        const brands = await queryBuilder
-            .orderBy("brand.createdAt", "DESC").select(['brand.id', 'brand.title', 'brand.path', 'brand.slug', 'brand.description', 'popularBrand.id'])
-            .getMany()
+        if (title) {
+            filter.title = Like(`%${title}%`);  
+        }
 
-        return res.status(200).json({ data: brands, error: null, status: 200 });
+        const [brands, total] = await Promise.all([
+            brandRepository.find({
+                where: filter,
+                skip: offset,
+                take: limitNumber,
+                order: {
+                    createdAt: 'DESC'
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    path: true,
+                    slug: true,
+                    description: true,
+                    createdAt: true,
+                    popularBrand: {
+                        id: true
+                    }
+                }
+            }),
+            brandRepository.count({
+                where: filter
+            })
+        ]); 
+
+        const totalPages = Math.ceil(total / limitNumber);
+
+        return res.status(200).json({
+            data: {
+                brands,
+                total,
+                totalPages,
+                pageNumber,
+                limitNumber
+            },
+            error: null,
+            status: 200
+        });
+        
     } catch (error) {
         next(error);
     }

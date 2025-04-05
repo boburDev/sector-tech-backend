@@ -193,12 +193,26 @@ router.delete("/delete/:id", validateAdminToken, validateParams(uuidSchema), Bra
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: popular
+ *         name: page
+ *         schema:
+ *           type: number
+ *         required: false
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *         required: false
+ *         description: Limit number
+ *       - in: query
+ *         name: title
  *         schema:
  *           type: string
  *         required: false
- *         description: Filter by popular brands (true/false)
- *     responses:
+ *         description: Title
+ *     responses:           
+ *       401:
+ *         description: Unauthorized    
  *       200:
  *         description: List of brands
  *       500:
