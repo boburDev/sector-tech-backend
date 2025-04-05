@@ -11,7 +11,7 @@ export const deleteFile = (path: string) => {
 export const deleteFileBeforeSave = (filePath: string | null) => {
     if (filePath) {
         const fullPath = path.resolve(filePath);
-    
+
         fs.unlink(fullPath, (err) => {
             if (err) {
                 console.error(`Faylni o‘chirishda xatolik yuz berdi: ${err.message}`);

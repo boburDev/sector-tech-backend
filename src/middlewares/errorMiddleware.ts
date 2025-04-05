@@ -37,6 +37,7 @@ export const logErrorToFile = (errorData: object) => {
         console.error("Failed to write error log:", err);
     }
 };
+
 const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunction) => {
     const isCustomError = err instanceof CustomError;
     const status = isCustomError ? (err as CustomError).status : 500;
