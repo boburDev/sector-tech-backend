@@ -17,8 +17,8 @@ const userRepository = AppDataSource.getRepository(Users);
 export async function validateUserToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-        throw new CustomError("No token provided", 401);
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw new CustomError("Authorization header is missing or invalid", 401);
     }
 
     const token = authHeader.split(' ')[1];
