@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Product } from '../../entities/products.entity';
-import { In, IsNull, Not } from 'typeorm';
+import { In, IsNull, Not, Like } from 'typeorm';
 import { productFunctionalSchema, productSchema } from '../../validators/product.validator';
 import { createSlug } from '../../utils/slug';
 import { deleteFile, deleteFileBeforeSave } from '../../middlewares/removeFiltePath';
@@ -102,6 +102,77 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
+
+export const getProductsByFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {   
+        const { productCode, page, limit, title } = req.query;
+        const pageNumber = parseInt(page as string) || 1;
+        const limitNumber = parseInt(limit as string) || 10;
+        const offset = (pageNumber - 1) * limitNumber;
+
+        const filter: any = { deletedAt: IsNull() };
+
+        if (productCode) {
+            filter.productCode = productCode as string;
+        }
+
+        if (title) {
+            filter.title = Like(`%${title}%`);
+        }
+        
+
+        const [products, total] = await Promise.all([
+            productRepository.find({
+                where: filter,
+                skip: offset,
+                take: limitNumber,
+                relations: ["category", "relevances", "conditions", "catalog", "subcatalog", "brand"],
+                order: { createdAt: "DESC" },
+                select: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                    articul: true,
+                    inStock: true,
+                    price: true,
+                    mainImage: true,
+                    recommended: true,
+                    catalogId: true,
+                    subcatalogId: true,
+                    categoryId: true,
+                    brandId: true,
+                    conditionId: true,
+                    relevanceId: true,
+                    description: true,
+                    fullDescription: true,
+                    fullDescriptionImages: true,
+                    characteristics: true,
+                    productCode: true,
+                    garanteeIds: true,
+                    images: true,
+                    createdAt: true,
+                    brand: {
+                        id: true,
+                        title: true,
+                        slug: true,
+                    },
+                },
+            }),
+            productRepository.count({ where: filter }),
+        ]);
+
+        const totalPages = Math.ceil(total / limitNumber);
+
+        return res.status(200).json({
+            data: { products, total, pageNumber, limitNumber, totalPages },
+            error: null,
+            status: 200
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
 
 export const getProductById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {

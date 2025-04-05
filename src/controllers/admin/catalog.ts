@@ -6,11 +6,13 @@ import { createSlug } from '../../utils/slug';
 import { deleteFile } from '../../middlewares/removeFiltePath';
 import { PopularCategory } from '../../entities/popular.entity';
 import { CustomError } from '../../error-handling/error-handling';
+import { Product } from '../../entities/products.entity';
 
 const catalogRepository = AppDataSource.getRepository(Catalog);
 const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
 const categoryRepository = AppDataSource.getRepository(Category);
 const popularCategoryRepository = AppDataSource.getRepository(PopularCategory);
+const productRepository = AppDataSource.getRepository(Product);
 // Catalog Controllers
 export const getCatalogById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
@@ -385,6 +387,49 @@ export const deleteSubcatalog = async (req: Request, res: Response, next: NextFu
             data: { message: 'Subcatalog deleted successfully' },
             error: null,
             status: 200
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getProductsBySubcatalogIdAndCategoryId = async (req: Request,res: Response,next: NextFunction): Promise<any> => {
+    try {
+        const { subCatalogId, categoryId } = req.query;
+
+        let whereCondition: any = {
+            deletedAt: IsNull(),
+        };
+
+        if (subCatalogId) {
+            const subcatalogExists = await subcatalogRepository.findOne({
+                where: { id: subCatalogId as string, deletedAt: IsNull() },
+            });
+            if (!subcatalogExists) throw new CustomError("Subcatalog not found", 404);
+
+            whereCondition.subcatalogId = subCatalogId as string;
+        }
+
+        if (categoryId) {
+            const categoryExists = await categoryRepository.findOne({
+                where: { id: categoryId as string, deletedAt: IsNull() },
+            });
+            if (!categoryExists) throw new CustomError("Category not found", 404);
+
+            whereCondition.categoryId = categoryId as string;
+        }
+
+        const products = await productRepository.find({
+            where: whereCondition,
+            order: {
+                createdAt: 'DESC'
+            }
+        });
+
+        return res.status(200).json({
+            data: products,
+            error: null,
+            status: 200,
         });
     } catch (error) {
         next(error);

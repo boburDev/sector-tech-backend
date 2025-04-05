@@ -53,6 +53,41 @@ const router = express.Router();
  */
 router.get('/', validateAdminToken, Product.getProducts);
 
+/** 
+ * @swagger
+ * /product/filter:
+ *   get:
+ *     summary: Get products by filter
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: productCode
+ *         required: false
+ *         description: Product code    
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         description: Limit number
+ *       - in: query
+ *         name: title
+ *         required: false
+ *         description: Title
+ *     responses:   
+ *       200:
+ *         description: Products fetched successfully
+ *       400:
+ *         description: Invalid query parameters
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/filter', validateAdminToken, Product.getProductsByFilter);
+
 /**
  * @swagger
  * /product/by-id/{id}:
@@ -317,33 +352,33 @@ router.post('/create-functional', validateAdminToken, uploadPhoto.fields([{ name
  */
 router.put('/update/:id', validateAdminToken, uploadPhoto.fields([{ name: "productMainImage", maxCount: 1 }, { name: "productImages", maxCount: 10 }, { name: "fullDescriptionImages", maxCount: 15 } ]), Product.updateProduct);
 
-/**
- * @swagger
- * /product/delete/{id}:
- *   delete:
- *     summary: Delete a product
- *     description: Deletes a product (soft delete). Requires authentication.
- *     tags: [Product]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Product ID
- *         schema:
- *           type: string  # UUID bo‘lsa ham, Swaggerda string sifatida belgilash yaxshiroq
- *     responses:
- *       200:
- *         description: Product deleted successfully
- *       400:
- *         description: Invalid ID format
- *       404:
- *         description: Product not found
- *       500:
- *         description: Internal server error
- */
-router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Product.deleteProduct);
+// /**
+//  * @swagger
+//  * /product/delete/{id}:
+//  *   delete:
+//  *     summary: Delete a product
+//  *     description: Deletes a product (soft delete). Requires authentication.
+//  *     tags: [Product]
+//  *     security:
+//  *       - bearerAuth: []
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         description: Product ID
+//  *         schema:
+//  *           type: string  # UUID bo‘lsa ham, Swaggerda string sifatida belgilash yaxshiroq
+//  *     responses:
+//  *       200:
+//  *         description: Product deleted successfully
+//  *       400:
+//  *         description: Invalid ID format
+//  *       404:
+//  *         description: Product not found
+//  *       500:
+//  *         description: Internal server error
+//  */
+// router.delete('/delete/:id', validateAdminToken, validateParams(uuidSchema), Product.deleteProduct);
 
 /**
  * @swagger

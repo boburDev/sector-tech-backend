@@ -159,4 +159,5 @@ router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), Cata
  *         description: Test filter not found   
  */
 router.get("/test", validateAdminToken, CatalogFilter.getTestFilterSubcatalogIdCategoryId); 
+
 export default router;
