@@ -81,7 +81,7 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
             }));
 
             const newFilter = catalogFilterRepository.create({
-                subcatalogId,
+                subcatalogId: categoryId ? null : subcatalogId,
                 categoryId,
                 data: updatedData
             });
@@ -103,7 +103,6 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
         }
     } catch (error) {
         console.log(error);
-        
         next(error);
     }
 };
