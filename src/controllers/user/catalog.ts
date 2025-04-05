@@ -126,16 +126,27 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
     }
 };
 
-export const getFilterBySubcatalogCategoryId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { subcatalogId, categoryId } = req.query;
+        const { subcatalogSlug, categorySlug } = req.query;
 
         const whereCondition: any = {
             deletedAt: IsNull()
         };
 
-        if (subcatalogId) whereCondition.subcatalogId = subcatalogId;
-        if (categoryId) whereCondition.categoryId = categoryId;
+        if (subcatalogSlug){
+            const subcatalog = await subcatalogRepository.findOne({
+                where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
+            }) 
+            whereCondition.subcatalogId = subcatalog?.id;
+        } 
+        
+        if (categorySlug){
+            const category = await categoryRepository.findOne({
+                where: { deletedAt: IsNull(), slug: categorySlug as string }
+            })
+            whereCondition.categoryId = category?.id;
+        }
 
         const categoryFilter = await catalogFilterRepository.findOne({
             where: whereCondition,

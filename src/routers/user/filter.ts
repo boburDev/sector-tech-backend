@@ -14,25 +14,25 @@ const router = express.Router();
  * /user/filter:
  *   get:
  *     summary: Get filter by optional subcatalog and category
- *     tags: [Filter]
+ *     tags: [Filter]   
  *     parameters:
- *       - name: subcatalogId
+ *       - name: subcatalogSlug
  *         in: query
  *         required: false
  *         type: string
- *         description: (Optional) The ID of the subcatalog.
- *       - name: categoryId
+ *         description: (Optional) The slug of the subcatalog.
+ *       - name: categorySlug
  *         in: query
- *         required: false
+ *         required: false  
  *         type: string
- *         description: (Optional) The ID of the category.
+ *         description: (Optional) The slug of the category.
  *     responses:
  *       200:
  *         description: Filter by subcatalog and/or category.
  *         schema:
- *           type: object
+ *           type: object   
  */
 
-router.get("/", Filter.getFilterBySubcatalogCategoryId);
+router.get("/", Filter.getFilterBySubcatalogCategorySlug);
 
 export default router;
