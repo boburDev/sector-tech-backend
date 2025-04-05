@@ -120,9 +120,9 @@ export const updateCatalogFilter = async (req: Request, res: Response, next: Nex
 
         if (itemIndex === -1) throw new CustomError(`Item with name "${name}" not found in filter data`, 404);
 
-        if(filter.data[itemIndex].name === data.name){
-          throw new CustomError(`You can't update the same element: ${data.name}`, 404);
-        }
+        // if(filter.data[itemIndex].name === data.name){
+        //   throw new CustomError(`You can't update the same element: ${data.name}`, 404);
+        // }
         filter.data[itemIndex] = {
             ...data,
             productsId: filter.data[itemIndex].productsId
