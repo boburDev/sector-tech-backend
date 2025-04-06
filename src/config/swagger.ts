@@ -35,18 +35,29 @@ const userSwaggerSpec = swaggerJSDoc(
   ])
 );
 
+const mobileSwaggerSpec = swaggerJSDoc(
+  createSwaggerConfig("Mobile API", baseUrl, [
+    "./src/routers/mobile/*.ts",
+  ])
+);
+
 const adminSwaggerSpec = swaggerJSDoc(
   createSwaggerConfig("Admin API", baseUrl, [
     "./src/routers/admin/*.ts",
   ])
 );
 
-
 export const setupSwagger = (app: Express) => {
   app.use(
     "/api-docs",
     swaggerUI.serveFiles(userSwaggerSpec),
     swaggerUI.setup(userSwaggerSpec)
+  );
+
+  app.use(
+    "/mobile-docs",
+    swaggerUI.serveFiles(mobileSwaggerSpec),
+    swaggerUI.setup(mobileSwaggerSpec)
   );
 
   app.use(

@@ -4,6 +4,7 @@ import path from "path";
 import AppDataSource from "./config/ormconfig";
 import adminRouter from "./routers/admin/index";
 import userRouter from "./routers/user/index";
+import mobileRouter from "./routers/mobile/index";
 import cors from "cors";
 import "dotenv/config";
 import "./common/strategy/google.strategy";
@@ -52,8 +53,10 @@ app.get('/', async (req: any, res: any) => {
     res.status(500).send('error')
   }
 })
+
 app.use("/", adminRouter);
 app.use("/user", userRouter);
+app.use("/mobile", mobileRouter);
 app.use(errorMiddleware);
 setupSwagger(app);
 
