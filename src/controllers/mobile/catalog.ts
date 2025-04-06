@@ -1,0 +1,168 @@
+import { NextFunction, Request, Response } from 'express';
+import AppDataSource from '../../config/ormconfig';
+import { Catalog, Subcatalog, Category } from '../../entities/catalog.entity';
+import { IsNull } from 'typeorm';
+import { CatalogFilter } from '../../entities/catalog_filter.entity';
+const catalogRepository = AppDataSource.getRepository(Catalog);
+const subcatalogRepository = AppDataSource.getRepository(Subcatalog);
+const categoryRepository = AppDataSource.getRepository(Category);
+const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
+
+// Catalog Controllers
+
+interface CatalogSelect {
+    id: boolean;
+    slug: boolean;
+    title: boolean;
+    subcatalogs?: {
+        id: boolean;
+        title: boolean;
+        slug: boolean;
+        categories?: {
+            id: boolean;
+            slug: boolean;
+            title: boolean;
+        };
+    };
+}
+
+export const getCatalogs = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { catalog, subcatalog, category } = req.query;
+
+        const isCatalog = catalog === "true";
+        const isSubcatalog = subcatalog === "true";
+        const isCategory = category === "true";
+
+        const defaultCase = !catalog && !subcatalog && !category;
+
+        const relations: string[] = [];
+        const select: CatalogSelect = {
+            id: true,
+            slug: true,
+            title: true,
+        };
+
+        if (isCategory || defaultCase) {
+            relations.push("subcatalogs");
+            select.subcatalogs = {
+                id: true,
+                title: true,
+                slug: true,
+            };
+            relations.push("subcatalogs.categories");
+            select.subcatalogs.categories = {
+                id: true,
+                slug: true,
+                title: true,
+            };
+        }
+        else if (isSubcatalog) {
+            relations.push("subcatalogs");
+            select.subcatalogs = {
+                id: true,
+                title: true,
+                slug: true,
+            };
+        }
+        else if (isCatalog && !isSubcatalog && !isCategory) {
+        }
+
+        const catalogs = await catalogRepository.find({
+            where: { deletedAt: IsNull() },
+            order: { updatedAt: "ASC" },
+            relations: relations.length > 0 ? relations : undefined,
+            select,
+        });
+
+        return res.status(200).json({ data: catalogs, error: null, status: 200  });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { catalogSlug } = req.params;
+        // console.log(catalogSlug);
+        
+        const subcatalog = await subcatalogRepository.find({
+            where: {
+                deletedAt: IsNull(),
+                catalog: {
+                    slug: catalogSlug
+                },
+            },
+            order: { createdAt : "DESC" },
+            relations: ["catalog"]
+        });
+        return res.status(200).json({ data: subcatalog, error: null, status: 200 });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { subCatalogSlug } = req.params;
+        // console.log(subCatalogSlug);
+        
+        const categories = await categoryRepository.find({
+            where: {
+                deletedAt: IsNull(),
+                subCatalog: {
+                    slug: subCatalogSlug
+                }
+            },
+            order: { createdAt: "DESC" },
+            relations: ["subCatalog"]
+        });
+
+        return res.status(200).json({ data: categories, error: null, status: 200 });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { subcatalogSlug, categorySlug } = req.query;
+
+        const whereCondition: any = {
+            deletedAt: IsNull()
+        };
+
+        if (subcatalogSlug){
+            const subcatalog = await subcatalogRepository.findOne({
+                where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
+            }) 
+            whereCondition.subcatalogId = subcatalog?.id;
+        } 
+        
+        if (categorySlug){
+            const category = await categoryRepository.findOne({
+                where: { deletedAt: IsNull(), slug: categorySlug as string }
+            })
+            whereCondition.categoryId = category?.id;
+        }
+
+        const categoryFilter = await catalogFilterRepository.findOne({
+            where: whereCondition,
+            select: ['id', 'data']
+        });
+
+        const updatedCategoryFilter = categoryFilter?.data.map((filters: any) => {
+            const { productsId, ...filter } = filters
+            return {
+                ...filter,
+                productCount: productsId.length || 0
+            }
+        });
+
+        return res.status(200).json({ data: updatedCategoryFilter, error: null, status: 200 });
+    } catch (error) {
+        next(error);
+    }
+};
