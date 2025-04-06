@@ -28,7 +28,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Catalog already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Catalog already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -42,7 +42,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 i.updatedAt = new Date();
                 await catalogRepository.save(i);
             }
-            return res.status(200).json({ message: 'Catalog updated successfully' });
+            return res.status(200).json({ message: 'Catalog order changed successfully' });
         }
 
         if (name === 'subcatalog') {

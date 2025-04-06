@@ -14,14 +14,17 @@ interface CatalogSelect {
     id: boolean;
     slug: boolean;
     title: boolean;
+    updatedAt: boolean;
     subcatalogs?: {
         id: boolean;
         title: boolean;
         slug: boolean;
+        updatedAt: boolean;
         categories?: {
             id: boolean;
             slug: boolean;
             title: boolean;
+            updatedAt: boolean;
         };
     };
 }
@@ -41,6 +44,7 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
             id: true,
             slug: true,
             title: true,
+            updatedAt: true,
         };
 
         if (isCategory || defaultCase) {
@@ -49,33 +53,43 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
                 id: true,
                 title: true,
                 slug: true,
+                updatedAt: true,
             };
             relations.push("subcatalogs.categories");
             select.subcatalogs.categories = {
                 id: true,
                 slug: true,
                 title: true,
+                updatedAt: true,
             };
-        }
-        else if (isSubcatalog) {
+        } else if (isSubcatalog) {
             relations.push("subcatalogs");
             select.subcatalogs = {
                 id: true,
                 title: true,
                 slug: true,
+                updatedAt: true,
             };
-        }
-        else if (isCatalog && !isSubcatalog && !isCategory) {
+        } else if (isCatalog && !isSubcatalog && !isCategory) {
+            // No changes for catalogs only
         }
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            order: { updatedAt: "ASC" },
-            relations: relations.length > 0 ? relations : undefined,
+            order: {
+                updatedAt: "ASC",
+                subcatalogs: {
+                    updatedAt: "ASC",
+                    categories: {
+                        updatedAt: "ASC"
+                    }
+                }
+            },
+            relations: ["subcatalogs", "subcatalogs.categories"],
             select,
         });
 
-        return res.status(200).json({ data: catalogs, error: null, status: 200  });
+        return res.status(200).json({ data: catalogs, error: null, status: 200 });
     } catch (error) {
         next(error);
     }
@@ -93,7 +107,7 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, ne
                     slug: catalogSlug
                 },
             },
-            order: { createdAt : "DESC" },
+            order: { updatedAt: "ASC" },
             relations: ["catalog"]
         });
         return res.status(200).json({ data: subcatalog, error: null, status: 200 });
@@ -115,7 +129,7 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
                     slug: subCatalogSlug
                 }
             },
-            order: { createdAt: "DESC" },
+            order: { updatedAt: "ASC" },
             relations: ["subCatalog"]
         });
 

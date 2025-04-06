@@ -48,7 +48,7 @@ export const getAllCatalogs = async (req: Request, res: Response, next: NextFunc
             .createQueryBuilder('catalog')
             .leftJoinAndSelect('catalog.subcatalogs', 'subcatalogs', 'subcatalogs.deletedAt IS NULL')
             .where('catalog.deletedAt IS NULL')
-            .orderBy('catalog.createdAt', 'DESC')
+            .orderBy('catalog.updatedAt', 'ASC')
             .getMany();
 
         const catalogsWithoutDates = catalogs.map(catalog => {
@@ -182,6 +182,9 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             where: {
                 id,
                 deletedAt: IsNull()
+            },
+            order: {
+                updatedAt: 'ASC'
             }
         });
 
@@ -192,8 +195,8 @@ export const getSubcatalogWithCategoryByCatalogId = async (req: Request, res: Re
             .leftJoinAndSelect('subcatalog.categories', 'category', 'category.deletedAt IS NULL')
             .where('subcatalog.catalogId = :catalogId', { catalogId: id })
             .andWhere('subcatalog.deletedAt IS NULL')
-            .orderBy('subcatalog.createdAt', 'DESC')
-            .addOrderBy('category.createdAt', 'DESC');
+            .orderBy('subcatalog.updatedAt', 'ASC')
+            .addOrderBy('category.updatedAt', 'ASC');
 
         const subcatalogs = await queryBuilder.getMany();
 
@@ -446,6 +449,9 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
             where: {
                 id,
                 deletedAt: IsNull()
+            },
+            order: {
+                updatedAt: "ASC"
             }
         });
 
@@ -465,8 +471,9 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
         const categories = await categoryRepository.find({
             where: whereCondition,
             order: {
-                createdAt: 'DESC'
-            }
+                updatedAt: 'ASC'
+            },
+            relations: ["popularCategory"]
         });
 
         if (!categories.length) {
@@ -698,13 +705,14 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
 
         const categories = await categoryRepository.find({
             where: whereCondition,
-            order: { createdAt: "DESC" },
+            order: { updatedAt: "ASC" },
             relations: ["popularCategory"],
             select: {
                 id: true,
                 title: true,
                 path: true,
                 slug: true,
+                updatedAt: true,
                 ...(popular === "true" ? { popularCategory: { id: true } } : {})
             }
         });
