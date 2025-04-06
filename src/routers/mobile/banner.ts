@@ -12,7 +12,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/banner/all:
+ * /mobile/banner/all:
  *   get:
  *     summary: Get all banners
  *     tags: [Banners]

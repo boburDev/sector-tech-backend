@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/product/all:
+ * /mobile/product/all:
  *   get:
  *     summary: Retrieve all products with optional filters
  *     tags: [Product]
@@ -154,7 +154,7 @@ router.get("/all", Product.getProducts);
 
 /**
  * @swagger
- * /user/product/by-slug/{slug}:
+ * /mobile/product/by-slug/{slug}:
  *   get:
  *     summary: Retrieve a product by its SLUG
  *     tags: [Product]
@@ -183,7 +183,7 @@ router.get('/by-slug/:slug', Product.getProductById);
 
 /**
  * @swagger
- * /user/product/toggle-saved:
+ * /mobile/product/toggle-saved:
  *   post:
  *     summary: Toggle the saved status of a product for the user
  *     tags: [savedProduct]
@@ -211,7 +211,7 @@ router.post('/toggle-saved', validateUserToken, validate(productIdParamsSchema),
 
 /**
  * @swagger
- * /user/product/saved-products:
+ * /mobile/product/saved-products:
  *   get:
  *     summary: Retrieve all saved products for the user
  *     tags: [savedProduct]
@@ -231,7 +231,7 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
 
 /**
  * @swagger
- * /user/product/by-slug:
+ * /mobile/product/by-slug:
  *   get:
  *     summary: Get products by catalog or subcatalog slug with sorting and pagination
  *     description: Fetch products based on catalog or subcatalog slug with additional filters like category, stock availability, title search, and sorting options.

@@ -14,7 +14,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/kontragent/create:
+ * /mobile/kontragent/create:
  *   post:
  *     summary: Create a new kontragent
  *     tags: [Kontragent]
@@ -91,7 +91,7 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
 
 /**
  * @swagger
- * /user/kontragent/all:
+ * /mobile/kontragent/all:
  *   get:
  *     summary: Get all kontragents for the authenticated user
  *     tags: [Kontragent]
@@ -152,7 +152,7 @@ router.get("/all", validateUserToken, kontragentController.getKontragents);
 
 /**
  * @swagger
- * /user/kontragent/update/{id}:
+ * /mobile/kontragent/update/{id}:
  *   patch:
  *     summary: Update an existing kontragent (all fields are optional)
  *     tags: [Kontragent]
@@ -230,7 +230,7 @@ router.patch("/update/:id", validateUserToken, kontragentController.updateKontra
 
 /**
  * @swagger
- * /user/kontragent/delete/{id}:
+ * /mobile/kontragent/delete/{id}:
  *   delete:
  *     summary: Delete a kontragent (soft delete)
  *     tags: [Kontragent]

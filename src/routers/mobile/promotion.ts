@@ -14,7 +14,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/promotion/all:
+ * /mobile/promotion/all:
  *   get:
  *     summary: Get all promotions
  *     tags: [Promotions]
@@ -26,7 +26,7 @@ router.get("/all", Promotion.getPromotions);
 
 /**
  * @swagger
- * /user/promotion/{id}:
+ * /mobile/promotion/{id}:
  *   get:
  *     summary: Get promotion by ID
  *     tags: [Promotions]

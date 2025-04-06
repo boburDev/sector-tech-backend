@@ -68,4 +68,5 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`User Swagger docs at http://localhost:${PORT}/api-docs`);
   console.log(`Admin Swagger docs at http://localhost:${PORT}/admin-docs`);
+  console.log(`Mobile Swagger docs at http://localhost:${PORT}/mobile-docs`);
 });

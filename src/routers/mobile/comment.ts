@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/comment/add:
+ * /mobile/comment/add:
  *   post:
  *     summary: Add a new product comment
  *     tags: [productComment]
@@ -47,7 +47,7 @@ router.post('/add', validateUserToken, validate(productCommentSchema), ProductCo
 
 /**
  * @swagger
- * /user/comment/by-productId/{productId}:
+ * /mobile/comment/by-productId/{productId}:
  *   get:
  *     summary: Get comments by product ID
  *     tags: [productComment]

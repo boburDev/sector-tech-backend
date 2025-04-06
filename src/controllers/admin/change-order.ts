@@ -13,8 +13,6 @@ const popularBrandRepository = AppDataSource.getRepository(PopularBrand);
 const popularCategoryRepository = AppDataSource.getRepository(PopularCategory);
 const popularProductRepository = AppDataSource.getRepository(PopularProduct);
 
-
-
 export const changeOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { name } = req.query;
@@ -53,7 +51,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Subcatalog already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Subcatalog already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -67,7 +65,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 i.updatedAt = new Date();
                 await subcatalogRepository.save(i);
             }
-            return res.status(200).json({ message: 'Subcatalog updated successfully' });
+            return res.status(200).json({ message: 'Subcatalog order changed successfully' });
         }
 
         if (name === 'category') {
@@ -78,7 +76,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Category already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Category already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -92,7 +90,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 i.updatedAt = new Date();
                 await categoryRepository.save(i);
             }
-            return res.status(200).json({ message: 'Category updated successfully' });  
+            return res.status(200).json({ message: 'Category order changed successfully' });  
         }       
 
         if (name === 'brand') {
@@ -103,7 +101,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Brand already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Brand already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -117,7 +115,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 i.updatedAt = new Date();
                 await brandRepository.save(i);
             }
-            return res.status(200).json({ message: 'Brand updated successfully' });
+            return res.status(200).json({ message: 'Brand order changed successfully' });
         }
 
         if (name === 'popularBrand') {
@@ -128,7 +126,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Popular brand already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Popular brand already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -142,7 +140,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 i.updatedAt = new Date();
                 await popularBrandRepository.save(i);
             }
-            return res.status(200).json({ message: 'Popular brand updated successfully' });
+            return res.status(200).json({ message: 'Popular brand order changed successfully' });
         }
         if (name === 'popularCategory') {
             const elements = await popularCategoryRepository.find({ order: { updatedAt: 'ASC' } });
@@ -152,7 +150,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Popular category already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Popular category already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -167,7 +165,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 await popularCategoryRepository.save(i);
             }   
 
-            return res.status(200).json({ message: 'Popular category updated successfully' });
+            return res.status(200).json({ message: 'Popular category order changed successfully' });
         }   
 
         if (name === 'popularProduct') {
@@ -178,7 +176,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
 
-            if (elementIndex === index) throw new CustomError('Popular product already in this index', 200);
+            if (elementIndex === index) throw new CustomError('Popular product already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
@@ -192,7 +190,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 i.updatedAt = new Date();
                 await popularProductRepository.save(i);
             }
-            return res.status(200).json({ message: 'Popular product updated successfully' });
+            return res.status(200).json({ message: 'Popular product order changed successfully' });
         }    
 
         throw new CustomError('Invalid query parameter: name must be "catalog"', 400)
@@ -200,4 +198,3 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
-

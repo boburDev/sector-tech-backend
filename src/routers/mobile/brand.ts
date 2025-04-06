@@ -12,7 +12,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/brand/all:
+ * /mobile/brand/all:
  *   get:
  *     summary: Get all brands or filter by popular brands
  *     tags: [Brands]
@@ -62,7 +62,7 @@ router.get("/all", Brands.getBrands);
 
 /**
  * @swagger
- * /user/brand/{slug}:
+ * /mobile/brand/{slug}:
  *   get:
  *     summary: Get brand by SLUG
  *     tags: [Brands]

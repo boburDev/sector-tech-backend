@@ -70,23 +70,16 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
                 slug: true,
                 updatedAt: true,
             };
-        } else if (isCatalog && !isSubcatalog && !isCategory) {
-            // No changes for catalogs only
-        }
+        } 
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            order: {
-                updatedAt: "ASC",
-                subcatalogs: {
-                    updatedAt: "ASC",
-                    categories: {
-                        updatedAt: "ASC"
-                    }
-                }
-            },
             relations: ["subcatalogs", "subcatalogs.categories"],
             select,
+            order: {
+                updatedAt: "ASC",
+                subcatalogs: { updatedAt: "ASC" ,categories: { updatedAt: "ASC" }},
+            },
         });
 
         return res.status(200).json({ data: catalogs, error: null, status: 200 });

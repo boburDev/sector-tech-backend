@@ -13,7 +13,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/catalog/all:
+ * /mobile/catalog/all:
  *   get:
  *     summary: Get all catalogs with optional subcatalogs and categories
  *     tags: [Catalog]
@@ -117,7 +117,7 @@ router.get("/all", Catalog.getCatalogs);
 
 /**
  * @swagger
- * /user/catalog/category/by-subcatalog/{subCatalogSlug}:
+ * /mobile/catalog/category/by-subcatalog/{subCatalogSlug}:
  *   get:
  *     summary: Get categories by subcatalog slug
  *     tags: [Catalog]
@@ -168,7 +168,7 @@ router.get("/category/by-subcatalog/:subCatalogSlug", Catalog.getCategoryBySubCa
 
 /**
  * @swagger
- * /user/catalog/subcatalog/by-catalog/{catalogSlug}:
+ * /mobile/catalog/subcatalog/by-catalog/{catalogSlug}:
  *   get:
  *     summary: Get a subcatalog by catalog slug
  *     tags: [Catalog]

@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/cart/toggle-cart:
+ * /mobile/cart/toggle-cart:
  *   post:
  *     summary: Toggle cart product status
  *     tags: [Cart]
@@ -43,7 +43,7 @@ router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), 
 
 /**
  * @swagger
- * /user/cart/all:
+ * /mobile/cart/all:
  *   get:
  *     summary: Get all carts user
  *     tags: [Cart]

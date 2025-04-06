@@ -12,7 +12,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/region/all:
+ * /mobile/region/all:
  *   get:
  *     summary: Get all regions
  *     tags: [Region]   

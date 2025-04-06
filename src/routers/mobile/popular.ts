@@ -12,7 +12,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/popular/all:
+ * /mobile/popular/all:
  *   get:
  *     summary: Get popular categories and brands
  *     tags: [Popular]

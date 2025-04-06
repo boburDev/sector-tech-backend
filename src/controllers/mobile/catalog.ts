@@ -14,14 +14,17 @@ interface CatalogSelect {
     id: boolean;
     slug: boolean;
     title: boolean;
+    updatedAt: boolean;
     subcatalogs?: {
         id: boolean;
         title: boolean;
         slug: boolean;
+        updatedAt: boolean;
         categories?: {
             id: boolean;
             slug: boolean;
             title: boolean;
+            updatedAt: boolean;
         };
     };
 }
@@ -41,6 +44,7 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
             id: true,
             slug: true,
             title: true,
+            updatedAt: true,
         };
 
         if (isCategory || defaultCase) {
@@ -49,33 +53,36 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
                 id: true,
                 title: true,
                 slug: true,
+                updatedAt: true,
             };
             relations.push("subcatalogs.categories");
             select.subcatalogs.categories = {
                 id: true,
                 slug: true,
                 title: true,
+                updatedAt: true,
             };
-        }
-        else if (isSubcatalog) {
+        } else if (isSubcatalog) {
             relations.push("subcatalogs");
             select.subcatalogs = {
                 id: true,
                 title: true,
                 slug: true,
+                updatedAt: true,
             };
-        }
-        else if (isCatalog && !isSubcatalog && !isCategory) {
         }
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
-            order: { updatedAt: "ASC" },
-            relations: relations.length > 0 ? relations : undefined,
+            relations: ["subcatalogs", "subcatalogs.categories"],
             select,
+            order: {
+                updatedAt: "ASC",
+                subcatalogs: { updatedAt: "ASC", categories: { updatedAt: "ASC" } },
+            },
         });
 
-        return res.status(200).json({ data: catalogs, error: null, status: 200  });
+        return res.status(200).json({ data: catalogs, error: null, status: 200 });
     } catch (error) {
         next(error);
     }

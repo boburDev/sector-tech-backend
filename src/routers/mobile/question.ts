@@ -14,7 +14,7 @@ const router = Router();
 
 /**
  * @swagger
- * /user/question/add:
+ * /mobile/question/add:
  *   post:
  *     summary: Add a new product question
  *     tags: [productQuestion]
@@ -43,7 +43,7 @@ router.post("/add", validateUserToken, validate(productQuestionSchema), ProductQ
 
 /**
  * @swagger
- * /user/question/by-productId/{productId}:
+ * /mobile/question/by-productId/{productId}:
  *   get:
  *     summary: Get questions by product ID
  *     tags: [productQuestion]

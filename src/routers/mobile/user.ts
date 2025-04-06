@@ -16,7 +16,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/auth/google/login:
+ * /mobile/auth/google/login:
  *   get:
  *     summary: Login and sign-up with Google
  *     tags: [User]
@@ -38,7 +38,7 @@ router.get("/google/callback", passport.authenticate("google", { failureRedirect
 
 /**
  * @swagger
- * /user/auth/facebook/login:
+ * /mobile/auth/facebook/login:
  *   get:
  *     summary: Login and sign-up with Facebook
  *     tags: [User]
@@ -60,7 +60,7 @@ router.get("/facebook/callback", passport.authenticate("facebook", { failureRedi
 
 /**
  * @swagger
- * /user/auth/linkedin/login:
+ * /mobile/auth/linkedin/login:
  *   get:
  *     summary: Login and sign-up with LinkedIn
  *     tags: [User]
@@ -82,7 +82,7 @@ router.get("/linkedin/callback", passport.authenticate("linkedin", { failureRedi
 
 /**
  * @swagger
- * /user/auth/yandex/login:
+ * /mobile/auth/yandex/login:
  *   get:
  *     summary: Login and sign-up with Yandex
  *     tags: [User]
@@ -104,7 +104,7 @@ router.get("/yandex/callback",passport.authenticate("yandex", { failureRedirect:
 
 /**
  * @swagger
- * /user/auth/login:
+ * /mobile/auth/login:
  *   post:
  *     summary: User login with values
  *     tags: [User]
@@ -134,7 +134,7 @@ router.post("/login", loginAttemptLimiter, User.login);
 
 /**
  * @swagger
- * /user/auth/send-otp:
+ * /mobile/auth/send-otp:
  *   post:
  *     summary: Send OTP to user's email
  *     tags: [User]
@@ -159,7 +159,7 @@ router.post("/send-otp", User.sendOtp);
 
 /**
  * @swagger
- * /user/auth/sign-up:
+ * /mobile/auth/sign-up:
  *   post:
  *     summary: Create a new user
  *     tags: [User]
@@ -188,7 +188,7 @@ router.post("/sign-up", loginAttemptLimiter, validate(userSchemaValidator), User
 
 /**
  * @swagger
- * /user/auth/update:
+ * /mobile/auth/update:
  *   put:
  *     summary: Update user profile
  *     tags: [User]
@@ -218,7 +218,7 @@ router.put("/update", validateUserToken, User.updateProfile);
 
 /**
  * @swagger
- * /user/auth/me:
+ * /mobile/auth/me:
  *   get:
  *     summary: Get user by ID
  *     tags: [User]

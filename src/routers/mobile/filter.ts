@@ -11,7 +11,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/filter:
+ * /mobile/filter:
  *   get:
  *     summary: Get filter by optional subcatalog and category
  *     tags: [Filter]   
