@@ -512,7 +512,7 @@ router.delete('/delete/popular/:id', validateAdminToken, validateParams(uuidSche
  *       500:   
  *         description: Internal server error
  */
-router.get('/by-catalog-id', Product.getProductsBySubcatalogCategoryId);
+router.get('/by-catalog-id', validateAdminToken, Product.getProductsBySubcatalogCategoryId);
 
 export default router;
 
