@@ -30,16 +30,12 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-            }
+            elements.splice(index, 0, movedElement);
 
-            for (const i of elements) {
-                i.updatedAt = new Date();
-                await catalogRepository.save(i);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
             }
+            await catalogRepository.save(elements); 
             return res.status(200).json({ message: 'Catalog order changed successfully' });
         }
 
@@ -56,12 +52,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             if (elementIndex === index) throw new CustomError('Subcatalog already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
-
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-            }
+            elements.splice(index, 0, movedElement);
 
             for (let i = 0; i < elements.length; i++) {
                 elements[i].updatedAt = new Date(Date.now() + i);
@@ -103,17 +94,12 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             if (elementIndex === index) throw new CustomError('Brand already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
+            elements.splice(index, 0, movedElement);
 
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-                }
-
-            for (const i of elements) {
-                i.updatedAt = new Date();
-                await brandRepository.save(i);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
             }
+            await brandRepository.save(elements);
             return res.status(200).json({ message: 'Brand order changed successfully' });
         }
 
@@ -129,16 +115,12 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-            }
+            elements.splice(index, 0, movedElement);
 
-            for (const i of elements) {
-                i.updatedAt = new Date();
-                await popularBrandRepository.save(i);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
             }
+            await popularBrandRepository.save(elements);
             return res.status(200).json({ message: 'Popular brand order changed successfully' });
         }
         if (name === 'popularCategory') {
@@ -153,16 +135,12 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
 
             const [movedElement] = elements.splice(elementIndex, 1);
 
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-            }
+            elements.splice(index, 0, movedElement);
 
-            for (const i of elements) {
-                i.updatedAt = new Date();
-                await popularCategoryRepository.save(i);
-            }   
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
+            }
+            await popularCategoryRepository.save(elements);
 
             return res.status(200).json({ message: 'Popular category order changed successfully' });
         }   
@@ -178,17 +156,13 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             if (elementIndex === index) throw new CustomError('Popular product already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
+            elements.splice(index, 0, movedElement);
 
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-            }
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
+            }   
 
-            for (const i of elements) { 
-                i.updatedAt = new Date();
-                await popularProductRepository.save(i);
-            }
+            await popularProductRepository.save(elements);
             return res.status(200).json({ message: 'Popular product order changed successfully' });
         }    
 

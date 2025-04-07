@@ -141,14 +141,14 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             deletedAt: IsNull()
         };
 
-        if (subcatalogSlug){
+        if (subcatalogSlug) {
             const subcatalog = await subcatalogRepository.findOne({
                 where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
-            }) 
+            })
             whereCondition.subcatalogId = subcatalog?.id;
-        } 
-        
-        if (categorySlug){
+        }
+
+        if (categorySlug) {
             const category = await categoryRepository.findOne({
                 where: { deletedAt: IsNull(), slug: categorySlug as string }
             })
@@ -161,11 +161,18 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
         });
 
         const updatedCategoryFilter = categoryFilter?.data.map((filters: any) => {
-            const { productsId, ...filter } = filters
+            const updatedOptions = filters.options?.map((option: any) => {
+                const { productsId, ...rest } = option;
+                return {
+                    ...rest,
+                    productCount: productsId?.length || 0,
+                };
+            });
+
             return {
-                ...filter,
-                productCount: productsId.length || 0
-            }
+                ...filters,
+                options: updatedOptions,
+            };
         });
 
         return res.status(200).json({ data: updatedCategoryFilter, error: null, status: 200 });
