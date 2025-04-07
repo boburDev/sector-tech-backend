@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as Product from "../../controllers/user/product";
+import * as Product from "../../controllers/mobile/product";
 import { validateUserToken } from "../../middlewares/userValidator";
 import { validate } from "../../middlewares/validate";
 import { productIdParamsSchema } from "../../validators/product-comment.validate";

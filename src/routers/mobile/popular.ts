@@ -1,5 +1,5 @@
 import express from "express";
-import * as Popular from "../../controllers/user/popular";
+import * as Popular from "../../controllers/mobile/popular";
 
 const router = express.Router();
 

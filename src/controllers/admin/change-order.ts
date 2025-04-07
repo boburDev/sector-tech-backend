@@ -44,7 +44,9 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
         }
 
         if (name === 'subcatalog') {
-            const elements = await subcatalogRepository.find({ order: { updatedAt: 'ASC' } });
+            const subcatalog = await subcatalogRepository.findOne({ where: { id: id } });
+
+            const elements = await subcatalogRepository.find({ where: { catalogId: subcatalog?.catalogId }, order: { updatedAt: 'ASC' } });
 
             const elementIndex = elements.findIndex(element => element.id === id);
             if (elementIndex === -1) throw new CustomError('Subcatalog not found', 404);
@@ -61,37 +63,34 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
                 elements.splice(index, 0, movedElement);
             }
 
-            for (const i of elements) {
-                i.updatedAt = new Date();
-                await subcatalogRepository.save(i);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
             }
+            await subcatalogRepository.save(elements);
             return res.status(200).json({ message: 'Subcatalog order changed successfully' });
         }
 
         if (name === 'category') {
-            const elements = await categoryRepository.find({ order: { updatedAt: 'ASC' } });
-
+            const category = await categoryRepository.findOne({ where: { id: id } });
+            const elements = await categoryRepository.find({ where: { subCatalogId: category?.subCatalogId }, order: { updatedAt: 'ASC' } });
+            
             const elementIndex = elements.findIndex(element => element.id === id);
             if (elementIndex === -1) throw new CustomError('Category not found', 404);
 
             if (index < 0 || index >= elements.length) throw new CustomError('Invalid index', 400);
-
             if (elementIndex === index) throw new CustomError('Category already in this index', 400);
 
             const [movedElement] = elements.splice(elementIndex, 1);
+            elements.splice(index, 0, movedElement);
 
-            if (elementIndex > index) {
-                elements.splice(index, 0, movedElement);
-            } else {
-                elements.splice(index, 0, movedElement);
-            }   
-
-            for (const i of elements) {
-                i.updatedAt = new Date();
-                await categoryRepository.save(i);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].updatedAt = new Date(Date.now() + i);
             }
-            return res.status(200).json({ message: 'Category order changed successfully' });  
-        }       
+            await categoryRepository.save(elements);
+
+            return res.status(200).json({ message: 'Category order changed successfully' });
+        }
+   
 
         if (name === 'brand') {
             const elements = await brandRepository.find({ order: { updatedAt: 'ASC' } });

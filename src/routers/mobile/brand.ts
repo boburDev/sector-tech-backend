@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as Brands from "../../controllers/user/brand";
+import * as Brands from "../../controllers/mobile/brand";
 
 const router = Router();
 

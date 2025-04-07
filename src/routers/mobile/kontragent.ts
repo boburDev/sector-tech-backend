@@ -1,5 +1,5 @@
 import express from "express";
-import * as kontragentController from "../../controllers/user/kontragent";
+import * as kontragentController from "../../controllers/mobile/kontragent";
 import { validateUserToken } from "../../middlewares/userValidator";
 import { validate } from "../../middlewares/validate";
 import { kontragentSchemaValidator } from "../../validators/user.validator";

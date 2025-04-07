@@ -1,5 +1,5 @@
 import express from "express";
-import * as User from "../../controllers/user/user";
+import * as User from "../../controllers/mobile/user";
 import { loginAttemptLimiter } from "../../middlewares/attemptLimiter";
 import { validateUserToken } from "../../middlewares/userValidator";
 import passport from "passport";

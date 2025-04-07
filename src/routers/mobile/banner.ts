@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as BannerController from "../../controllers/user/banner";
+import * as BannerController from "../../controllers/mobile/banner";
 
 const router = Router();
 

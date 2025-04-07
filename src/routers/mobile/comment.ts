@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import * as ProductComment from '../../controllers/user/comment_question';
+import * as ProductComment from '../../controllers/mobile/comment_question';
 import { validateUserToken } from '../../middlewares/userValidator';
 import { validate, validateParams } from '../../middlewares/validate';
 import { productCommentSchema, productIdParamsSchema } from '../../validators/product-comment.validate';

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as Product from "../../controllers/user/product";
+import * as Cart from "../../controllers/mobile/product";
 import { validateUserToken } from "../../middlewares/userValidator";
 import { validate } from "../../middlewares/validate";
 import { productIdParamsSchema } from "../../validators/product-comment.validate";
@@ -39,7 +39,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), Product.toggleCart);
+router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), Cart.toggleCart);
 
 /**
  * @swagger
@@ -59,6 +59,6 @@ router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), 
  *       500:
  *         description: Internal server error
  */
-router.get('/all', validateUserToken, Product.getProductCarts);
+router.get('/all', validateUserToken, Cart.getProductCarts);
 
 export default router;

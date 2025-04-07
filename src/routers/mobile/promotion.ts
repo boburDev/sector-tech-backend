@@ -1,5 +1,5 @@
 import express from "express";
-import * as Promotion from "../../controllers/user/promotion";
+import * as Promotion from "../../controllers/mobile/promotion";
 import { validateParams } from "../../middlewares/validate";
 import { uuidSchema } from "../../validators/admin.validate";
 

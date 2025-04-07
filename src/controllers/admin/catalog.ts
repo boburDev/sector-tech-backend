@@ -470,10 +470,19 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
 
         const categories = await categoryRepository.find({
             where: whereCondition,
+            relations: ["popularCategory"],
+            select: {
+                id: true,
+                title: true,
+                path: true,
+                slug: true,
+                updatedAt: true,
+                ...(popular === "true" ? { popularCategory: { id: true } } : {}),
+                subCatalogId: true,
+            },
             order: {
                 updatedAt: 'ASC'
             },
-            relations: ["popularCategory"]
         });
 
         if (!categories.length) {
@@ -484,13 +493,8 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
             });
         }
 
-        const formattedCategories = categories.map(category => {
-            const { createdAt, deletedAt, ...categoryData } = category;
-            return categoryData;
-        });
-
         return res.json({
-            data: formattedCategories,
+            data: categories,
             error: null,
             status: 200
         });

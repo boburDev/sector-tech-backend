@@ -1,5 +1,5 @@
 import express from "express";
-import * as Filter from "../../controllers/user/catalog";
+import * as Filter from "../../controllers/mobile/catalog";
 
 const router = express.Router();
 /**
