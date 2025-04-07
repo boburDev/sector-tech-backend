@@ -489,23 +489,20 @@ router.delete('/delete/popular/:id', validateAdminToken, validateParams(uuidSche
 
 /**
  * @swagger
- * /product/by-slug:
+ * /product/by-catalog-id:
  *   get:
- *     summary: Get products by catalog, subcatalog, and category
+ *     summary: Get products by subcatalog, and category
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: catalogSlug
+ *         name: subcatalogId
  *         required: false
- *         description: Catalog slug
+ *         description: Subcatalog Id
  *       - in: query
- *         name: subcatalogSlug
- *         required: false
- *         description: Subcatalog slug
- *       - in: query
- *         name: categorySlug
+ *         name: categoryId
+ *         description: category Id
  *         required: false  
  *     responses:
  *       200:
@@ -515,7 +512,7 @@ router.delete('/delete/popular/:id', validateAdminToken, validateParams(uuidSche
  *       500:   
  *         description: Internal server error
  */
-router.get('/by-slug', validateAdminToken, Product.getProductsByCatalogSubcatalogCategory);
+router.get('/by-catalog-id', Product.getProductsBySubcatalogCategoryId);
 
 export default router;
 
