@@ -517,5 +517,23 @@ router.delete('/delete/popular/:id', validateAdminToken, validateParams(uuidSche
  */
 router.get('/by-slug', validateAdminToken, Product.getProductsByCatalogSubcatalogCategory);
 
+/**
+ * @swagger
+ * /product/popular:
+ *   get:
+ *     summary: Get popular products
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Popular products fetched successfully
+ *       400:
+ *         description: Invalid query parameters
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/popular/all', validateAdminToken, Product.getPopularProducts);
+
 export default router;
 

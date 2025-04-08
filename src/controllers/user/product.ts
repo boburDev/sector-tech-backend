@@ -419,7 +419,6 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
       status: 200
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

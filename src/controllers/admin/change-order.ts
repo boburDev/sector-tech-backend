@@ -35,7 +35,7 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
             for (let i = 0; i < elements.length; i++) {
                 elements[i].updatedAt = new Date(Date.now() + i);
             }
-            await catalogRepository.save(elements); 
+            await catalogRepository.save(elements);  
             return res.status(200).json({ message: 'Catalog order changed successfully' });
         }
 
@@ -125,7 +125,6 @@ export const changeOrder = async (req: Request, res: Response, next: NextFunctio
         }
         if (name === 'popularCategory') {
             const elements = await popularCategoryRepository.find({ order: { updatedAt: 'ASC' } });
-
             const elementIndex = elements.findIndex(element => element.id === id);
             if (elementIndex === -1) throw new CustomError('Popular category not found', 404);
 
