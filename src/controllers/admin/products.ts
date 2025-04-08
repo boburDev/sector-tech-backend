@@ -681,3 +681,31 @@ export const getProductsBySubcatalogCategoryId = async (req: Request, res: Respo
         next(error);
     }
 };
+
+export const getPopularProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const popularProducts = await popularProductRepository.find({
+            where: { productId: Not(IsNull()) },
+            relations: ["product"],
+            order: { updatedAt: "ASC" },
+            select: {
+                id: true,
+                updatedAt: true,
+                product: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                    articul: true,
+                    inStock: true,
+                    price: true,
+                    mainImage: true,
+                    recommended: true,
+                    productCode: true,
+                }
+            }
+        });
+        return res.status(200).json({ data: popularProducts, error: null, status: 200 });
+    } catch (error) {
+        next(error);
+    }
+}

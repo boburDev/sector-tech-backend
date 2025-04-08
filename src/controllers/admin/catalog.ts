@@ -699,27 +699,25 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
     try {
         const { popular } = req.query;
 
-        let whereCondition: any = { deletedAt: IsNull() };
-
         if (popular === "true") {
-            whereCondition.popularCategory = { id: Not(IsNull()) };
+            const popularCategories = await popularCategoryRepository.find({
+                where: { categoryId: Not(IsNull()) },
+                order: { updatedAt: "ASC" },
+                relations: ["category"],
+                select: {
+                    id: true,
+                    updatedAt: true,
+                    category: {
+                        id: true,
+                        title: true,
+                        path: true,
+                        slug: true,
+                        deletedAt: true
+                    }
+                }
+            });
+            return res.status(200).json({ data: popularCategories, error: null, status: 200 });
         }
-
-        const categories = await categoryRepository.find({
-            where: whereCondition,
-            order: { updatedAt: "ASC" },
-            relations: ["popularCategory"],
-            select: {
-                id: true,
-                title: true,
-                path: true,
-                slug: true,
-                updatedAt: true,
-                ...(popular === "true" ? { popularCategory: { id: true } } : {})
-            }
-        });
-
-        return res.status(200).json({ data: categories, error: null, status: 200 });
     } catch (error) {
         next(error);
     }

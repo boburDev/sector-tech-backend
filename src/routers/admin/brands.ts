@@ -300,4 +300,20 @@ router.delete("/popular/delete/:id", validateAdminToken, validateParams(uuidSche
  */         
 router.get("/popular/by-id/:id", validateAdminToken, validateParams(uuidSchema), Brands.getPopularBrandById);       
 
+/**
+ * @swagger
+ * /brand/popular/all:
+ *   get:
+ *     summary: Get all popular brands
+ *     tags: [PopularBrands]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of popular brands  
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/popular/all", validateAdminToken, Brands.getPopularBrands);    
+
 export default router;  

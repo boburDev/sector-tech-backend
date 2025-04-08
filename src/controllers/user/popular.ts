@@ -12,8 +12,8 @@ export const getPopular = async (req: Request, res: Response, next: NextFunction
         let whereCondition: any = { deletedAt: IsNull(), popularCategory: { id: Not(IsNull()) } };
         const categories = await categoryRepository.find({
             where: whereCondition,
-            order: { updatedAt: "DESC" },
-            relations: ["popularCategory"],
+            order: { updatedAt: "ASC" },
+            relations: ["popularCategory"], 
             select: {
                 id: true,
                 title: true,
@@ -27,7 +27,7 @@ export const getPopular = async (req: Request, res: Response, next: NextFunction
 
         const brands = await brandRepository.find({
             where: { deletedAt: IsNull(), popularBrand: { id: Not(IsNull()) } },
-            order: { updatedAt: "DESC" },
+            order: { updatedAt: "ASC" },
             relations: ["popularBrand"],
             select: {
                 id: true,

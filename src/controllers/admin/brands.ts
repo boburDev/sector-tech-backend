@@ -382,3 +382,22 @@ export const deletePopularBrand = async (req: Request, res: Response, next: Next
         next(error);
     }
 };  
+
+export const getPopularBrands = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const popularBrands = await popularBrandRepository.find({   
+            relations: ['brand'],
+            where: { brandId: Not(IsNull()) },
+            order: { updatedAt: "ASC" },
+            select: {   
+                id: true,
+                updatedAt: true,
+                brand: { id: true, title: true, path: true, slug: true, description: true,  }
+            }
+        });
+
+        return res.status(200).json({ data: popularBrands, error: null, status: 200 });
+    } catch (error) {
+        next(error);
+    }
+}
