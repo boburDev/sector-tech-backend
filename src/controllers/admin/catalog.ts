@@ -499,8 +499,6 @@ export const getCategoriesBySubcatalogId = async (req: Request, res: Response, n
             status: 200
         });
     } catch (error) {
-        console.log(error);
-        
         next(error);
     }
 };

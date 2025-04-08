@@ -10,49 +10,54 @@ const categoryRepository = AppDataSource.getRepository(Category);
 
 
 export async function insertCatalogData() {
-    await AppDataSource.transaction(async transactionalEntityManager => {
-        for (const catalogItem of catalogData) {
-            let catalog = await catalogRepository.findOne({ where: { title: catalogItem.name } });
+    try {
+        await AppDataSource.transaction(async transactionalEntityManager => {
+            for (const catalogItem of catalogData) {
+                let catalog = await catalogRepository.findOne({ where: { title: catalogItem.name } });
 
-            if (!catalog) {
-                catalog = catalogRepository.create({
-                    title: catalogItem.name,
-                    slug: createSlug(catalogItem.name)
-                });
-                catalog = await transactionalEntityManager.save(catalog);
-            }
-
-            for (const subcatalogItem of catalogItem.subcatalog) {
-                let subcatalog = await subcatalogRepository.findOne({
-                    where: { title: subcatalogItem.name, catalogId: catalog.id },
-                });
-
-                if (!subcatalog) {
-                    subcatalog = subcatalogRepository.create({
-                        title: subcatalogItem.name,
-                        slug: createSlug(subcatalogItem.name),
-                        catalogId: catalog.id,
+                if (!catalog) {
+                    catalog = catalogRepository.create({
+                        title: catalogItem.name,
+                        slug: createSlug(catalogItem.name)
                     });
-                    subcatalog = await transactionalEntityManager.save(subcatalog);
+                    catalog = await transactionalEntityManager.save(catalog);
                 }
 
-                for (const categoryItem of subcatalogItem.category) {
-                    let category = await categoryRepository.findOne({
-                        where: { title: categoryItem.name, subCatalogId: subcatalog.id },
+                for (const subcatalogItem of catalogItem.subcatalog) {
+                    let subcatalog = await subcatalogRepository.findOne({
+                        where: { title: subcatalogItem.name, catalogId: catalog.id },
                     });
 
-                    if (!category) {
-                        category = categoryRepository.create({
-                            title: categoryItem.name,
-                            slug: createSlug(categoryItem.name),
-                            subCatalogId: subcatalog.id,
+                    if (!subcatalog) {
+                        subcatalog = subcatalogRepository.create({
+                            title: subcatalogItem.name,
+                            slug: createSlug(subcatalogItem.name),
+                            catalogId: catalog.id,
                         });
-                        await transactionalEntityManager.save(category);
+                        subcatalog = await transactionalEntityManager.save(subcatalog);
+                    }
+
+                    for (const categoryItem of subcatalogItem.category) {
+                        let category = await categoryRepository.findOne({
+                            where: { title: categoryItem.name, subCatalogId: subcatalog.id },
+                        });
+
+                        if (!category) {
+                            category = categoryRepository.create({
+                                title: categoryItem.name,
+                                slug: createSlug(categoryItem.name),
+                                subCatalogId: subcatalog.id,
+                            });
+                            await transactionalEntityManager.save(category);
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
-    console.log("✅ Katalog ma'lumotlari muvaffaqiyatli qo'shildi!");
+        console.log("✅ Katalog ma'lumotlari muvaffaqiyatli qo'shildi!");
+    } catch (error) {
+        console.error('❌ Error catalog brand:', error);
+        process.exit(1);
+    }
 }

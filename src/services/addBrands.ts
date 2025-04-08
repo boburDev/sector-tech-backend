@@ -25,7 +25,8 @@ export async function insertBrandData() {
 
         console.log("✅ Brand ma'lumotlari muvaffaqiyatli qo'shildi!");
     } catch (error) {
-        console.log(error);
+        console.error('❌ Error adding brand:', error);
+        process.exit(1);
     }
     
 }

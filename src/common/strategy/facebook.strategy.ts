@@ -14,7 +14,6 @@ passport.use(
     },
     (accessToken: string, refreshToken: string, profile: any, done) => {
       try {
-        console.log(profile);
         const user = {
           name: profile.name?.givenName,
           email: profile.emails?.[0].value,

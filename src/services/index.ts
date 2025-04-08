@@ -16,6 +16,6 @@ export default async function insertData (query: any) {
         }
     } catch (error) {
         console.log(error);
-
+        
     }
 } 

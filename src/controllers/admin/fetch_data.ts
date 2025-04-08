@@ -13,8 +13,6 @@ export const fetchDataFromShopNag = async (req: Request, res: Response, next: Ne
         if (!htmlCode) throw new CustomError('Body not exist', 400);
 
         const productInfo = await extractProductData(htmlCode);
-        // console.log(productInfo);
-        
         res.status(201).json({ data: productInfo, error: null, status: 201 });
     } catch (error) {
         next(error);

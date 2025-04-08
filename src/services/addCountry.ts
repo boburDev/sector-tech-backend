@@ -37,5 +37,6 @@ export async function insertCountryData() {
         console.log("✅ Country va Region ma'lumotlari muvaffaqiyatli qo'shildi!");
     } catch (error) {
         console.error("❌ Xatolik yuz berdi:", error);
+        process.exit(1);
     }
 }

@@ -47,6 +47,7 @@ const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
         });
 
         console.log("✅ Catalog filterlar muvaffaqiyatli yangilandi!");
+        process.exit(0);
     } catch (error) {
         console.error('❌ Error updating catalog filters:', error);
         process.exit(1);

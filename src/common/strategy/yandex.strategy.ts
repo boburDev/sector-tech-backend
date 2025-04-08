@@ -13,8 +13,6 @@ passport.use(
     },
     (accessToken: string, refreshToken: string, profile: any, done) => {
       try {
-        console.log("Yandex Profile:", profile);
-
         const user = {
           id: profile.id,
           name: profile?.name?.familyName,

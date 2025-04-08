@@ -109,7 +109,6 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
 
         res.send('ok')
     } catch (error) {
-        console.log(error);
         next(error);
     }
 };

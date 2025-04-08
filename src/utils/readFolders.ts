@@ -23,8 +23,6 @@ export default async function listContents(subPath: string = '') {
                 type: stats.isDirectory() ? 'folder' : 'file',
             });
         }
-
-        console.log(result);
         return result;
     } catch (error) {
         console.error('Error reading folder contents:', error);

@@ -91,7 +91,6 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
 export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { catalogSlug } = req.params;
-        // console.log(catalogSlug);
         
         const subcatalog = await subcatalogRepository.find({
             where: {
@@ -113,7 +112,6 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, ne
 export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { subCatalogSlug } = req.params;
-        // console.log(subCatalogSlug);
         
         const categories = await categoryRepository.find({
             where: {

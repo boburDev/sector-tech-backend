@@ -520,8 +520,6 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
         return res.json({ message: "Product created", data: sortedData });
     } catch (error) {
-        console.log(error);
-        
         deleteFileBeforeSave(productMainImage.path)
         productImages.forEach(file => {
             deleteFile(file.path)
