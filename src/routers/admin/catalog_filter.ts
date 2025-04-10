@@ -138,6 +138,49 @@ router.put("/update/:id",validateAdminToken,validateParams(uuidSchema), CatalogF
  */
 router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), CatalogFilter.deleteCatalogFilter);
 
-router.get("/test-one", CatalogFilter.getTestFilterSubcatalogIdCategoryId1); 
+/**
+ * @swagger
+ * /catalog-filter/addProduct:
+ *   post:
+ *     summary: Add a product to the filter
+ *     tags: [CatalogFilter]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID to add to the filter
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               subcatalogId:
+ *                 type: string
+ *                 description: The ID of the subcatalog.
+ *               categoryId:
+ *                 type: string
+ *                 description: The ID of the category.
+ *               data:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Array of product data.
+ *     responses:
+ *       200:
+ *         description: Successfully added the product to the filter
+ *       400:
+ *         description: Invalid input data
+ *       404:
+ *         description: Product or filter not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/addProduct", CatalogFilter.addProductToFilter);
 
 export default router;

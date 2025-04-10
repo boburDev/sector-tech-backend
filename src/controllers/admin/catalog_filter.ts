@@ -2,9 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 import { CustomError } from '../../error-handling/error-handling';
-import { IsNull } from 'typeorm';
-import { Not } from 'typeorm';
-import { createSlug } from '../../utils/slug';
+ 
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -192,67 +190,16 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
     }
 };
 
-export const getTestFilterSubcatalogIdCategoryId1 = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+export const addProductToFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const query = req.query.id
+        const { id } = req.params;
+        let { subcatalogId = null, categoryId = null, data = [] } = req.body;
 
-        if (query) {
-            let filter: any = await catalogFilterRepository.findOne({
-                where: {
-                    categoryId: query as string,
-                    subcatalogId: IsNull(),
-                    deletedAt: IsNull()
-                },
-            });
-            return res.status(200).json({ data: filter, error: null, status: 200 });
-            // return res.status(200).json({ data: spreadProductsIdToOptions(filter.data), error: null, status: 200 });
-        } else {
-            let filter = await catalogFilterRepository.find({
-                where: {
-                    categoryId: Not(IsNull()),
-                    subcatalogId: IsNull(),
-                    deletedAt: IsNull()
-                },
-            });
-            // let newFilter = filter.map((i: any) => {
-            //     return {
-            //         ...i,
-            //         data: spreadProductsIdToOptions(i?.data)
-            //     }
-            // })
-            return res.status(200).json({ data: filter, error: null, status: 200 });
-        }
+        console.log(id)
+        console.log(subcatalogId, categoryId, data)
+
+        return res.status(200).json('Successfully added');
     } catch (error) {
         next(error);
     }
-};
-
-function spreadProductsIdToOptions(filters: any[]) {
-    return filters
-        .filter(filter => !['состояние-товара', 'актуальность-товара'].includes(filter.name))
-        .map(filter => {
-            const newFilter = { ...filter };
-
-            // Slugify main filter name
-            newFilter.name = createSlug(newFilter.name);
-
-            const isBrandOrPrice = filter.name === 'бренд' || filter.name === 'цена';
-            const isRadio = filter.type === 'radio';
-
-            if (isBrandOrPrice) {
-                delete newFilter.options;
-                delete newFilter.productsId;
-            } else if (isRadio) {
-                delete newFilter.productsId;
-            } else if (Array.isArray(newFilter.options)) {
-                newFilter.options = newFilter.options.map((option: any) => ({
-                    ...option,
-                    name: createSlug(option.name),
-                    productsId: [...(newFilter.productsId || [])],
-                }));
-                delete newFilter.productsId;
-            }
-
-            return newFilter;
-        });
 }
