@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
-import { IsNull } from "typeorm";
+import { In, IsNull } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
 const kontragentRepository = AppDataSource.getRepository(Kontragent);
 
@@ -97,9 +97,20 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
                 }
             }
         });
+
+        const user_kontragents = await kontragentRepository.find({
+            where: {
+                inn: In(kontragents.map((kontragent) => kontragent.inn !== null ? kontragent.inn : ""))
+            },
+            select: {
+                inn: true,
+                name: true,
+            }
+        })
+        
         return res.status(200).json({
             message: "Kontragents successfully received",
-            data: kontragents,
+            data: { kontragents, user_kontragents },
             error: null,
             status: 200
         });

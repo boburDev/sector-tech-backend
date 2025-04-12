@@ -134,7 +134,7 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
 export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { subcatalogSlug, categorySlug } = req.query;
-
+            
         const whereCondition: any = {
             deletedAt: IsNull()
         };
@@ -162,7 +162,7 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             const updatedOptions = filters.options?.map((option: any) => {
                 const { productsId, ...rest } = option;
                 return {
-                    ...rest,
+                    ...rest,   
                     productCount: productsId?.length || 0,
                 };
             });
@@ -173,7 +173,7 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             };
         });
 
-        return res.status(200).json({ data: updatedCategoryFilter, error: null, status: 200 });
+        return res.status(200).json({ data: updatedCategoryFilter ? updatedCategoryFilter : [], error: null, status: 200 });
     } catch (error) {
         next(error);
     }
