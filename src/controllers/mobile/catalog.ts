@@ -171,7 +171,7 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             };
         });
 
-        return res.status(200).json({ data: updatedCategoryFilter, error: null, status: 200 });
+        return res.status(200).json({ data: updatedCategoryFilter ? updatedCategoryFilter : [], error: null, status: 200 });
     } catch (error) {
         next(error);
     }

@@ -134,19 +134,19 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
 export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { subcatalogSlug, categorySlug } = req.query;
-            
+
         const whereCondition: any = {
             deletedAt: IsNull()
         };
 
-        if (subcatalogSlug){
+        if (subcatalogSlug) {
             const subcatalog = await subcatalogRepository.findOne({
                 where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
-            }) 
+            })
             whereCondition.subcatalogId = subcatalog?.id;
-        } 
-        
-        if (categorySlug){
+        }
+
+        if (categorySlug) {
             const category = await categoryRepository.findOne({
                 where: { deletedAt: IsNull(), slug: categorySlug as string }
             })
@@ -162,7 +162,7 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             const updatedOptions = filters.options?.map((option: any) => {
                 const { productsId, ...rest } = option;
                 return {
-                    ...rest,   
+                    ...rest,
                     productCount: productsId?.length || 0,
                 };
             });

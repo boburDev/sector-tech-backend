@@ -1,22 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
-import { In, IsNull } from "typeorm";
+import { In, IsNull, Not } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
+import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 const kontragentRepository = AppDataSource.getRepository(Kontragent);
+const kontragentAddressRepository = AppDataSource.getRepository(KontragentAddress);
 
 export const createKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const {
-            ownershipForm,
-            inn,
-            pinfl,
-            oked,
-            name,
-            legalAddress,
-            isFavorite,
-            countryOfRegistration
-        } = req.body;
+        const { ownershipForm, inn, pinfl, oked, name, legalAddress, isFavorite, countryOfRegistration } = req.body;
         const userId = req.user.id;
 
         if (!ownershipForm) throw new CustomError('ownershipForm is required', 400);
@@ -78,7 +71,13 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
         const userId = req.user.id;
         const kontragents = await kontragentRepository.find({
             where: { userId, deletedAt: IsNull() },
-            relations: ["user"],
+            relations: ["user", "address"],
+            order: {
+                createdAt: "DESC",
+                address: {
+                    createdAt: "DESC"
+                }
+            },
             select: {
                 id: true,
                 ownershipForm: true,
@@ -94,6 +93,20 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
                     name: true,
                     phone: true,
                     email: true
+                },
+                address: {
+                    id: true,
+                    fullAddress: true,
+                    country: true,
+                    region: true,
+                    district: true,
+                    street: true,
+                    house: true,
+                    apartment: true,
+                    index: true,
+                    comment: true,
+                    isMain: true,
+                    createdAt: true,
                 }
             }
         });
@@ -107,7 +120,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
                 name: true,
             }
         })
-        
+
         return res.status(200).json({
             message: "Kontragents successfully received",
             data: { kontragents, user_kontragents },
@@ -132,31 +145,46 @@ export const updateKontragent = async (req: Request, res: Response, next: NextFu
             isFavorite,
             countryOfRegistration
         } = req.body;
+
         const userId = req.user.id;
+
         const kontragent = await kontragentRepository.findOne({ where: { id, userId, deletedAt: IsNull() } });
         if (!kontragent) throw new CustomError('Kontragent not found', 404);
 
-        if (ownershipForm !== undefined) {
-            kontragent.ownershipForm = ownershipForm;
+        const newOwnershipForm = ownershipForm ?? kontragent.ownershipForm;
+
+        if (newOwnershipForm === "Индивидуальный предприниматель" && (pinfl ?? kontragent.pinfl) === undefined) {
+            throw new CustomError('pinfl is required for Индивидуальный предприниматель', 400);
         }
-        if (inn !== undefined) {
-            kontragent.inn = inn;
+
+        if (
+            (newOwnershipForm === "Юридическое лицо" || newOwnershipForm === "Юридическое лицо, обособленное подразделение") &&
+            (inn ?? kontragent.inn) === undefined
+        ) {
+            throw new CustomError('inn is required for Юридическое лицо', 400);
         }
-        if (pinfl !== undefined) {
-            kontragent.pinfl = pinfl;
+
+        if (inn) {
+            const exists = await kontragentRepository.findOne({
+                where: { inn, userId, deletedAt: IsNull(), id: Not(id) }
+            });
+            if (exists) throw new CustomError('Another kontragent with this INN already exists', 400);
         }
-        if (oked !== undefined) {
-            kontragent.oked = oked;
+
+        if (pinfl) {
+            const exists = await kontragentRepository.findOne({
+                where: { pinfl, userId, deletedAt: IsNull(), id: Not(id) }
+            });
+            if (exists) throw new CustomError('Another kontragent with this PINFL already exists', 400);
         }
-        if (name !== undefined) {
-            kontragent.name = name; 
-        }
-        if (legalAddress !== undefined) {
-            kontragent.legalAddress = legalAddress;
-        }
-        if (countryOfRegistration !== undefined) {
-            kontragent.countryOfRegistration = countryOfRegistration;
-        }
+
+        if (ownershipForm !== undefined) kontragent.ownershipForm = ownershipForm;
+        if (inn !== undefined) kontragent.inn = inn;
+        if (pinfl !== undefined) kontragent.pinfl = pinfl;
+        if (oked !== undefined) kontragent.oked = oked;
+        if (name !== undefined) kontragent.name = name;
+        if (legalAddress !== undefined) kontragent.legalAddress = legalAddress;
+        if (countryOfRegistration !== undefined) kontragent.countryOfRegistration = countryOfRegistration;
 
         if (isFavorite !== undefined) {
             if (isFavorite === true) {
@@ -166,6 +194,7 @@ export const updateKontragent = async (req: Request, res: Response, next: NextFu
                         { userId, isFavorite: true, deletedAt: IsNull() },
                         { isFavorite: false }
                     );
+
                     kontragent.isFavorite = true;
                     await manager.save(kontragent);
                 });
@@ -195,11 +224,88 @@ export const deleteKontragent = async (req: Request, res: Response, next: NextFu
         const kontragent = await kontragentRepository.findOne({ where: { id, userId, deletedAt: IsNull() } });
 
         if (!kontragent) throw new CustomError('Kontragent not found', 404);
-        
+
         kontragent.deletedAt = new Date();
         await kontragentRepository.save(kontragent);
         return res.status(200).json({
             message: "Kontragent successfully deleted",
+            data: null,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const createOrUpdateKontragentAddress = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { id } = req.params;
+        if (!id) throw new CustomError('Kontragent ID is required', 400);
+        const { fullAddress, country, region, district, street, house, apartment, index, comment, isMain } = req.body;
+
+        const existingAddress = await kontragentAddressRepository.findOne({ where: { kontragentId: id, deletedAt: IsNull() } });
+
+            if (existingAddress) {
+                existingAddress.fullAddress = fullAddress ?? existingAddress.fullAddress;
+                existingAddress.country = country ?? existingAddress.country;
+                existingAddress.region = region ?? existingAddress.region;
+                existingAddress.district = district ?? existingAddress.district;
+                existingAddress.street = street ?? existingAddress.street;
+                existingAddress.house = house ?? existingAddress.house;
+                existingAddress.apartment = apartment ?? existingAddress.apartment;
+                existingAddress.index = index ?? existingAddress.index;
+                existingAddress.comment = comment ?? existingAddress.comment;
+                existingAddress.isMain = isMain ?? existingAddress.isMain;
+
+                await kontragentAddressRepository.save(existingAddress);
+
+                return res.status(200).json({
+                    message: "Kontragent address successfully updated",
+                    data: existingAddress,
+                    error: null,
+                    status: 200
+                });
+            } else {
+                const newAddress = kontragentAddressRepository.create({
+                    kontragentId: id,
+                    fullAddress,
+                    country,
+                    region,
+                    district,
+                    street,
+                    house,
+                    apartment,
+                    index,
+                    comment,
+                    isMain: isMain ?? false
+                });
+
+                await kontragentAddressRepository.save(newAddress);
+
+                return res.status(201).json({
+                    message: "Kontragent address successfully created",
+                    data: newAddress,
+                    error: null,
+                    status: 201
+                });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteKontragentAddress = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const kontragentAddress = await kontragentAddressRepository.findOne({ where: { id, deletedAt: IsNull() } });
+
+        if (!kontragentAddress) throw new CustomError('Kontragent address not found', 404);
+
+        kontragentAddress.deletedAt = new Date();
+        await kontragentAddressRepository.save(kontragentAddress);
+        return res.status(200).json({
+            message: "Kontragent address successfully deleted",
             data: null,
             error: null,
             status: 200

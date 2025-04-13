@@ -52,7 +52,7 @@ const router = express.Router();
  *               ownershipForm: "Юридическое лицо"
  *               inn: "123456789"
  *               pnfl: ""
- *               oked: "101"
+ *               oked: "12345"
  *               name: "Kontragent Name"
  *               legalAddress: "Tashkent, Uzbekistan"
  *               isFavorite: true

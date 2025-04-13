@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn, OneToOne } from "typeorm";
 import { Users } from "./user.entity";
+import { KontragentAddress } from "./kontragent_addresses.entity";
 
 @Entity()
 export class Kontragent {
@@ -33,10 +34,7 @@ export class Kontragent {
     @Column()
     userId: string;
 
-    @ManyToOne(() => Users, (user) => user.contragents, {
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
-    })
+    @ManyToOne(() => Users, (user) => user.contragents)
     @JoinColumn({ name: "userId" })
     user: Users;
 
@@ -48,4 +46,7 @@ export class Kontragent {
 
     @DeleteDateColumn()
     deletedAt: Date;
+
+    @OneToOne(() => KontragentAddress, (address) => address.kontragent)
+    address: KontragentAddress;
 }
