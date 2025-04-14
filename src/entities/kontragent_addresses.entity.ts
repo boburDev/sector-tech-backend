@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne } from "typeorm";
 import { Kontragent } from "./kontragent.entity";
 
 @Entity("kontragent_address")
@@ -48,7 +48,7 @@ export class KontragentAddress {
     @DeleteDateColumn({ default: null })
     deletedAt: Date;
 
-    @OneToOne(() => Kontragent, (kontragent) => kontragent.address)
+    @ManyToOne(() => Kontragent, (kontragent: Kontragent) => kontragent.address)
     @JoinColumn({ name: "kontragentId" })
     kontragent: Kontragent;
 }   
