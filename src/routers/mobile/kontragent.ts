@@ -271,4 +271,51 @@ router.patch("/update/:id", validateUserToken, kontragentController.updateKontra
  */
 router.delete("/delete/:id", validateUserToken, kontragentController.deleteKontragent);
 
+/**
+ * @swagger
+ * /mobile/kontragent/search:
+ *   get:
+ *     summary: Search for a kontragent by inn or name
+ *     tags: [Kontragent]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: inn
+ *         in: query
+ *         description: Inn of the kontragent
+ *       - name: name
+ *         in: query
+ *         description: Name of the kontragent  
+ *     responses:
+ *       200:
+ *         description: Kontragent found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: number
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: number
+ */
+router.get("/search", validateUserToken, kontragentController.getKontragentByInn);
+
 export default router;
