@@ -295,6 +295,12 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *           enum: ["asc", "desc"]
  *         required: false
  *         description: Sort products by name
+ *       - in: query
+ *         name: productCode
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter products by product code
  *     responses:
  *       200:
  *         description: Successfully retrieved products

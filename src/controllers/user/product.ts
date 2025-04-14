@@ -321,7 +321,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
 
 export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { slug, categorySlug, page, limit, inStock, title, popular, price, name } = req.query;
+    const { slug, categorySlug, page, limit, inStock, title, popular, price, name, productCode } = req.query;
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
     const offset = (pageNumber - 1) * limitNumber;
@@ -344,6 +344,10 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
 
     if (categorySlug) {
       filter.category = { slug: categorySlug as string, deletedAt: IsNull() };
+    }
+
+    if (productCode) {
+      filter.productCode = Like(`%${productCode}%`);
     }
 
     if (inStock === "true") {

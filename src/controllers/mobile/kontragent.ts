@@ -4,6 +4,7 @@ import { Kontragent } from "../../entities/kontragent.entity";
 import { In, IsNull, Like, Not } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
+import { getLocations } from "../../utils/get-location";
 const kontragentRepository = AppDataSource.getRepository(Kontragent);
 const kontragentAddressRepository = AppDataSource.getRepository(KontragentAddress);
 
@@ -69,15 +70,17 @@ export const createKontragent = async (req: Request, res: Response, next: NextFu
 export const getKontragents = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const userId = req.user.id;
+        const { inn, name } = req.query;
+        let whereCondition: any = { userId, deletedAt: IsNull() };
+        if (inn) {
+            whereCondition.inn = Like(`%${inn}%`);
+        }
+        if (name) {
+            whereCondition.name = Like(`%${name}%`);
+        }
         const kontragents = await kontragentRepository.find({
-            where: { userId, deletedAt: IsNull() },
+            where: whereCondition,
             relations: ["user", "address"],
-            order: {
-                createdAt: "DESC",
-                address: {
-                    createdAt: "DESC"
-                }
-            },
             select: {
                 id: true,
                 ownershipForm: true,
@@ -135,16 +138,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
 export const updateKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        const {
-            ownershipForm,
-            inn,
-            pinfl,
-            oked,
-            name,
-            legalAddress,
-            isFavorite,
-            countryOfRegistration
-        } = req.body;
+        const { ownershipForm, inn, pinfl, oked, name, legalAddress, isFavorite, countryOfRegistration } = req.body;
 
         const userId = req.user.id;
 
@@ -353,22 +347,14 @@ export const deleteKontragentAddress = async (req: Request, res: Response, next:
     }
 };
 
-export const getKontragentByInn = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+export const getLocationbyName = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { inn, name } = req.query;
-        const userId = req.user.id;
-
-        if (!inn) throw new CustomError('inn is required', 400);
-        let whereCondition: any = { inn: Like(`%${inn}%`), userId, deletedAt: IsNull() };
-        if (name) {
-            whereCondition.name = Like(`%${name}%`);
-        }
-        const kontragent = await kontragentRepository.findOne({ where: whereCondition });
-        if (!kontragent) throw new CustomError('Kontragent not found', 404);
+        const { name } = req.query;
+        const locations = await getLocations(name as string);
 
         return res.status(200).json({
-            message: "Kontragent successfully received",
-            data: kontragent,
+            message: "Location successfully received",
+            data: locations,
             error: null,
             status: 200
         });

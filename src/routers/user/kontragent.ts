@@ -97,6 +97,19 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *     tags: [Kontragent]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: inn
+ *         in: query
+ *         description: Inn of the kontragent
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - name: name
+ *         in: query
+ *         description: Name of the kontragent
+ *         required: false
+ *         schema:
+ *           type: string   
  *     responses:
  *       200:
  *         description: Kontragents retrieved successfully
@@ -118,7 +131,7 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                         type: string
  *                       inn:
  *                         type: string
- *                       pnfl:
+ *                       pnfl:  
  *                         type: string
  *                       oked:
  *                         type: string
@@ -127,9 +140,17 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                       legalAddress:
  *                         type: string
  *                       isFavorite:
- *                         type: boolean
+ *                         type: boolean    
  *                       countryOfRegistration:
- *                         type: string
+ *                         type: string 
+ *                       address:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           address:
+ *                             type: string
+ *                           createdAt:
  *                 error:
  *                   type: string
  *                 status:
@@ -273,49 +294,46 @@ router.delete("/delete/:id", validateUserToken, kontragentController.deleteKontr
 
 /**
  * @swagger
- * /user/kontragent/search:
+ * /user/kontragent/location:
  *   get:
- *     summary: Search for a kontragent by inn or name
- *     tags: [Kontragent]
+ *     summary: Get location by name
+ *     tags: [Kontragent]   
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: inn
- *         in: query
- *         description: Inn of the kontragent
  *       - name: name
  *         in: query
- *         description: Name of the kontragent  
+ *         description: Name of the location    
  *     responses:
  *       200:
- *         description: Kontragent found successfully
+ *         description: Location retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               type: object   
  *               properties:
  *                 message:
  *                   type: string
  *                 data:
  *                   type: object
- *                 error:
+ *                 error:   
  *                   type: string
  *                 status:
  *                   type: number
  *       500:
  *         description: Internal server error
- *         content:
+ *         content: 
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 message:
- *                   type: string
+ *                   type: string   
  *                 error:
  *                   type: string
  *                 status:
  *                   type: number
  */ 
-router.get("/search", validateUserToken, kontragentController.getKontragentByInn);
+router.get("/location", kontragentController.getLocationbyName);
 
 export default router;
