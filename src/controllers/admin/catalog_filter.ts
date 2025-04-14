@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 import { CustomError } from '../../error-handling/error-handling';
- 
+import { createSlug } from '../../utils/slug';
+
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -48,10 +49,16 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
                 categoryId,
             }]
         });
+
         console.log(existingFilter);
         console.log(data);
         console.log(data[0].options);
-        return
+
+        const preparedData = prepareFilterData(data);
+        console.log(preparedData);
+        console.log(preparedData[0].options);
+
+        return res.send('ok')
         if (existingFilter) {
             const existingNames = new Set(existingFilter.data.map((item: any) => item.name));
 
@@ -107,8 +114,6 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
             }
             return res.status(201).json(filterResult);
         }
-
-        res.send('ok')
     } catch (error) {
         next(error);
     }
@@ -196,7 +201,7 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
 export const addProductToFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        let { subcatalogId = null, categoryId = null, productId='', data = [] } = req.body;
+        let { subcatalogId = null, categoryId = null, productId = '', data = [] } = req.body;
 
         console.log(id)
         console.log(subcatalogId, categoryId, data)
@@ -208,18 +213,29 @@ export const addProductToFilter = async (req: Request, res: Response, next: Next
 }
 
 function prepareFilterData(data: any[]): any[] {
-    return data.map((item) => {
-        const newItem = { ...item };
+    return data
+        .filter((filter: any) => !['состояние-товара', 'актуальность-товара'].includes(filter.name))
+        .map((item) => {
+            const newItem = { ...item };
+            newItem.name = createSlug(newItem.name);
 
-        if (Array.isArray(item.options)) {
-            newItem.options = item.options.map((opt: any) => ({
-                ...opt,
-                productsId: opt.productsId ?? []
-            }));
-        }
+            const isBrandOrPrice = item.name === 'brend' || item.name === 'tsena';
+            const isRadio = item.type === 'radio';
+            
+            if (isBrandOrPrice) {
+                delete newItem.options;
+            } else if (isRadio) {
+                newItem.options = []
+            }else if (Array.isArray(item.options)) {
+                newItem.options = item.options.map((opt: any) => ({
+                    ...opt,
+                    name: createSlug(opt.name),
+                    productsId: opt.productsId ?? []
+                }));
+            }
 
-        return newItem;
-    });
+            return newItem;
+        });
 }
 
 function cleanData(item: any): any {
