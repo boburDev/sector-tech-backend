@@ -6,7 +6,7 @@ dotenv.config();
 
 export const getLocations = async (name: string) => {
     try {
-        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+        const apiKey = "AIzaSyC1xxfvw3t6g5u67tiYBNDFdjleEfI_wGQ";
 
         const autocompleteRes = await axios.get(
             'https://maps.googleapis.com/maps/api/place/autocomplete/json',
