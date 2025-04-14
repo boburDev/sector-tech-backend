@@ -3,19 +3,89 @@ import * as kontragentAddressController from "../../controllers/user/kontragent"
 import { validateUserToken } from "../../middlewares/userValidator";
 
 const router = express.Router();
-
 /**
  * @swagger
  * tags:
  *   name: KontragentAddresses
- *   description: Kontragent addresses management
+ *   description: Kontragent address management
  */
 
 /**
  * @swagger
- * /user/kontragent-address/save/{id}:
+ * /user/kontragent-address/create/{kontragentId}:
  *   post:
- *     summary: Create or update a kontragent address (toggle style)
+ *     summary: Create a new kontragent address
+ *     tags: [KontragentAddresses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: kontragentId
+ *         in: path
+ *         required: true
+ *         description: The ID of the kontragent
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object 
+ *             required:
+ *               - fullAddress
+ *               - country
+ *               - region
+ *               - district
+ *               - street
+ *               - house
+ *               - index
+ *             properties:
+ *               fullAddress:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               region:
+ *                 type: string
+ *               district:
+ *                 type: string
+ *               street:
+ *                 type: string
+ *               house:
+ *                 type: string
+ *               apartment:
+ *                 type: string
+ *               index:
+ *                 type: string
+ *               comment:
+ *                 type: string
+ *               isMain:
+ *                 type: boolean
+ *             example:
+ *               fullAddress: "Tashkent, Chilonzor, 10-uy"
+ *               country: "UZ"
+ *               region: "Tashkent"
+ *               district: "Chilonzor"
+ *               street: "Bog'ishamol"
+ *               house: "10"
+ *               apartment: "5"
+ *               index: "100115"
+ *               comment: "Main office"
+ *               isMain: true
+ *     responses:
+ *       201:
+ *         description: Kontragent address successfully created
+ *       404:
+ *         description: Kontragent not found
+ *       500:
+ *         description: Server error
+ */
+router.post("/create/:kontragentId", validateUserToken, kontragentAddressController.createKontragentAddress);
+
+/**
+ * @swagger
+ * /user/kontragent-address/update/{id}:
+ *   patch:
+ *     summary: Update an existing kontragent address
  *     tags: [KontragentAddresses]
  *     security:
  *       - bearerAuth: []
@@ -23,7 +93,7 @@ const router = express.Router();
  *       - name: id
  *         in: path
  *         required: true
- *         description: Kontragent ID (required for toggling create/update)
+ *         description: The ID of the kontragent address
  *         schema:
  *           type: string
  *     requestBody:
@@ -54,29 +124,25 @@ const router = express.Router();
  *               isMain:
  *                 type: boolean
  *             example:
- *               fullAddress: "Tashkent, Olmazor tumani, Chilonzor-9, 12-uy"
+ *               fullAddress: "Tashkent, Yunusabad, Amir Temur 5"
  *               country: "UZ"
  *               region: "Tashkent"
- *               district: "Olmazor"
- *               street: "Chilonzor"
- *               house: "9"
+ *               district: "Yunusabad"
+ *               street: "Amir Temur"
+ *               house: "5"
  *               apartment: "12"
- *               index: "100115"
- *               comment: "Yangi filial"
+ *               index: "100120"
+ *               comment: "Updated address"
  *               isMain: false
  *     responses:
  *       200:
- *         description: Address successfully updated
- *       201:
- *         description: Address successfully created
- *       400:
- *         description: Kontragent ID is required
+ *         description: Kontragent address successfully updated
  *       404:
- *         description: Kontragent not found
+ *         description: Address not found
  *       500:
- *         description: Internal server error
+ *         description: Server error
  */
-router.post("/save/:id", validateUserToken, kontragentAddressController.createOrUpdateKontragentAddress);
+router.patch("/update/:id", validateUserToken, kontragentAddressController.updateKontragentAddress);
 
 /**
  * @swagger

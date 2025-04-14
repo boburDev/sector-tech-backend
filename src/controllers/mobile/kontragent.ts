@@ -238,63 +238,95 @@ export const deleteKontragent = async (req: Request, res: Response, next: NextFu
     }
 };
 
-export const createOrUpdateKontragentAddress = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+export const createKontragentAddress = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { kontragentId } = req.params;
+        const userId = req.user.id;
+        const { fullAddress, country, region, district, street, house, apartment, index, comment, isMain } = req.body;
+
+        const kontragent = await kontragentRepository.findOne({ where: { id: kontragentId, userId, deletedAt: IsNull() } });
+        if (!kontragent) throw new CustomError('Kontragent not found', 404);
+
+        const existingKontragentAddress = await kontragentAddressRepository.findOne({ where: { fullAddress, deletedAt: IsNull() } });
+        if (existingKontragentAddress) throw new CustomError('Kontragent address already exists', 400);
+
+        await AppDataSource.transaction(async (manager) => {
+            if (isMain) {
+                await manager.update(
+                    KontragentAddress,
+                    { kontragentId, isMain: true, deletedAt: IsNull() },
+                    { isMain: false }
+                );
+            }
+            const kontragentAddress = manager.create(KontragentAddress, {
+                kontragentId,
+                fullAddress,
+                country,
+                region,
+                district,
+                street,
+                house,
+                apartment,
+                index,
+                comment,
+                isMain
+            });
+
+            await manager.save(kontragentAddress);
+
+            return res.status(201).json({
+                message: "Kontragent address successfully created",
+                data: kontragentAddress,
+                error: null,
+                status: 201
+            });
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateKontragentAddress = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { fullAddress, country, region, district, street, house, apartment, index, comment, isMain } = req.body;
+        const kontragentAddress = await kontragentAddressRepository.findOne({ where: { id, deletedAt: IsNull() } });
+        if (!kontragentAddress) throw new CustomError('Kontragent address not found', 404);
 
-        const kontragent = await kontragentRepository.findOne({ where: { id, deletedAt: IsNull() } });
-        if (!kontragent) throw new CustomError('Kontragent not found', 404);
+        kontragentAddress.fullAddress = fullAddress ?? kontragentAddress.fullAddress;
+        kontragentAddress.country = country ?? kontragentAddress.country;
+        kontragentAddress.region = region ?? kontragentAddress.region;
+        kontragentAddress.district = district ?? kontragentAddress.district;
+        kontragentAddress.street = street ?? kontragentAddress.street;
+        kontragentAddress.house = house ?? kontragentAddress.house;
+        kontragentAddress.apartment = apartment ?? kontragentAddress.apartment;
+        kontragentAddress.index = index ?? kontragentAddress.index;
+        kontragentAddress.comment = comment ?? kontragentAddress.comment;
+        if (isMain !== undefined) {
+            if (isMain === true) {
+                await AppDataSource.transaction(async (manager) => {
+                    await manager.update(
+                        KontragentAddress,
+                        { kontragentId: kontragentAddress.kontragentId, isMain: true, deletedAt: IsNull() },
+                        { isMain: false }
+                    );
 
-        await AppDataSource.transaction(async (manager) => {
-            const existingAddress = await kontragentAddressRepository.findOne({
-                where: { kontragentId: kontragent.id, deletedAt: IsNull() }
-            });
-
-            if (existingAddress) {
-                existingAddress.fullAddress = fullAddress ?? existingAddress.fullAddress;
-                existingAddress.country = country ?? existingAddress.country;
-                existingAddress.region = region ?? existingAddress.region;
-                existingAddress.district = district ?? existingAddress.district;
-                existingAddress.street = street ?? existingAddress.street;
-                existingAddress.house = house ?? existingAddress.house;
-                existingAddress.apartment = apartment ?? existingAddress.apartment;
-                existingAddress.index = index ?? existingAddress.index;
-                existingAddress.comment = comment ?? existingAddress.comment;
-                existingAddress.isMain = isMain ?? existingAddress.isMain;
-
-                await manager.save(existingAddress);
-
-                return res.status(200).json({
-                    message: "Kontragent address successfully updated",
-                    data: existingAddress,
-                    error: null,
-                    status: 200
+                    kontragentAddress.isMain = true;
+                    await manager.save(kontragentAddress);
                 });
             } else {
-                const newAddress = manager.create(KontragentAddress, {
-                    kontragentId: kontragent.id,
-                    fullAddress,
-                    country,
-                    region,
-                    district,
-                    street,
-                    house,
-                    apartment,
-                    index,
-                    comment,
-                    isMain: isMain ?? false
-                });
-
-                await manager.save(newAddress);
-
-                return res.status(201).json({
-                    message: "Kontragent address successfully created",
-                    data: newAddress,
-                    error: null,
-                    status: 201
-                });
+                kontragentAddress.isMain = false;
+                await kontragentAddressRepository.save(kontragentAddress);
             }
+        } else {
+            await kontragentAddressRepository.save(kontragentAddress);
+        }
+
+        return res.status(200).json({
+            message: "Kontragent address successfully updated",
+            data: kontragentAddress,
+            error: null,
+            status: 200
         });
     } catch (error) {
         next(error);
