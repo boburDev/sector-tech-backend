@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
-import { In, IsNull, Not } from "typeorm";
+import { In, IsNull, Like, Not } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 const kontragentRepository = AppDataSource.getRepository(Kontragent);
@@ -76,7 +76,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
                 createdAt: "DESC",
                 address: {
                     createdAt: "DESC"
-                }
+                }  
             },
             select: {
                 id: true,
@@ -353,3 +353,26 @@ export const deleteKontragentAddress = async (req: Request, res: Response, next:
     }
 };
 
+export const getKontragentByInn = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { inn, name } = req.query;
+        const userId = req.user.id;
+
+        if (!inn ) throw new CustomError('inn is required', 400);
+        let whereCondition: any = { inn: Like(`%${inn}%`), userId, deletedAt: IsNull() };
+        if(name) {
+            whereCondition.name = Like(`%${name}%`);
+        }
+        const kontragent = await kontragentRepository.findOne({ where: whereCondition });
+        if (!kontragent) throw new CustomError('Kontragent not found', 404);
+
+        return res.status(200).json({
+            message: "Kontragent successfully received",
+            data: kontragent,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        next(error);
+    }
+};
