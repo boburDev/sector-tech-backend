@@ -22,6 +22,7 @@ export const getCatalogFilterById = async (req: Request, res: Response, next: Ne
             const { productsId, ...rest } = item;
             return rest;
         });
+
         const result = {
             message: "Catalog filter retrieved successfully.",
             id: filter.id,
@@ -48,62 +49,64 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
             }]
         });
         console.log(existingFilter);
-        
-        // if (existingFilter) {
-        //     const existingNames = new Set(existingFilter.data.map((item: any) => item.name));
+        console.log(data);
+        console.log(data[0].options);
+        return
+        if (existingFilter) {
+            const existingNames = new Set(existingFilter.data.map((item: any) => item.name));
 
-        //     for (const item of data) {
-        //         if (existingNames.has(item.name)) throw new CustomError(`You can't create the same element: ${item.name}`, 400);
-        //     }
+            for (const item of data) {
+                if (existingNames.has(item.name)) throw new CustomError(`You can't create the same element: ${item.name}`, 400);
+            }
 
-        //     existingFilter.data = [...existingFilter.data, ...data];
+            existingFilter.data = [...existingFilter.data, ...data];
 
-        //     existingFilter.data = existingFilter.data.map((item: any) => ({
-        //         ...item,
-        //         productsId: item.productsId ?? []
-        //     }));
+            existingFilter.data = existingFilter.data.map((item: any) => ({
+                ...item,
+                productsId: item.productsId ?? []
+            }));
 
-        //     const result = await catalogFilterRepository.save(existingFilter);
-        //     result.data = result.data.map((item: any) => {
-        //         const { productsId, ...rest } = item;
-        //         return rest;
-        //     });
+            const result = await catalogFilterRepository.save(existingFilter);
+            result.data = result.data.map((item: any) => {
+                const { productsId, ...rest } = item;
+                return rest;
+            });
 
-        //     const filterResult = {
-        //         message: "New filter updated successfully.",
-        //         id: result.id,
-        //         subcatalog: result.subcatalogId,
-        //         category: result.categoryId,
-        //         data: result.data,
-        //     }
-        //     return res.status(201).json(filterResult);
-        // } else {
-        //     const updatedData = data.map((item: any) => ({
-        //         ...item,
-        //         productsId: item.productsId ?? []
-        //     }));
+            const filterResult = {
+                message: "New filter updated successfully.",
+                id: result.id,
+                subcatalog: result.subcatalogId,
+                category: result.categoryId,
+                data: result.data,
+            }
+            return res.status(201).json(filterResult);
+        } else {
+            const updatedData = data.map((item: any) => ({
+                ...item,
+                productsId: item.productsId ?? []
+            }));
 
-        //     const newFilter = catalogFilterRepository.create({
-        //         subcatalogId: categoryId ? null : subcatalogId,
-        //         categoryId,
-        //         data: updatedData
-        //     });
+            const newFilter = catalogFilterRepository.create({
+                subcatalogId: categoryId ? null : subcatalogId,
+                categoryId,
+                data: updatedData
+            });
 
-        //     const result = await catalogFilterRepository.save(newFilter);
-        //     result.data = result.data.map((item: any) => {
-        //         const { productsId, ...rest } = item;
-        //         return rest;
-        //     });
+            const result = await catalogFilterRepository.save(newFilter);
+            result.data = result.data.map((item: any) => {
+                const { productsId, ...rest } = item;
+                return rest;
+            });
 
-        //     const filterResult = {
-        //         message: "New filter created successfully.",
-        //         id: result.id,
-        //         subcatalog: result.subcatalogId,
-        //         category: result.categoryId,
-        //         data: result.data,
-        //     }
-        //     return res.status(201).json(filterResult);
-        // }
+            const filterResult = {
+                message: "New filter created successfully.",
+                id: result.id,
+                subcatalog: result.subcatalogId,
+                category: result.categoryId,
+                data: result.data,
+            }
+            return res.status(201).json(filterResult);
+        }
 
         res.send('ok')
     } catch (error) {
@@ -193,7 +196,7 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
 export const addProductToFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        let { subcatalogId = null, categoryId = null, data = [] } = req.body;
+        let { subcatalogId = null, categoryId = null, productId='', data = [] } = req.body;
 
         console.log(id)
         console.log(subcatalogId, categoryId, data)
@@ -202,4 +205,32 @@ export const addProductToFilter = async (req: Request, res: Response, next: Next
     } catch (error) {
         next(error);
     }
+}
+
+function prepareFilterData(data: any[]): any[] {
+    return data.map((item) => {
+        const newItem = { ...item };
+
+        if (Array.isArray(item.options)) {
+            newItem.options = item.options.map((opt: any) => ({
+                ...opt,
+                productsId: opt.productsId ?? []
+            }));
+        }
+
+        return newItem;
+    });
+}
+
+function cleanData(item: any): any {
+    const { productsId, ...rest } = item;
+
+    if (rest.options && Array.isArray(rest.options)) {
+        rest.options = rest.options.map((opt: any) => {
+            const { productsId, ...optRest } = opt;
+            return optRest;
+        });
+    }
+
+    return rest;
 }

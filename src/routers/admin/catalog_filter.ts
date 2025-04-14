@@ -34,7 +34,9 @@ const router = express.Router();
  *       404:
  *         description: Catalog Filter not found
  */
-router.get("/by/:id", validateAdminToken, validateParams(uuidSchema), CatalogFilter.getCatalogFilterById);
+router.get("/by/:id", 
+    // validateAdminToken,
+     validateParams(uuidSchema), CatalogFilter.getCatalogFilterById);
 
 /**
  * @swagger
@@ -65,7 +67,9 @@ router.get("/by/:id", validateAdminToken, validateParams(uuidSchema), CatalogFil
  *       201:
  *         description: Catalog Filter created successfully
  */
-router.post("/create", validateAdminToken, CatalogFilter.createCatalogFilter);
+router.post("/create", 
+    // validateAdminToken,
+     CatalogFilter.createCatalogFilter);
 
 /**
  * @swagger
@@ -101,7 +105,9 @@ router.post("/create", validateAdminToken, CatalogFilter.createCatalogFilter);
  *       404:
  *         description: Catalog Filter not found
  */
-router.put("/update/:id",validateAdminToken,validateParams(uuidSchema), CatalogFilter.updateCatalogFilter);
+router.put("/update/:id",
+    // validateAdminToken,
+    validateParams(uuidSchema), CatalogFilter.updateCatalogFilter);
 
 /**
  * @swagger
@@ -136,7 +142,9 @@ router.put("/update/:id",validateAdminToken,validateParams(uuidSchema), CatalogF
  *       404:
  *         description: Catalog Filter not found
  */
-router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), CatalogFilter.deleteCatalogFilter);
+router.delete("/delete/:id",
+    // validateAdminToken,
+     validateParams(uuidSchema), CatalogFilter.deleteCatalogFilter);
 
 /**
  * @swagger
@@ -160,6 +168,9 @@ router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), Cata
  *           schema:
  *             type: object
  *             properties:
+ *               productId:
+ *                 type: string
+ *                 description: The ID of the product.
  *               subcatalogId:
  *                 type: string
  *                 description: The ID of the subcatalog.
@@ -169,7 +180,7 @@ router.delete("/delete/:id",validateAdminToken, validateParams(uuidSchema), Cata
  *               data:
  *                 type: array
  *                 items:
- *                   type: string
+ *                   type: object
  *                 description: Array of product data.
  *     responses:
  *       200:
