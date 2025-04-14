@@ -148,7 +148,7 @@ router.delete("/delete/:id",
 
 /**
  * @swagger
- * /catalog-filter/addProduct:
+ * /catalog-filter/addProduct/:id:
  *   post:
  *     summary: Add a product to the filter
  *     tags: [CatalogFilter]
@@ -192,6 +192,6 @@ router.delete("/delete/:id",
  *       500:
  *         description: Internal server error
  */
-router.post("/addProduct", CatalogFilter.addProductToFilter);
+router.post("/addProduct/:id", CatalogFilter.addProductToFilter);
 
 export default router;

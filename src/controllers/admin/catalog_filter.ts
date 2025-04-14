@@ -3,7 +3,7 @@ import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 import { CustomError } from '../../error-handling/error-handling';
 import { createSlug } from '../../utils/slug';
-
+const STATIC_TITLE = ['Подкатегории', 'Состояние товара', 'Актуальность товара', 'Наличие в филиалах']
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -50,53 +50,34 @@ export const createCatalogFilter = async (req: Request, res: Response, next: Nex
             }]
         });
 
-        console.log(existingFilter);
-        console.log(data);
-        console.log(data[0].options);
-
         const preparedData = prepareFilterData(data);
-        console.log(preparedData);
-        console.log(preparedData[0].options);
 
-        return res.send('ok')
         if (existingFilter) {
+            
             const existingNames = new Set(existingFilter.data.map((item: any) => item.name));
 
-            for (const item of data) {
-                if (existingNames.has(item.name)) throw new CustomError(`You can't create the same element: ${item.name}`, 400);
+            for (const item of preparedData) {
+                if (existingNames.has(item.name)) throw new CustomError(`You can't create the same element: ${item.title}`, 400);
             }
 
-            existingFilter.data = [...existingFilter.data, ...data];
-
-            existingFilter.data = existingFilter.data.map((item: any) => ({
-                ...item,
-                productsId: item.productsId ?? []
-            }));
+            existingFilter.data = [...existingFilter.data, ...preparedData];
 
             const result = await catalogFilterRepository.save(existingFilter);
-            result.data = result.data.map((item: any) => {
-                const { productsId, ...rest } = item;
-                return rest;
-            });
+            const cleanedData = result.data.map(cleanData);
 
             const filterResult = {
                 message: "New filter updated successfully.",
                 id: result.id,
                 subcatalog: result.subcatalogId,
                 category: result.categoryId,
-                data: result.data,
+                data: cleanedData,
             }
             return res.status(201).json(filterResult);
         } else {
-            const updatedData = data.map((item: any) => ({
-                ...item,
-                productsId: item.productsId ?? []
-            }));
-
             const newFilter = catalogFilterRepository.create({
                 subcatalogId: categoryId ? null : subcatalogId,
                 categoryId,
-                data: updatedData
+                data: preparedData
             });
 
             const result = await catalogFilterRepository.save(newFilter);
@@ -127,29 +108,46 @@ export const updateCatalogFilter = async (req: Request, res: Response, next: Nex
         const filter: any = await catalogFilterRepository.findOneBy({ id });
 
         if (!filter) throw new CustomError('Catalog filter not found', 404);
-
+        
         const itemIndex = filter.data.findIndex((item: any) => item.name === name);
-
+        
         if (itemIndex === -1) throw new CustomError(`Item with name "${name}" not found in filter data`, 404);
+        
+        const itemNewIndex = filter.data.findIndex((item: any) => item.name === createSlug(data.title));
+        if (itemNewIndex !== -1 && itemNewIndex !== itemIndex) throw new CustomError(`You can't update the same element: ${data.title}`, 404);
+        
+        const oldItem = filter.data[itemIndex];
 
-        if (filter.data[itemIndex].name === data.name) {
-            throw new CustomError(`You can't update the same element: ${data.name}`, 404);
+        let updatedOptions = data.options;
+        if (Array.isArray(data.options)) {
+            updatedOptions = data.options.map((newOpt: any) => {
+                const oldOpt = oldItem.options?.find((o: any) => o.name === newOpt.name);
+                return {
+                    ...newOpt,
+                    name: createSlug(newOpt.title),
+                    productsId: oldOpt?.productsId ?? []
+                };
+            });
         }
-        filter.data[itemIndex] = {
-            ...data,
-            productsId: filter.data[itemIndex].productsId
+
+        const updatedItem = {
+            ...oldItem, 
+            name: createSlug(data.title),
+            title: data.title,
+            icon: data.icon,
+            type: data.type,
+            withSearch: data.withSearch,
+            options: updatedOptions
         };
 
-        const result = await catalogFilterRepository.save(filter);
+        filter.data[itemIndex] = updatedItem;
 
-        result.data = result.data.map((item: any) => {
-            const { productsId, ...rest } = item;
-            return rest;
-        });
+        const result = await catalogFilterRepository.save(filter);
+        const cleanedData = result.data.map(cleanData);
 
         const filterResult = {
             message: "Catalog filter item updated successfully.",
-            data: result.data,
+            data: cleanedData,
             subcatalog: result.subcatalogId,
             category: result.categoryId,
             id: result.id,
@@ -201,10 +199,19 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
 export const addProductToFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        let { subcatalogId = null, categoryId = null, productId = '', data = [] } = req.body;
-
-        console.log(id)
-        console.log(subcatalogId, categoryId, data)
+        let { productId = '', data = [] } = req.body;
+        const filter: any = await catalogFilterRepository.findOneBy({ id });
+        const filterData = filter.data
+        for (const i of filterData) {
+            console.log(i);
+        }
+        console.log(productId);
+        for (const i of data) {
+            console.log(i);
+            
+        }
+        // console.log(req.body)
+        // console.log(req.body.data[0].options)
 
         return res.status(200).json('Successfully added');
     } catch (error) {
@@ -214,22 +221,24 @@ export const addProductToFilter = async (req: Request, res: Response, next: Next
 
 function prepareFilterData(data: any[]): any[] {
     return data
-        .filter((filter: any) => !['состояние-товара', 'актуальность-товара'].includes(filter.name))
+        .filter((filter: any) => !STATIC_TITLE.includes(filter.title))
         .map((item) => {
             const newItem = { ...item };
-            newItem.name = createSlug(newItem.name);
+            newItem.name = createSlug(newItem.title);
 
-            const isBrandOrPrice = item.name === 'brend' || item.name === 'tsena';
-            const isRadio = item.type === 'radio';
+            const isBrandOrPrice = newItem.name === 'brend' || newItem.name === 'tsena';
+            const isRadio = newItem.type === 'radio';
             
             if (isBrandOrPrice) {
                 delete newItem.options;
+                newItem.withSearch = false
             } else if (isRadio) {
                 newItem.options = []
-            }else if (Array.isArray(item.options)) {
-                newItem.options = item.options.map((opt: any) => ({
+                newItem.withSearch = false
+            } else if (Array.isArray(newItem.options)) {
+                newItem.options = newItem.options.map((opt: any) => ({
                     ...opt,
-                    name: createSlug(opt.name),
+                    name: createSlug(opt.title),
                     productsId: opt.productsId ?? []
                 }));
             }
@@ -239,14 +248,14 @@ function prepareFilterData(data: any[]): any[] {
 }
 
 function cleanData(item: any): any {
-    const { productsId, ...rest } = item;
+    const result = { ...item };
 
-    if (rest.options && Array.isArray(rest.options)) {
-        rest.options = rest.options.map((opt: any) => {
-            const { productsId, ...optRest } = opt;
-            return optRest;
+    if (Array.isArray(item.options)) {
+        result.options = item.options.map((opt: any) => {
+            const { productsId, ...rest } = opt;
+            return rest;
         });
     }
 
-    return rest;
+    return result;
 }
