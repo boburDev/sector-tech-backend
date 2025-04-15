@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
-import { In, IsNull, Like, Not } from "typeorm";
+import { ILike, In, IsNull, Not } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { getLocations } from "../../utils/get-location";
@@ -69,15 +69,20 @@ export const createKontragent = async (req: Request, res: Response, next: NextFu
 
 export const getKontragents = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { inn, name } = req.query;
+        const { inn } = req.query;
         const userId = req.user.id;
+
         let whereCondition: any = { userId, deletedAt: IsNull() };
-        if (inn) {
-            whereCondition.inn = Like(`%${inn}%`);
+
+        if (inn && typeof inn === "string") {
+            const isNumeric = /^\d+$/.test(inn);
+            if (isNumeric) {
+                whereCondition.inn = ILike(`%${inn}%`);
+            } else {
+                whereCondition.name = ILike(`%${inn}%`);
+            }
         }
-        if (name) {
-            whereCondition.name = Like(`%${name}%`);
-        }
+
         const kontragents = await kontragentRepository.find({
             relations: ["user", "address"],
             where: whereCondition,
@@ -95,7 +100,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
                     id: true,
                     name: true,
                     phone: true,
-                    email: true
+                    email: true,
                 },
                 address: {
                     id: true,
@@ -116,13 +121,13 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
 
         const user_kontragents = await kontragentRepository.find({
             where: {
-                inn: In(kontragents.map((kontragent) => kontragent.inn !== null ? kontragent.inn : ""))
+                inn: In(kontragents.map(k => k.inn || ""))
             },
             select: {
                 inn: true,
-                name: true,
+                name: true
             }
-        })
+        });
 
         return res.status(200).json({
             message: "Kontragents successfully received",
@@ -130,6 +135,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
             error: null,
             status: 200
         });
+
     } catch (error) {
         next(error);
     }
@@ -348,30 +354,6 @@ export const deleteKontragentAddress = async (req: Request, res: Response, next:
         return res.status(200).json({
             message: "Kontragent address successfully deleted",
             data: null,
-            error: null,
-            status: 200
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-export const getKontragentByInn = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    try {
-        const { inn, name } = req.query;
-        const userId = req.user.id;
-
-        if (!inn ) throw new CustomError('inn is required', 400);
-        let whereCondition: any = { inn: Like(`%${inn}%`), userId, deletedAt: IsNull() };
-        if(name) {
-            whereCondition.name = Like(`%${name}%`);
-        }
-        const kontragent = await kontragentRepository.findOne({ where: whereCondition });
-        if (!kontragent) throw new CustomError('Kontragent not found', 404);
-
-        return res.status(200).json({
-            message: "Kontragent successfully received",
-            data: kontragent,
             error: null,
             status: 200
         });

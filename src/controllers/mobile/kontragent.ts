@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
-import { In, IsNull, Like, Not } from "typeorm";
+import { ILike, In, IsNull, Like, Not } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { getLocations } from "../../utils/get-location";
@@ -69,18 +69,23 @@ export const createKontragent = async (req: Request, res: Response, next: NextFu
 
 export const getKontragents = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+        const { inn } = req.query;
         const userId = req.user.id;
-        const { inn, name } = req.query;
+
         let whereCondition: any = { userId, deletedAt: IsNull() };
-        if (inn) {
-            whereCondition.inn = Like(`%${inn}%`);
+
+        if (inn && typeof inn === "string") {
+            const isNumeric = /^\d+$/.test(inn); // faqat raqamlardan iboratmi?
+            if (isNumeric) {
+                whereCondition.inn = Like(`%${inn}%`);
+            } else {
+                whereCondition.name = ILike(`%${inn}%`);
+            }
         }
-        if (name) {
-            whereCondition.name = Like(`%${name}%`);
-        }
+
         const kontragents = await kontragentRepository.find({
-            where: whereCondition,
             relations: ["user", "address"],
+            where: whereCondition,
             select: {
                 id: true,
                 ownershipForm: true,
@@ -95,7 +100,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
                     id: true,
                     name: true,
                     phone: true,
-                    email: true
+                    email: true,
                 },
                 address: {
                     id: true,
@@ -116,13 +121,13 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
 
         const user_kontragents = await kontragentRepository.find({
             where: {
-                inn: In(kontragents.map((kontragent) => kontragent.inn !== null ? kontragent.inn : ""))
+                inn: In(kontragents.map(k => k.inn || ""))
             },
             select: {
                 inn: true,
-                name: true,
+                name: true
             }
-        })
+        });
 
         return res.status(200).json({
             message: "Kontragents successfully received",
@@ -130,6 +135,7 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
             error: null,
             status: 200
         });
+
     } catch (error) {
         next(error);
     }

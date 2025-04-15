@@ -104,12 +104,6 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *         required: false
  *         schema:
  *           type: string
- *       - name: name
- *         in: query
- *         description: Name of the kontragent
- *         required: false
- *         schema:
- *           type: string   
  *     responses:
  *       200:
  *         description: Kontragents retrieved successfully
@@ -148,14 +142,22 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                         properties:
  *                           id:
  *                             type: string
- *                           address:
+ *                           fullAddress:
+ *                             type: string
+ *                           country:
+ *                             type: string
+ *                           region:
+ *                             type: string
+ *                           district:
+ *                             type: string
+ *                           street:
  *                             type: string
  *                           createdAt:
  *                             type: string
  *                           updatedAt:
  *                             type: string
  *                           deletedAt:
- *                             type: string | null  
+ *                             type: string | null      
  *                 error:
  *                   type: string
  *                 status:

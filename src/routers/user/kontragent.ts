@@ -104,12 +104,6 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *         required: false
  *         schema:
  *           type: string
- *       - name: name
- *         in: query
- *         description: Name of the kontragent
- *         required: false
- *         schema:
- *           type: string   
  *     responses:
  *       200:
  *         description: Kontragents retrieved successfully
@@ -121,7 +115,7 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                 message:
  *                   type: string
  *                 data:
- *                   type: array
+ *                   type: array    
  *                   items:
  *                     type: object
  *                     properties:
@@ -151,6 +145,7 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                           address:
  *                             type: string
  *                           createdAt:
+ *                             type: string
  *                 error:
  *                   type: string
  *                 status:
