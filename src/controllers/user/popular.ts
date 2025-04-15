@@ -25,6 +25,7 @@ export const getPopular = async (req: Request, res: Response, next: NextFunction
                 title: true,
                 path: true,
                 slug: true,
+                updatedAt: true,    
                 popularCategory: {
                     id: true,
                 }
@@ -64,6 +65,7 @@ export const getPopular = async (req: Request, res: Response, next: NextFunction
                 slug: true,
                 description: true,
                 path: true,
+                updatedAt: true,
                 popularBrand: {
                     id: true,
                 }
