@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Product } from '../../entities/products.entity';
-import { In, IsNull, Not, Like } from 'typeorm';
+import { In, IsNull, Not, Like, ILike } from 'typeorm';
 import { productFunctionalSchema, productSchema } from '../../validators/product.validator';
 import { createSlug } from '../../utils/slug';
 import { deleteFile, deleteFileBeforeSave } from '../../middlewares/removeFiltePath';
@@ -117,7 +117,7 @@ export const getProductsByFilter = async (req: Request, res: Response, next: Nex
         }
 
         if (title) {
-            filter.title = Like(`%${title}%`);
+            filter.title = ILike(`%${title}%`);
         }
         
 

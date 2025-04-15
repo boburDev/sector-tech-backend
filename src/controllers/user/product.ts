@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
-import { IsNull, Like, MoreThan, Not } from "typeorm";
+import { ILike, IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";
 
@@ -359,7 +359,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
     }
 
     if (title) {
-      filter.title = Like(`%${title}%`);
+      filter.title = ILike(`%${title}%`);
     }
 
     if (popular === "true") {

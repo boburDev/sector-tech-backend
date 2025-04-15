@@ -19,6 +19,7 @@ export const getPopular = async (req: Request, res: Response, next: NextFunction
             where: whereCondition,
             order: { updatedAt: "ASC" },
             relations: ["popularCategory"],
+            take: 11,
             select: {
                 id: true,
                 title: true,
@@ -56,6 +57,7 @@ export const getPopular = async (req: Request, res: Response, next: NextFunction
             where: { deletedAt: IsNull(), popularBrand: { id: Not(IsNull()) } },
             order: { updatedAt: "ASC" },
             relations: ["popularBrand"],
+            take: 5,
             select: {
                 id: true,
                 title: true,

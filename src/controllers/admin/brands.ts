@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { ILike, In, IsNull, Like, Not } from 'typeorm';
+import { ILike, In, IsNull, Not } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { Brand } from '../../entities/brands.entity';
 import { createSlug } from '../../utils/slug';
@@ -218,7 +218,7 @@ export const getBrands = async (req: Request, res: Response, next: NextFunction)
         }
 
         if (title) {
-            filter.title = Like(`%${title}%`);  
+            filter.title = ILike(`%${title}%`);  
         }
 
         const [brands, total] = await Promise.all([
@@ -381,15 +381,15 @@ export const deletePopularBrand = async (req: Request, res: Response, next: Next
     } catch (error) {
         next(error);
     }
-};  
+};
 
 export const getPopularBrands = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const popularBrands = await popularBrandRepository.find({   
+        const popularBrands = await popularBrandRepository.find({
             relations: ['brand'],
             where: { brandId: Not(IsNull()) },
             order: { updatedAt: "ASC" },
-            select: {   
+            select: {
                 id: true,
                 updatedAt: true,
                 brand: { id: true, title: true, path: true, slug: true, description: true,  }
