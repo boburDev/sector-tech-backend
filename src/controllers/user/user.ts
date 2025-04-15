@@ -14,30 +14,22 @@ export const OAuthCallback = async (req: Request, res: Response, next: NextFunct
 
     let user = await userRepository.findOne({ where: { email } });
 
-    if (user) {
-      const accessToken = sign(
-        { id: user.id, email: user.email },
-        86400000, // 1 kun (24 soat)
-        "user"
-      );
-      return res.status(200).redirect(`http://localhost:3000?token=${accessToken}`);
-
-    } else {
+    if (!user) {
       const newUser = new Users();
-      newUser.name = name;
+      newUser.name = name || "";
       newUser.email = email;
       newUser.password = "";
       newUser.phone = "";
-      const savedUser = await userRepository.save(newUser);
-
-      const token = sign(
-        { id: savedUser.id, email: savedUser.email },
-        86400000, // 1 day in milliseconds
-        "user"
-      );
-
-      return res.status(201).redirect(`http://localhost:3000?token=${token}`);
+      user = await userRepository.save(newUser);
     }
+
+    const token = sign(
+      { id: user.id, email: user.email },
+      86400000, // 1 day
+      "user"
+    );
+
+    return res.redirect(`http://localhost:3000?token=${token}`);
   } catch (error) {
     next(error);
   }
@@ -56,7 +48,7 @@ export const sendOtp = async (req: Request, res: Response, next: NextFunction): 
         const createdAt = new Date(opt.createdAt);
         const timeDifference = (currentTime.getTime() - createdAt.getTime()) / 1000;
         
-        if (timeDifference < 180) throw new CustomError('OTP already sent, please try again', 400);
+        if (timeDifference < 60) throw new CustomError('OTP already sent, please try again', 400);
         else await optRepository.delete(opt.id);
     }
     
@@ -86,30 +78,39 @@ export const signup = async (req: Request, res: Response, next: NextFunction): P
 
     const opt = await optRepository.findOne({ where: { email } });
     if (!opt) throw new CustomError("OTP not found", 400);
-
     if (opt.optCode !== optCode) throw new CustomError("Invalid OTP", 400);
 
-    const existingUser = await userRepository.findOne({ where: { email } });
+    await optRepository.delete({ email });
 
-    if (existingUser) throw new CustomError("User already exists", 400);
+    let user = await userRepository.findOne({ where: { email } });
 
-    const newUser = new Users();
-    newUser.email = email;
-    const savedUser = await userRepository.save(newUser);
+    let message: string;
+
+    if (!user) {
+      const newUser = new Users();
+      newUser.email = email;
+      user = await userRepository.save(newUser);
+      message = "You have successfully registered";
+    } else {
+      message = "You have already registered";
+    }
 
     const token = sign(
-      { id: savedUser.id, email: savedUser.email },
-      86400000, // 1 day in milliseconds
+      { id: user.id, email: user.email },
+      86400000, // 1 kun
       "user"
     );
 
-    const userData = {
-      id: savedUser.id,
-      email: savedUser.email
-    };
+    return res.status(200).json({
+      message,
+      token,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    });
 
-    return res.status(201).json({ message: "User created successfully", token, user: userData });
-  } catch (error: any) {
+  } catch (error) {
     next(error);
   }
 };

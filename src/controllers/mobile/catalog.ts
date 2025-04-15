@@ -137,22 +137,33 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             deletedAt: IsNull()
         };
 
-        if (subcatalogSlug) {
-            const subcatalog = await subcatalogRepository.findOne({
-                where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
-            })
-            whereCondition.subcatalogId = subcatalog?.id;
-        }
-
         if (categorySlug) {
             const category = await categoryRepository.findOne({
                 where: { deletedAt: IsNull(), slug: categorySlug as string }
             })
-            whereCondition.categoryId = category?.id;
+            if (category) {
+                whereCondition.categoryId = category.id;
+                whereCondition.subcatalogId = null;
+            } else {
+                return res.status(200).json({ data: [], error: null, status: 200 });
+            }
+        } else if (subcatalogSlug) {
+            const subcatalog = await subcatalogRepository.findOne({
+                where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
+            })
+            if (subcatalog) {
+                whereCondition.subcatalogId = subcatalog.id;
+                whereCondition.categoryId = null;
+            } else {
+                return res.status(200).json({ data: [], error: null, status: 200 });
+            }
+        } else {
+            return res.status(200).json({ data: [], error: null, status: 200 });
         }
 
         const categoryFilter = await catalogFilterRepository.findOne({
             where: whereCondition,
+            relations: ['subcatalog', 'category'],
             select: ['id', 'data']
         });
 

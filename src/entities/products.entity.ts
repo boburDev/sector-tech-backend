@@ -70,6 +70,12 @@ export class Product {
   @Column("json", { default: []})
   garanteeIds: string[];
 
+  @Column("json", { default: []})
+  subcatalogFilter: string[];
+
+  @Column("json", { default: []})
+  categoryFilter: string[];
+
   @ManyToOne(() => ProductRelevance, (relevance) => relevance.products)
   @JoinColumn({ name: "relevanceId" })
   relevances: ProductRelevance;

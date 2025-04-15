@@ -3,8 +3,10 @@ import { CatalogFilter } from '../../entities/catalog_filter.entity';
 import AppDataSource from '../../config/ormconfig';
 import { CustomError } from '../../error-handling/error-handling';
 import { createSlug } from '../../utils/slug';
+import { Product } from '../../entities/products.entity';
 const STATIC_TITLE = ['Подкатегории', 'Состояние товара', 'Актуальность товара', 'Наличие в филиалах']
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
+const productRepository = AppDataSource.getRepository(Product);
 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
@@ -199,25 +201,50 @@ export const deleteCatalogFilter = async (req: Request, res: Response, next: Nex
 export const addProductToFilter = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        let { productId = '', data = [] } = req.body;
-        const filter: any = await catalogFilterRepository.findOneBy({ id });
-        const filterData = filter.data
-        for (const i of filterData) {
-            console.log(i);
-        }
-        console.log(productId);
-        for (const i of data) {
-            console.log(i);
-            
-        }
-        // console.log(req.body)
-        // console.log(req.body.data[0].options)
+        let { productId = '', data = [], subcatalogId = null, categoryId = null } = req.body;
 
-        return res.status(200).json('Successfully added');
+        const filter: any = await catalogFilterRepository.findOneBy({ id });
+        if (!filter) throw new CustomError("Filter not found", 404);
+
+        const product: any = await productRepository.findOneBy({ id: productId });
+        if (!product) throw new CustomError("Product not found", 404);
+
+        const filterData = filter.data;
+
+        for (const filterItem of filterData) {
+            const matchedInputItem = data.find((inputItem: any) => inputItem.name === filterItem.name);
+            if (!matchedInputItem) continue;
+
+            for (const option of filterItem.options) {
+                const matchedOption = matchedInputItem.options.find(
+                    (opt: any) => opt.name === option.name
+                );
+
+                if (matchedOption) {
+                    if (!option.productsId.includes(productId)) {
+                        option.productsId.push(productId);
+                    }
+                }
+            }
+        }
+
+        const newFilters = mapFilterOptionsToString(data);
+        await catalogFilterRepository.save(filter);
+
+        const existingFilters = new Set(product.categoryFilter || []);
+        newFilters.forEach(f => existingFilters.add(f));
+
+        product.categoryFilter = Array.from(existingFilters);
+        await productRepository.save(product);
+
+        return res.status(200).json({
+            message: "Successfully added",
+            filterData: filter.data,
+        });
     } catch (error) {
         next(error);
     }
-}
+};
 
 function prepareFilterData(data: any[]): any[] {
     return data
@@ -258,4 +285,19 @@ function cleanData(item: any): any {
     }
 
     return result;
+}
+
+type FilterOption = {
+    name: string;
+};
+
+type FilterItem = {
+    name: string;
+    options: FilterOption[];
+};
+
+function mapFilterOptionsToString(data: FilterItem[]): string[] {
+    return data.flatMap(item =>
+        item.options.map(option => `${item.name}$$${option.name}`)
+    );
 }
