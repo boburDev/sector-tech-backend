@@ -6,7 +6,7 @@ const secretKey: string = String(process.env.JWT_SECRET)
 const secretKeyUser: string = String(process.env.JWT_SECRET_USER)
 
 // 60sec * 60min * 24hour = 1d   
-function sign(payload: any, expireTime: number = 600000, role?: string) {
+function sign(payload: any, expireTime: number = 60 * 60 * 24, role?: string) {
     return jwt.sign(payload, role === 'user' ? secretKeyUser : secretKey, { expiresIn: expireTime })
 }
 
