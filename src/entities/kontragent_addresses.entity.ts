@@ -18,19 +18,19 @@ export class KontragentAddress {
     @Column()
     region: string;
 
-    @Column()
+    @Column({ nullable: true })
     district: string;
 
-    @Column()
+    @Column({ nullable: true })
     street: string;
 
-    @Column()
+    @Column({ nullable: true })
     house: string;
 
     @Column({ nullable: true })
     apartment: string;
 
-    @Column()
+    @Column({ nullable: true })
     index: string;
 
     @Column({ type: "text", nullable: true })
