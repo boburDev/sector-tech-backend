@@ -180,6 +180,53 @@ router.get("/all", validateUserToken, kontragentController.getKontragents);
 
 /**
  * @swagger
+ * /mobile/kontragent/{id}:
+ *   get:
+ *     summary: Get a kontragent by ID
+ *     tags: [Kontragent]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Kontragent ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Kontragent retrieved successfully
+ *         content:
+ *           application/json:  
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: number
+ *       500:
+ *         description: Internal server error   
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: number
+ */
+router.get("/:id", validateUserToken, kontragentController.getKontragentById);
+
+/**
+ * @swagger
  * /mobile/kontragent/update/{id}:
  *   patch:
  *     summary: Update an existing kontragent (all fields are optional)
