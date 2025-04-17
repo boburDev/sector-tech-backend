@@ -63,6 +63,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
         mainImage: true,
         garanteeIds: true,
         recommended: true,
+        createdAt: true,
         catalog: {
           slug: true,
           title: true,
