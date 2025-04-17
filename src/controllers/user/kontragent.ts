@@ -141,6 +141,59 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
     }
 };
 
+export const getKontragentById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const kontragent = await kontragentRepository.findOne({ 
+            where: { id, userId, deletedAt: IsNull() }, 
+            relations: ["address", "user"], 
+            select: {
+            id: true,
+            ownershipForm: true,
+            inn: true,
+            pinfl: true,
+            oked: true,
+            name: true,
+            legalAddress: true,
+            isFavorite: true,
+            countryOfRegistration: true,
+            user: {
+                id: true,
+                name: true,
+                phone: true,
+                email: true,
+            },
+            address: {
+                id: true,
+                fullAddress: true,
+                country: true,
+                region: true,
+                district: true,
+                street: true,
+                house: true,
+                apartment: true,
+                index: true,
+                comment: true,
+                isMain: true,
+                createdAt: true,
+            }
+        }
+        });
+        if (!kontragent) throw new CustomError('Kontragent not found', 404);
+
+        return res.status(200).json({
+            message: "Kontragent successfully received",
+            data: kontragent,
+            error: null,
+            status: 200
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
