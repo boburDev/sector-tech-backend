@@ -14,6 +14,55 @@ const router = express.Router();
 
 /**
  * @swagger
+ * /user/kontragent/location:
+ *   get:
+ *     summary: Get location by name
+ *     tags: [Kontragent]   
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: name
+ *         in: query
+ *         description: Name of the location    
+ *     responses:
+ *       200:
+ *         description: Location retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object   
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     results:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                 error:   
+ *                   type: string
+ *                 status:
+ *                   type: number
+ *       500:
+ *         description: Internal server error
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string   
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: number
+ */
+router.get("/location", kontragentController.getLocationbyName);
+
+/**
+ * @swagger
  * /user/kontragent/create:
  *   post:
  *     summary: Create a new kontragent
@@ -333,49 +382,5 @@ router.patch("/update/:id", validateUserToken, kontragentController.updateKontra
  *                   type: number
  */
 router.delete("/delete/:id", validateUserToken, kontragentController.deleteKontragent);
-
-/**
- * @swagger
- * /user/kontragent/location:
- *   get:
- *     summary: Get location by name
- *     tags: [Kontragent]   
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: name
- *         in: query
- *         description: Name of the location    
- *     responses:
- *       200:
- *         description: Location retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object   
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                 error:   
- *                   type: string
- *                 status:
- *                   type: number
- *       500:
- *         description: Internal server error
- *         content: 
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string   
- *                 error:
- *                   type: string
- *                 status:
- *                   type: number
- */ 
-router.get("/location", kontragentController.getLocationbyName);
 
 export default router;

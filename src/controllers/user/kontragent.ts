@@ -416,10 +416,15 @@ export const deleteKontragentAddress = async (req: Request, res: Response, next:
 };
 
 export const getLocationbyName = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    console.log("salom");
     try {
+        
         const { name } = req.query;
+        console.log(name);
+        
         const locations = await getLocations(name as string);
-
+        console.log(locations);
+        
         return res.status(200).json({
             message: "Location successfully received",
             data: locations,
@@ -427,6 +432,8 @@ export const getLocationbyName = async (req: Request, res: Response, next: NextF
             status: 200
         });
     } catch (error) {
+        console.log(error);
         next(error);
+        
     }
 };
