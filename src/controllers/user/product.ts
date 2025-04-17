@@ -11,7 +11,9 @@ const cartProductRepository = AppDataSource.getRepository(Cart);
 
 export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { recommended, condition, revalance, popular } = req.query;
+    const { recommended, condition, revalance, popular, limit = 12 } = req.query;
+    if (typeof limit != 'number') throw new CustomError('Limit must be number', 400);
+    
     const whereCondition: any = { deletedAt: IsNull() };
 
     const conditionMapping: Record<string, string> = {
@@ -50,6 +52,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
       relations,
       where: whereCondition,
       order: { createdAt: "DESC" },
+      take: limit,
       select: {
         id: true,
         title: true,
