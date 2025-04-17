@@ -15,7 +15,13 @@ const router = Router();
  * /mobile/region/all:
  *   get:
  *     summary: Get all regions
- *     tags: [Region]   
+ *     tags: [Region]    
+ *     parameters:
+ *       - name: name
+ *         in: query
+ *         description: Name of the region
+ *         required: false
+ *         type: string
  *     responses:
  *       200:
  *         description: Regions fetched successfully

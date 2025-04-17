@@ -1,13 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import AppDataSource from '../../config/ormconfig';
 import { Region } from '../../entities/location.entity';
-import { IsNull } from 'typeorm';
+import { ILike, IsNull } from 'typeorm';
 const regionRepository = AppDataSource.getRepository(Region);
 
 export const getRegions = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+        const { name } = req.query;
+        let where: any  = { deletedAt: IsNull() };
+        if(name){ 
+            where = { name: ILike(`%${name}%`) };
+        }
         const regions = await regionRepository.find({
-            where: { deletedAt: IsNull() },
+            where,
             select: {
             id: true,
             name: true,
