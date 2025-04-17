@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv';
-import 'dotenv/config';
-dotenv.config();
+// import dotenv from 'dotenv';
+// import 'dotenv/config';
+// dotenv.config();
 const secretKey: string = String(process.env.JWT_SECRET)
 const secretKeyUser: string = String(process.env.JWT_SECRET_USER)
 

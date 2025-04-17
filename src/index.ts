@@ -1,6 +1,7 @@
-import express, { NextFunction } from "express";
-import dotenv from "dotenv";
+import express from "express";
 import path from "path";
+import dotenv from "dotenv";
+dotenv.config(); 
 import AppDataSource from "./config/ormconfig";
 import adminRouter from "./routers/admin/index";
 import userRouter from "./routers/user/index";
@@ -16,9 +17,6 @@ import session from "express-session";
 import passport from "passport";
 import insertData from "./services";
 import errorMiddleware from "./middlewares/errorMiddleware";
-
-dotenv.config(); 
-
 
 const PORT = Number(process.env.PORT) || 3030;
 

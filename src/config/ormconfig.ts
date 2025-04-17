@@ -1,9 +1,10 @@
 import "reflect-metadata"
 import path from 'path'
 import { DataSource } from 'typeorm'
-import dotenv from 'dotenv';
-import 'dotenv/config';
-dotenv.config();
+// import dotenv from 'dotenv';
+// import 'dotenv/config';
+// dotenv.config();
+console.log(process.env);
 
 // ALTER USER postgres WITH PASSWORD '5432';
 export default new DataSource({

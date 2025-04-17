@@ -1,8 +1,8 @@
 import axios from "axios";
-import dotenv from 'dotenv';
 import { CustomError } from "../error-handling/error-handling";
 
-dotenv.config();
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 export const getLocations = async (name: string) => {
     try {

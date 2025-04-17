@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-import 'dotenv/config';
-dotenv.config();
+// import dotenv from 'dotenv';
+// import 'dotenv/config';
+// dotenv.config();
 
 export const mailService = async (email: string, otp: string) => {
     try {
