@@ -375,7 +375,44 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           mainImage: true,
           articul: true,
           garanteeIds: true,
-          images: true
+          images: true,
+          productCode: true,
+          inStock: true,  
+          description: true,
+          fullDescription: true,
+          fullDescriptionImages: true,
+          characteristics: true,
+          createdAt: true,
+          brand: {
+            id: true,
+            slug: true,
+            title: true,
+          },  
+          subcatalog: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          catalog: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          category: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          conditions: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          relevances: {
+            id: true,
+            slug: true,
+            title: true,
+          },
         },
       },
     });
