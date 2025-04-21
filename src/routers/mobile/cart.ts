@@ -91,7 +91,7 @@ router.get('/all', validateUserToken, Cart.getProductCarts);
 
 /**
  * @swagger
- * /user/cart/update-amount:
+ * /mobile/cart/update-amount:
  *   post:
  *     summary: Update the quantity of a product in the user's cart
  *     tags: [Cart]
@@ -140,4 +140,4 @@ router.get('/all', validateUserToken, Cart.getProductCarts);
  */
 router.post('/update-amount', validateUserToken, Cart.updateOrAddAmountToCart);
 
-export default router;
+export default router;  
