@@ -378,4 +378,20 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  */
 router.get('/by-slug', Product.getProductsByCatalogSubcatalogCategory);
 
+/**
+ * @swagger
+ * /user/product/delete-saved:
+ *   delete:
+ *     summary: Delete all saved user
+ *     tags: [savedProduct] 
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Saved deleted successfully.
+ *       500:   
+ *         description: Internal server error
+ */
+router.delete('/delete-saved', validateUserToken, Product.deleteSavedByUserId);
+
 export default router;

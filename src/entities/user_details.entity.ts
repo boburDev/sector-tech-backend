@@ -41,9 +41,12 @@ export class Cart {
     @JoinColumn({ name: "userId" })
     user: Users;
 
+    @Column({ type: "int", default: 1 })
+    count: number;
+
     @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
-        
+
     @DeleteDateColumn()
     deletedAt: Date;
 }

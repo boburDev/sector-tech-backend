@@ -61,4 +61,48 @@ router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), 
  */
 router.get('/all', validateUserToken, Cart.getProductCarts);
 
+/**
+ * @swagger
+ * /mobile/cart/update-amount:
+ *   post:
+ *     summary: Update or add a product to the user's cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: action
+ *         schema:
+ *           type: string
+ *           enum: [increment, decrement]
+ *         required: true
+ *         description: Action to perform on the cart item
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productId
+ *               - count
+ *             properties:
+ *               productId:
+ *                 type: string
+ *                 example: "product-uuid"
+ *               count:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Cart updated successfully
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/update-amount', validateUserToken, Cart.updateOrAddAmountToCart);
+
 export default router;
