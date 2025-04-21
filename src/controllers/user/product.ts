@@ -4,7 +4,6 @@ import { Product } from "../../entities/products.entity";
 import { ILike, IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";
-import { getSafeStock } from "../../utils/get-safe-stock";
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
@@ -472,21 +471,6 @@ export const updateOrAddAmountToCart = async ( req: Request, res: Response,next:
       return res.status(404).json({
         message: 'This product is not in the cart',
         status: 404,
-      });
-    }
-
-    const product = await productRepository.findOne({ where: { id: productId } });
-
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found', status: 404 });
-    }
-
-    const stock = getSafeStock(product.inStock);
-
-    if (count > stock) {
-      return res.status(400).json({
-        message: `Only ${stock} products are available in stock`,
-        status: 400,
       });
     }
 
