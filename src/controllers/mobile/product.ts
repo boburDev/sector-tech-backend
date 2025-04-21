@@ -250,6 +250,7 @@ export const toggleCart = async (req: Request, res: Response, next: NextFunction
   try {
     const { productId } = req.body;
     const { id: userId } = req.user;
+    const { count } = req.query;
 
     const existingCartItem = await cartProductRepository.findOne({
       where: {
@@ -260,16 +261,17 @@ export const toggleCart = async (req: Request, res: Response, next: NextFunction
 
     if (existingCartItem) {
       await cartProductRepository.remove(existingCartItem);
-      return res.status(200).json({ id:existingCartItem.id, message: "Product removed from cart." });
+      return res.status(200).json({ id: existingCartItem.id, message: "Product removed from cart." });
     }
 
     const newCartItem = cartProductRepository.create({
       userId,
       productId,
+      count: count ? parseInt(count as string) : 1,
     });
 
     await cartProductRepository.save(newCartItem);
-    return res.status(201).json({ id:newCartItem.id, message: "Product added to cart successfully." });
+    return res.status(201).json({ id: newCartItem.id, message: "Product added to cart successfully." });
   } catch (error) {
     // console.error("Error in toggleCart:", error);
     next(error);
@@ -294,13 +296,9 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           mainImage: true,
           articul: true,
           garanteeIds: true,
-          images: true,
           productCode: true,
           inStock: true,
           description: true,
-          fullDescription: true,
-          fullDescriptionImages: true,
-          characteristics: true,
           createdAt: true,
           brand: {
             id: true,

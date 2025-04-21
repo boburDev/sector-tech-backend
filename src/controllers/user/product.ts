@@ -375,19 +375,15 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           mainImage: true,
           articul: true,
           garanteeIds: true,
-          images: true,
           productCode: true,
-          inStock: true,  
+          inStock: true,
           description: true,
-          fullDescription: true,
-          fullDescriptionImages: true,
-          characteristics: true,
           createdAt: true,
           brand: {
             id: true,
             slug: true,
             title: true,
-          },  
+          },
           subcatalog: {
             id: true,
             slug: true,
@@ -417,6 +413,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
       },
     });
 
+
     const formattedCart = userCart.map((item) => ({
       count: item.count,
       ...item.product,
@@ -437,7 +434,8 @@ export const toggleCart = async (req: Request, res: Response, next: NextFunction
   try {
     const { productId } = req.body;
     const { id: userId } = req.user;
-
+    const { count } = req.query;
+    
     const existingCartItem = await cartProductRepository.findOne({
       where: {
         userId,
@@ -453,6 +451,7 @@ export const toggleCart = async (req: Request, res: Response, next: NextFunction
     const newCartItem = cartProductRepository.create({
       userId,
       productId,
+      count: count ? parseInt(count as string) : 1,
     });
 
     await cartProductRepository.save(newCartItem);

@@ -21,6 +21,14 @@ const router = Router();
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: count
+ *         in: query
+ *         description: "Mahsulotdan nechta qo‘shilishini belgilaydi (ixtiyoriy). Aks holda default = 1"
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 2
  *     requestBody:
  *       required: true
  *       content:
@@ -30,12 +38,32 @@ const router = Router();
  *             properties:
  *               productId:
  *                 type: string
- *                 example: "product-uuid"
+ *                 example: "d058b92f-d453-43e5-9337-efc341a4c1bb"
  *     responses:
  *       200:
  *         description: Product removed from cart.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *                   example: Product removed from cart.
  *       201:
  *         description: Product added to cart successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *                   example: Product added to cart successfully.
  *       500:
  *         description: Internal server error
  */
