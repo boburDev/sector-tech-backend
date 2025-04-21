@@ -455,7 +455,6 @@ export const updateOrAddAmountToCart = async (req: Request, res: Response, next:
   try {
     const { productId, count } = req.body;
     const { id: userId } = req.user;
-    const action = req.query.action as string;
 
     if (!productId || typeof count !== 'number' || count < 1) {
       return res.status(400).json({ message: 'Invalid input', status: 400 });
@@ -479,31 +478,15 @@ export const updateOrAddAmountToCart = async (req: Request, res: Response, next:
     }
 
     const stock = getSafeStock(product.inStock);
-    let newTotal = cartItem.count;
 
-    if (action === 'increment') {
-      newTotal += count;
-
-      if (newTotal > stock) {
-        return res.status(400).json({
-          message: `Only ${stock - cartItem.count} products are available in stock`,
-          status: 400,
-        });
-      }
-    } else if (action === 'decrement') {
-      newTotal -= count;
-
-      if (newTotal < 1) {
-        newTotal = 1;
-      }
-    } else {
+    if (count > stock) {
       return res.status(400).json({
-        message: 'Invalid action value. Only "increment" or "decrement" is allowed.',
+        message: `Only ${stock} products are available in stock`,
         status: 400,
       });
     }
 
-    cartItem.count = newTotal;
+    cartItem.count = count;
     const updated = await cartProductRepository.save(cartItem);
 
     return res.status(200).json({

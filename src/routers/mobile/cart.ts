@@ -63,20 +63,12 @@ router.get('/all', validateUserToken, Cart.getProductCarts);
 
 /**
  * @swagger
- * /mobile/cart/update-amount:
+ * /user/cart/update-amount:
  *   post:
- *     summary: Update or add a product to the user's cart
+ *     summary: Update the quantity of a product in the user's cart
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: action
- *         schema:
- *           type: string
- *           enum: [increment, decrement]
- *         required: true
- *         description: Action to perform on the cart item
  *     requestBody:
  *       required: true
  *       content:
@@ -92,14 +84,29 @@ router.get('/all', validateUserToken, Cart.getProductCarts);
  *                 example: "product-uuid"
  *               count:
  *                 type: integer
- *                 example: 1
+ *                 example: 2
+ *                 minimum: 1
+ *                 description: The exact number of items to set in the cart
  *     responses:
  *       200:
  *         description: Cart updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cart updated successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/CartItem'
+ *                 status:
+ *                   type: integer
+ *                   example: 200
  *       400:
- *         description: Invalid input
+ *         description: Invalid input or stock issue
  *       404:
- *         description: Product not found
+ *         description: Product or cart item not found
  *       500:
  *         description: Internal server error
  */
