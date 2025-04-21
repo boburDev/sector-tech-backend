@@ -4,6 +4,7 @@ import { Product } from "../../entities/products.entity";
 import { ILike, IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";
+import { getSafeStock } from "../../utils/get-safe-stock";
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
@@ -250,79 +251,6 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
   }
 };
 
-export const toggleCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-  try {
-    const { productId } = req.body;
-    const { id: userId } = req.user;
-
-    const existingCartItem = await cartProductRepository.findOne({
-      where: {
-        userId,
-        productId,
-      },
-    });
-
-    if (existingCartItem) {
-      await cartProductRepository.remove(existingCartItem);
-      return res.status(200).json({ id:existingCartItem.id, message: "Product removed from cart." });
-    }
-
-    const newCartItem = cartProductRepository.create({
-      userId,
-      productId,
-    });
-
-    await cartProductRepository.save(newCartItem);
-    return res.status(201).json({ id:newCartItem.id, message: "Product added to cart successfully." });
-  } catch (error) {
-    // console.error("Error in toggleCart:", error);
-    next(error);
-  }
-};
-
-export const getProductCarts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-  try {
-    const { id } = req.user;
-
-    const userCart = await cartProductRepository.find({
-      where: {
-        userId: id,
-      },
-      order: { id: "DESC" },
-      relations:["product","user"],
-      select: {
-        product: {
-          id: true,
-          mainImage: true,
-          title: true,
-          description: true,
-          images: true,
-          price: true,
-          articul: true,
-          garanteeIds: true,
-          slug: true,
-        },
-        user: {
-          id: true,
-          email: true,
-          phone: true,
-          name: true,
-        },
-      },
-    });
-
-    return res.status(200).json({
-      message: "Cart products retrieved successfully",
-      data: userCart,
-      error: null,
-      status: 200,
-    });
-
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { slug, categorySlug, page, limit, inStock, title, popular, price, name, productCode } = req.query;
@@ -430,3 +358,166 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
     next(error);
   }
 };
+
+export const getProductCarts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id } = req.user;
+
+    const userCart = await cartProductRepository.find({
+      where: { userId: id },
+      order: { id: 'DESC' },
+      relations: ['product'],
+      select: {
+        product: {
+          id: true,
+          title: true,
+          slug: true,
+          price: true,
+          mainImage: true,
+          articul: true,
+          garanteeIds: true,
+          images: true
+        },
+      },
+    });
+
+    const formattedCart = userCart.map((item) => ({
+      count: item.count,
+      ...item.product,
+    }));
+
+    return res.status(200).json({
+      message: 'Cart products retrieved successfully',
+      data: formattedCart,
+      error: null,
+      status: 200,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const toggleCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { productId } = req.body;
+    const { id: userId } = req.user;
+
+    const existingCartItem = await cartProductRepository.findOne({
+      where: {
+        userId,
+        productId,
+      },
+    });
+
+    if (existingCartItem) {
+      await cartProductRepository.remove(existingCartItem);
+      return res.status(200).json({ id: existingCartItem.id, message: "Product removed from cart." });
+    }
+
+    const newCartItem = cartProductRepository.create({
+      userId,
+      productId,
+    });
+
+    await cartProductRepository.save(newCartItem);
+    return res.status(201).json({ id: newCartItem.id, message: "Product added to cart successfully." });
+  } catch (error) {
+    // console.error("Error in toggleCart:", error);
+    next(error);
+  }
+};
+
+export const deleteCartByUserId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id } = req.user;
+    await cartProductRepository.delete({ userId: id });
+    const cart = await cartProductRepository.find({ where: { userId: id } });
+    if (cart.length > 0) {
+      return res.status(400).json({ message: "Cart already deleted", error: null, status: 400 });
+    }
+    return res.status(200).json({ message: "Cart deleted successfully", error: null, status: 200 });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const deleteSavedByUserId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id } = req.user;
+    await savedProductRepository.delete({ userId: id });  
+    const saved = await savedProductRepository.find({ where: { userId: id } });
+    if(saved.length > 0) {
+      return res.status(400).json({ message: "Saved already deleted", error: null, status: 400 });
+    }
+    return res.status(200).json({ message: "Saved deleted successfully", error: null, status: 200 });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const updateOrAddAmountToCart = async ( req: Request, res: Response, next: NextFunction ): Promise<any> => {
+  try {
+    const { productId, count } = req.body;
+    const { id: userId } = req.user;
+    const action = req.query.action as string;
+
+    if (!productId || typeof count !== 'number' || count < 1) {
+      return res.status(400).json({ message: 'Invalid input', status: 400 });
+    }
+
+    const cartItem = await cartProductRepository.findOne({
+      where: { userId, productId },
+    });
+
+    if (!cartItem) {
+      return res.status(404).json({
+        message: 'This product is not in the cart',
+        status: 404,
+      });
+    }
+
+    const product = await productRepository.findOne({ where: { id: productId } });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found', status: 404 });
+    }
+
+    const stock = getSafeStock(product.inStock);
+    let newTotal = cartItem.count;
+
+    if (action === 'increment') {
+      newTotal += count;
+
+      if (newTotal > stock) {
+        return res.status(400).json({
+          message: `Only ${stock - cartItem.count} products are available in stock`,
+          status: 400,
+        });
+      }
+    } else if (action === 'decrement') {
+      newTotal -= count;
+
+      if (newTotal < 1) {
+        newTotal = 1;
+      }
+    } else {
+      return res.status(400).json({
+        message: 'Invalid action value. Only "increment" or "decrement" is allowed.',
+        status: 400,
+      });
+    }
+
+    cartItem.count = newTotal;
+    const updated = await cartProductRepository.save(cartItem);
+
+    return res.status(200).json({
+      message: 'Cart updated successfully',
+      data: updated,
+      status: 200,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
