@@ -241,7 +241,7 @@ router.get('/saved-products', validateUserToken, Product.getUserSavedProducts);
  *         name: slug
  *         schema:
  *           type: string
- *         required: true
+ *         required: false
  *         description: Slug of the catalog or subcatalog (e.g. "0001.laptops" or "0100.smartphones")
  *       - in: query
  *         name: categorySlug

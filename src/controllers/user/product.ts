@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Product } from "../../entities/products.entity";
-import { ILike, IsNull, Like, MoreThan, Not } from "typeorm";
+import { ILike, In, IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";
+import { Garantee } from "../../entities/garantee.entity";
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
 const cartProductRepository = AppDataSource.getRepository(Cart);
+const garanteRepository = AppDataSource.getRepository(Garantee);
 
 export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
@@ -106,7 +108,7 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
         "relevances",
         "catalog",
         "subcatalog",
-        "category"
+        "category",
       ],
       select: {
         id: true,
@@ -121,8 +123,8 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
         fullDescription: true,
         fullDescriptionImages: true,
         characteristics: true,
-        garanteeIds: true,
         images: true,
+        garanteeIds: true,
         comments: {
           id: true,
           body: true,
@@ -140,7 +142,7 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
           title: true,
           slug: true,
         },
-        conditions:{
+        conditions: {
           id: true,
           title: true,
           slug: true,
@@ -171,11 +173,14 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
         deletedAt: IsNull()
       }
     });
-
+    const formattedProduct = {
+      ...product,
+      garanteeIds: JSON.parse(product?.garanteeIds as unknown as string)
+    }
 
     if (!product) throw new CustomError('Product not found', 404);
 
-    return res.status(200).json({ data: product, error: null, status: 200 });
+    return res.status(200).json({ data: formattedProduct, error: null, status: 200 });
 
   } catch (error) {
     next(error);
@@ -449,12 +454,45 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
       },
     });
 
+    const allGaranteeIds = userCart.flatMap((item) => {
+      const raw = item.product.garanteeIds;
+      if (Array.isArray(raw)) return raw;
+      try {
+        const parsed = JSON.parse(raw || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (err) {
+        return [];
+      }
+    });
 
-    const formattedCart = userCart.map((item) => ({
-      count: item.count,
-      ...item.product,
-      cartId: item.id,
-    }));
+    const uniqueIds = [...new Set(allGaranteeIds)];
+    const allGarantees = uniqueIds.length
+      ? await garanteRepository.find({ where: { id: In(uniqueIds) } })
+      : [];
+
+    const formattedCart = userCart.map((item) => {
+      const garanteeIdArray = Array.isArray(item.product.garanteeIds)
+        ? item.product.garanteeIds
+        : (() => {
+          try {
+            const parsed = JSON.parse(item.product.garanteeIds || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (e) {
+            return [];
+          }
+        })();
+
+      const productGarantees = garanteeIdArray.map((id: string) =>
+        allGarantees.find((g) => g.id === id)
+      ).filter(Boolean);
+
+      return {
+        count: item.count,
+        ...item.product,
+        cartId: item.id,
+        garantees: productGarantees,
+      };
+    });
 
     return res.status(200).json({
       message: 'Cart products retrieved successfully',

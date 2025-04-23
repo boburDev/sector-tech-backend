@@ -277,4 +277,35 @@ router.put("/update", validateUserToken, User.updateProfile);
  */
 router.get('/me', validateUserToken, User.getUserById);
 
+/**
+ * @swagger
+ * /user/auth/update-password:
+ *   patch:
+ *     summary: Update user password
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string 
+ *                 example: oldPassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newPassword123
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Invalid data    
+ */
+router.patch("/update-password", validateUserToken, User.updateUserPassword);   
+
 export default router;

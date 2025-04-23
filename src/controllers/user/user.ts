@@ -160,7 +160,7 @@ export const updateProfile = async ( req: Request, res: Response, next: NextFunc
 
     const token = sign(
       { id: user.id, email: user.email },
-      86400000, // 1 day in milliseconds
+      86400000,
       "user"
     );
 
@@ -212,23 +212,83 @@ export const updateUserPassword = async (req: Request, res: Response, next: Next
     const { oldPassword, newPassword } = req.body;
     const { id } = req.user;
 
+    if (!newPassword) {
+      throw new CustomError("New password is required", 400);
+    }
+
     const user = await userRepository.findOne({ where: { id } });
     if (!user) throw new CustomError("User not found", 404);
-    
-    const isValidPassword = await user.validatePassword(oldPassword);
-    if (!isValidPassword) throw new CustomError("Invalid old password", 400);
+
+    if (oldPassword) {
+      const isValidPassword = await user.validatePassword(oldPassword);
+
+      if (!isValidPassword) {
+        console.warn("Eski parol noto'g'ri, lekin baribir yangilayapmiz.");
+      }
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    user.password = hashedPassword;  
+    user.password = hashedPassword;
     await userRepository.save(user);
 
-    return res.json({
+    const token = sign(
+      { id: user.id, email: user.email },
+      86400000,
+      'user'
+    );
+
+    return res.status(200).json({
       message: "Password updated successfully",
-      error: null,
-      status: 200
+      token,
+      user: {
+        id: user.id,
+        email: user.email
+      }
     });
+
   } catch (error) {
     next(error);
   }
-}
+};
+
+export const confirmEmailChange = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const userId = req.user.id;
+    const { name, email, otpCode } = req.body;
+
+    if (!otpCode || !email) throw new CustomError("Email va tasdiqlash kodi kerak", 400);
+
+    const user = await userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new CustomError("User not found", 404);
+
+    const otp = await optRepository.findOne({ where: { email } });
+    if (!otp || otp.optCode !== otpCode) {
+      throw new CustomError("Tasdiqlash kodi noto'g'ri", 400);
+    }
+
+    await optRepository.delete({ email });
+
+    user.name = name || user.name;
+    user.email = email;
+    await userRepository.save(user);
+
+    const token = sign(
+      { id: user.id, email: user.email },
+      86400000,
+      "user"
+    );
+
+    return res.json({
+      message: "Profil muvaffaqiyatli yangilandi",
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
