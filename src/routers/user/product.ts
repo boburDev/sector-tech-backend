@@ -394,4 +394,142 @@ router.get('/by-slug', Product.getProductsByCatalogSubcatalogCategory);
  */
 router.delete('/delete-saved', validateUserToken, Product.deleteSavedByUserId);
 
+/**
+ * @swagger
+ * /user/product/search:
+ *   get:
+ *     summary: Search products by title, description, or product code
+ *     tags: [Product]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search query (title, description, or product code)
+ *       - in: query    
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number (default is 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Number of products per page (default is 10)
+ *       - in: query
+ *         name: inStock
+ *         schema:
+ *           type: string
+ *           enum: ["true", "false"]
+ *         description: Filter products by stock availability ("true" for in stock, "false" for out of stock)
+ *       - in: query
+ *         name: popular
+ *         schema:
+ *           type: string
+ *           enum: ["true", "false"]
+ *         description: Sort products by popularity (true = newest first)
+ *       - in: query
+ *         name: price
+ *         schema:      
+ *           enum: ["asc", "desc"]
+ *         description: Sort products by price
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string   
+ *           enum: ["asc", "desc"]
+ *         description: Sort products by name   
+ *  
+ *     responses:
+ *       200:   
+ *         description: Successfully retrieved products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       title:
+ *                         type: string
+ *                       articul:
+ *                         type: string
+ *                       slug:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *                       mainImage:
+ *                         type: string
+ *                       garanteeIds:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       productCode:
+ *                         type: string
+ *                       inStock:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       category:
+ *                         type: object
+ *                         properties:
+ *                           slug:
+ *                             type: string
+ *                           title:
+ *                             type: string
+ *                       catalog:
+ *                         type: object
+ *                         properties:
+ *                           slug:
+ *                             type: string
+ *                           title:
+ *                             type: string
+ *                       subcatalog:
+ *                         type: object
+ *                         properties:
+ *                           slug:
+ *                             type: string
+ *                           title:
+ *                             type: string
+ *                       relevances:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: string
+ *                             slug:
+ *                               type: string
+ *                             title:
+ *                               type: string
+ *                       conditions:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: string
+ *                             title:
+ *                               type: string
+ *                             slug:
+ *                               type: string
+ *                 error:
+ *                   type: null
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/search', Product.getSearchProducts);
+    
 export default router;

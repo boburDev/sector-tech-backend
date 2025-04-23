@@ -467,7 +467,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
 
     const uniqueIds = [...new Set(allGaranteeIds)];
     const allGarantees = uniqueIds.length
-      ? await garanteRepository.find({ where: { id: In(uniqueIds) } })
+      ? await garanteRepository.find({ where: { id: In(uniqueIds) }, select: ['title', 'price', 'id'] })
       : [];
 
     const formattedCart = userCart.map((item) => {
@@ -490,7 +490,10 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
         count: item.count,
         ...item.product,
         cartId: item.id,
-        garantees: productGarantees,
+        garantees: productGarantees.map((garantee) => ({
+          title: garantee?.title || '',
+          price: garantee?.price || 0,
+        })),
       };
     });
 
@@ -598,4 +601,117 @@ export const updateOrAddAmountToCart = async ( req: Request, res: Response,next:
   }
 };
 
+export const getSearchProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { search, page, limit, inStock, popular, price, name } = req.query;
 
+    const pageNumber = parseInt(page as string) || 1;
+    const limitNumber = parseInt(limit as string) || 10;
+    const offset = (pageNumber - 1) * limitNumber;
+
+    const isProductCode = /^\d+$/.test(search as string);
+    const order: any = {};
+    let whereCondition: any;
+
+    if (popular === "true") order.createdAt = "DESC";
+    else if (popular === "false") order.createdAt = "ASC";
+
+    if (price === "asc") order.price = "ASC";
+    else if (price === "desc") order.price = "DESC";
+
+    if (name === "asc") order.title = "ASC";
+    else if (name === "desc") order.title = "DESC";
+
+    if (isProductCode) {
+      whereCondition = [
+        { productCode: ILike(`%${search}%`), deletedAt: IsNull() },
+      ];
+    } else {
+      whereCondition = [
+        { title: ILike(`%${search}%`), deletedAt: IsNull() },
+        { description: ILike(`%${search}%`), deletedAt: IsNull() },
+        { articul: ILike(`%${search}%`), deletedAt: IsNull() }
+      ];
+    }
+
+    if (inStock && Array.isArray(whereCondition)) {
+      let stockFilter: any;
+      if (inStock === "true") stockFilter = MoreThan(0);
+      else if (inStock === "false") stockFilter = "Под заказ";
+      else if (!isNaN(parseInt(inStock as string))) stockFilter = parseInt(inStock as string);
+
+      whereCondition = whereCondition.map((cond) => ({
+        ...cond,
+        inStock: stockFilter,
+      }));
+    }
+
+    const products = await productRepository.find({
+      where: whereCondition,
+      order,
+      skip: offset,
+      take: limitNumber,
+      relations: ['category', 'catalog', 'subcatalog', 'relevances', 'conditions'],
+      select: {
+        id: true,
+        title: false,
+        articul: false,
+        slug: false,
+        price: false,
+        mainImage: false,
+        garanteeIds: false,
+        productCode: true,
+        inStock: false,
+        description: false,
+        createdAt: false,
+        category: { slug: true, title: true },
+        catalog: { slug: true, title: true },
+        subcatalog: { slug: true, title: true },
+        // relevances: { id: true, slug: true, title: true },
+        // conditions: { id: true, title: true, slug: true },
+      },
+    });
+
+    return res.status(200).json({
+      data: {
+        products,
+        total: products.length,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(products.length / limitNumber),
+      },
+      error: null,
+      status: 200,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+ [
+   {
+     "id": "642938c4-341c-4e6d-b7bc-c84fec1b1160",
+     "productCode": "46947",
+     "category": {
+       "title": "Патч-панели коммутационные",
+       "slug": "patch-paneli-kommutatsionnye"
+     },
+     "catalog": {
+       "title": "Кабельная продукция, СКС и компоненты ВОЛС",
+       "slug": "0004.kabelnaya-produktsiya-sks-i-komponenty-vols"
+     }
+   },
+   {
+     "id": "8ad62c62-a71b-4bb4-9a14-e6332df532a4",
+     "productCode": "94794",
+     "category": {
+       "title": "Фиксированные коммутаторы",
+       "slug": "fiksirovannye-kommutatory"
+     },
+     "catalog": {
+       "title": "Сетевое оборудование",
+       "slug": "setevoe-oborudovanie"
+     }
+   }
+ ]

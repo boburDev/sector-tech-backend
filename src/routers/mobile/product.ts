@@ -410,4 +410,24 @@ router.delete('/delete-cart', validateUserToken, Product.deleteCartByUserId);
  */
 router.delete('/delete-saved', validateUserToken, Product.deleteSavedByUserId);
 
+/**
+ * @swagger
+ * /mobile/product/search:
+ *   get:
+ *     summary: Search products by title, description, articul, or product code
+ *     tags: [Product]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search query (title, description, articul, or product code)
+ *     responses:
+ *       200:   
+ *         description: Successfully retrieved products
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/search', Product.getSearchProducts);
+
 export default router;
