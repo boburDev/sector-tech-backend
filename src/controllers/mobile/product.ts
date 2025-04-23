@@ -219,8 +219,8 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
       order: { id: "DESC" },
       select: {
         id: true,
-        productId: true,
         product: {
+          id: true,
           title: true,
           slug: true,
           price: true,
@@ -236,8 +236,7 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
     });
     const formattedSaved = savedProducts.map((item) => ({
       ...item.product,
-      id: item.id,  
-      productId: item.productId,
+      savedId: item.id,
     }));
 
     return res.status(200).json({
@@ -314,6 +313,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
     const formattedCart = userCart.map((item) => ({
       count: item.count,
       ...item.product,
+      cartId: item.id,
     }));
 
     return res.status(200).json({
