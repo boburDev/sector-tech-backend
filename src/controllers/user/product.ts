@@ -211,7 +211,7 @@ export const toggleSaved = async (req: Request,res: Response, next: NextFunction
   }
 };
 
-export const getUserSavedProducts = async (req: Request,res: Response, next: NextFunction ): Promise<any> => {
+export const getUserSavedProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.user;
 
@@ -222,8 +222,9 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
       relations: ['product'],
       order: { id: "DESC" },
       select: {
+        id: true,
+        productId: true,
         product: {
-          id: true,
           title: true,
           slug: true,
           price: true,
@@ -239,12 +240,15 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
     });
     const formattedSaved = savedProducts.map((item) => ({
       ...item.product,
+      id: item.id,
+      productId: item.productId,
     }));
 
-    return res.status(200).json({message: "Saved products retrived successfully",
-        data: formattedSaved,
-        error: null,
-        status: 200
+    return res.status(200).json({
+      message: "Saved products retrived successfully",
+      data: formattedSaved,
+      error: null,
+      status: 200
     });
   } catch (error) {
     next(error);
