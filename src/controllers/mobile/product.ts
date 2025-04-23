@@ -215,6 +215,7 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
       where: {
         userId: id,
       },
+      relations: ['product'],
       order: { id: "DESC" },
       select: {
         product: {
