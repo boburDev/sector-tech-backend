@@ -219,7 +219,7 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
       where: {
         userId: id,
       },
-      relations: ['product'],
+      relations: ['product', 'product.catalog', 'product.subcatalog', 'product.category', 'product.relevances', 'product.conditions', 'product.brand'],
       order: { id: "DESC" },
       select: {
         id: true,
@@ -235,6 +235,36 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
           inStock: true,
           description: true,
           createdAt: true,
+          catalog: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          subcatalog: { 
+            id: true,
+            slug: true,
+            title: true,
+          },
+          category: {
+            id: true, 
+            slug: true,
+            title: true,
+          },  
+          relevances: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          conditions: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          brand: {
+            id: true,
+            slug: true,
+            title: true,
+          },  
         },
       },
     });
@@ -369,7 +399,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
     const userCart = await cartProductRepository.find({
       where: { userId: id },
       order: { id: 'DESC' },
-      relations: ['product'],
+      relations: ['product', 'product.catalog', 'product.subcatalog', 'product.category', 'product.relevances', 'product.conditions', 'product.brand'],
       select: {
         id: true,
         count: true,
@@ -385,7 +415,37 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           inStock: true,
           description: true,
           createdAt: true,
-        },
+          catalog: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          subcatalog: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          category: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          relevances: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          conditions: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+          brand: {
+            id: true,
+            slug: true,
+            title: true,
+          },
+        }
       },
     });
 

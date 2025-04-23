@@ -5,6 +5,7 @@ import { Opt } from "../../entities/opt.entity";
 import { sign } from "../../utils/jwt";
 import { mailService } from "../../utils/mailService";
 import { CustomError } from "../../error-handling/error-handling";
+import * as bcrypt from "bcrypt";
 const userRepository = AppDataSource.getRepository(Users);
 const optRepository = AppDataSource.getRepository(Opt);
 
@@ -205,3 +206,29 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
+
+export const updateUserPassword = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.user;
+
+    const user = await userRepository.findOne({ where: { id } });
+    if (!user) throw new CustomError("User not found", 404);
+    
+    const isValidPassword = await user.validatePassword(oldPassword);
+    if (!isValidPassword) throw new CustomError("Invalid old password", 400);
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;  
+    await userRepository.save(user);
+
+    return res.json({
+      message: "Password updated successfully",
+      error: null,
+      status: 200
+    });
+  } catch (error) {
+    next(error);
+  }
+}
