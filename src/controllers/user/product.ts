@@ -215,7 +215,7 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
   try {
     const { id } = req.user;
 
-    const user = await savedProductRepository.find({
+    const savedProducts = await savedProductRepository.find({
       where: {
         userId: id,
       },
@@ -223,25 +223,25 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
       select: {
         product: {
           id: true,
-          mainImage: true,
           title: true,
-          description: true,
-          images: true,
-          price: true,
-          articul: true,
           slug: true,
-        },
-        user: {
-          id: true,
-          email: true,
-          phone: true,
-          name: true,
+          price: true,
+          mainImage: true,
+          articul: true,
+          garanteeIds: true,
+          productCode: true,
+          inStock: true,
+          description: true,
+          createdAt: true,
         },
       },
     });
+    const formattedSaved = savedProducts.map((item) => ({
+      ...item.product,
+    }));
 
     return res.status(200).json({message: "Saved products retrived successfully",
-        data: user,
+        data: formattedSaved,
         error: null,
         status: 200
     });
@@ -367,6 +367,8 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
       order: { id: 'DESC' },
       relations: ['product'],
       select: {
+        id: true,
+        count: true,
         product: {
           id: true,
           title: true,
@@ -379,36 +381,6 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           inStock: true,
           description: true,
           createdAt: true,
-          brand: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          subcatalog: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          catalog: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          category: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          conditions: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          relevances: {
-            id: true,
-            slug: true,
-            title: true,
-          },
         },
       },
     });

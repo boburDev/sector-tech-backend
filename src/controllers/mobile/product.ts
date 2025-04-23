@@ -207,11 +207,11 @@ export const toggleSaved = async (req: Request,res: Response, next: NextFunction
   }
 };
 
-export const getUserSavedProducts = async (req: Request,res: Response, next: NextFunction ): Promise<any> => {
+export const getUserSavedProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.user;
 
-    const user = await savedProductRepository.find({
+    const savedProducts = await savedProductRepository.find({
       where: {
         userId: id,
       },
@@ -219,27 +219,28 @@ export const getUserSavedProducts = async (req: Request,res: Response, next: Nex
       select: {
         product: {
           id: true,
-          mainImage: true,
           title: true,
-          description: true,
-          images: true,
-          price: true,
-          articul: true,
           slug: true,
-        },
-        user: {
-          id: true,
-          email: true,
-          phone: true,
-          name: true,
+          price: true,
+          mainImage: true,
+          articul: true,
+          garanteeIds: true,
+          productCode: true,
+          inStock: true,
+          description: true,
+          createdAt: true,
         },
       },
     });
+    const formattedSaved = savedProducts.map((item) => ({
+      ...item.product,
+    }));
 
-    return res.status(200).json({message: "Saved products retrived successfully",
-        data: user,
-        error: null,
-        status: 200
+    return res.status(200).json({
+      message: "Saved products retrived successfully",
+      data: formattedSaved,
+      error: null,
+      status: 200
     });
   } catch (error) {
     next(error);
@@ -282,12 +283,13 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
   try {
     const { id } = req.user;
 
-
     const userCart = await cartProductRepository.find({
       where: { userId: id },
       order: { id: 'DESC' },
       relations: ['product'],
       select: {
+        id: true,
+        count: true,
         product: {
           id: true,
           title: true,
@@ -300,39 +302,10 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
           inStock: true,
           description: true,
           createdAt: true,
-          brand: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          subcatalog: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          catalog: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          category: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          conditions: {
-            id: true,
-            slug: true,
-            title: true,
-          },
-          relevances: {
-            id: true,
-            slug: true,
-            title: true,
-          },
         },
       },
     });
+
 
     const formattedCart = userCart.map((item) => ({
       count: item.count,
