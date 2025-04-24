@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn, ManyToMany, JoinTable } from "typeorm";
 import { Users } from "./user.entity";
 
 @Entity()
@@ -21,8 +21,8 @@ export class Order {
     @Column({ nullable: true })
     comment: string;
 
-    @Column({ type: "varchar", default: "Не отгружен"})
-    orderDeleveryType: string;
+    @Column({ type: "varchar", default: "Не отгружен" })
+    deliveryMethod: string;
 
     @Column({ type: "varchar"})
     email: string;
@@ -48,8 +48,11 @@ export class Order {
     @Column({ nullable: true })
     paymentMethod: string;
 
-    @Column({ nullable: true })
-    deliveryDate: Date;
+    @Column({ default : () => 'CURRENT_TIMESTAMP' })
+    validStartDate: Date;
+
+    @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP + INTERVAL '3 days'" })
+    validEndDate: Date;
 
     @CreateDateColumn()
     createdAt: Date;

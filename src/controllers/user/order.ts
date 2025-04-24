@@ -5,58 +5,90 @@ import { Product } from "../../entities/products.entity";
 import { Kontragent } from "../../entities/kontragent.entity";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
-
+import { CustomError } from "../../error-handling/error-handling";
+import { In } from "typeorm";
+import { Garantee } from "../../entities/garantee.entity";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
 const kontragentRepo = AppDataSource.getRepository(Kontragent);
 const kontragentAddressRepo = AppDataSource.getRepository(KontragentAddress);
 const userRepo = AppDataSource.getRepository(Users);
+const garanteeRepo = AppDataSource.getRepository(Garantee);
 
-// export const createOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-//     try {
-//         const { agentId, contrAgentId, city, comment, deliveryMethod, email, firstname, lastname, fullname, phone, total, products } = req.body;
-//         const { id: userId } = req.user;
-//         if (!agentId || !contrAgentId || !userId || !products?.length) {
-//             throw new CustomError("Missing required fields", 400);
-//         }
+export const createOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { receiverInfo, productDetails, orderInfo } = req.body;
+        const { id: userId } = req.user;
+        const { fullname, email, phone } = receiverInfo;
+        const { kontragentId, agentId, city, comment, deliveryMethod, paymentMethod, total } = orderInfo;
 
-//         const [agent, kontragent, user, productEntities] = await Promise.all([
-//             kontragentAddressRepo.findOneBy({ id: agentId }),
-//             kontragentRepo.findOneBy({ id: contrAgentId }),
-//             userRepo.findOneBy({ id: userId }),
-//             productRepo.findBy({ id: In(products) })
-//         ]);
+        // Boshlang‘ich tekshiruv
+        if (!userId || !fullname || !phone || !email || !productDetails?.length || !kontragentId || !agentId || !city || !total) {
+            throw new CustomError("Majburiy maydonlar to‘liq emas", 400);
+        }
 
-//         if (!agent || !kontragent || !user || productEntities.length === 0) {
-//             throw new CustomError("Invalid agent, kontragent, user or products", 404);
-//         }
+        const [agent, kontragent, user] = await Promise.all([
+            kontragentAddressRepo.findOneBy({ id: agentId }),
+            kontragentRepo.findOneBy({ id: kontragentId }),
+            userRepo.findOneBy({ id: userId })
+        ]);
 
-//         const order = orderRepo.create({
-//             agentId,
-//             contrAgentId,
-//             userId,
-//             city,
-//             comment,
-//             deliveryMethod,
-//             email,
-//             firstname,
-//             lastname,
-//             fullname,
-//             phone,
-//             total,
-//             products: productEntities,
-//             agent,
-//             contrAgent: kontragent,
-//             user,
-//             status: OrderStatus.PENDING
-//         });
+        if (!agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
+        if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
+        if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
 
-//         await orderRepo.save(order);
-//         return res.status(201).json({ message: "Order created successfully", data: order, error: null, status: 201 });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+        const errors: string[] = [];
+
+        // Har bir product va garantee tekshiriladi
+        for (const item of productDetails) {
+            const product = await productRepo.findOneBy({ id: item.productId });
+            const garantee = await garanteeRepo.findOneBy({ id: item.garanteeId });
+
+            if (!product) errors.push(`Mahsulot topilmadi: ${item.productId}`);
+            if (!garantee) errors.push(`Kafolat topilmadi: ${item.garanteeId}`);
+        }
+
+        if (errors.length === productDetails.length * 2) {
+            throw new CustomError("Hech bir mahsulot yoki kafolat topilmadi:\n" + errors.join("\n"), 404);
+        }
+
+        if (errors.length) {
+            console.warn("⚠️ Ogohlantirishlar:\n" + errors.join("\n"));
+        }
+
+        // Order obyektini yaratish
+        const order = orderRepo.create({
+            agentId,
+            contrAgentId: kontragentId,
+            userId,
+            city,
+            comment,
+            deliveryMethod: deliveryMethod || "Не отгружен",
+            email,
+            fullname,
+            phone,
+            total,
+            paymentMethod: paymentMethod || null,
+            orderType: "online", // yoki dynamic berishingiz mumkin
+            status: "pending",
+            orderPriceStatus: "Не оплачен",
+            user,
+        });
+
+        await orderRepo.save(order);
+
+        return res.status(201).json({
+            message: "Buyurtma muvaffaqiyatli yaratildi",
+            data: order,
+            warnings: errors.length ? errors : null,
+            status: 201
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 // export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
 //     try {

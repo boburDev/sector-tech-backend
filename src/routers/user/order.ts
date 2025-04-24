@@ -11,69 +11,98 @@ const router = Router();
  *   description: Buyurtmalarni boshqarish (CRUD)
  */
 
-// /**
-//  * @swagger
-//  * /user/order/create:
-//  *   post:
-//  *     summary: Yangi buyurtma yaratish
-//  *     tags: [Orders]
-//  *     security:
-//  *       - bearerAuth: []
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             type: object
-//  *             required:
-//  *               - agentId
-//  *               - contrAgentId
-//  *               - userId
-//  *               - products
-//  *               - total
-//  *             properties:
-//  *               agentId:
-//  *                 type: string
-//  *                 format: uuid
-//  *               contrAgentId:
-//  *                 type: string
-//  *                 format: uuid
-//  *               userId:
-//  *                 type: string
-//  *                 format: uuid
-//  *               city:
-//  *                 type: string
-//  *               comment:
-//  *                 type: string
-//  *               deliveryMethod:
-//  *                 type: string
-//  *                 example: "Самовывоз"
-//  *               email:
-//  *                 type: string
-//  *               firstname:
-//  *                 type: string
-//  *               lastname:
-//  *                 type: string
-//  *               fullname:
-//  *                 type: string
-//  *               phone:
-//  *                 type: string
-//  *               total:
-//  *                 type: number
-//  *               products:
-//  *                 type: array
-//  *                 items:
-//  *                   type: string
-//  *                   format: uuid
-//  *     responses:
-//  *       201:
-//  *         description: Buyurtma muvaffaqiyatli yaratildi
-//  *       400:
-//  *         description: Noto‘g‘ri ma’lumot
-//  *       404:
-//  *         description: Bog‘liq resurslar topilmadi
-//  */
-// router.post("/create", validateUserToken, Order.createOrder);
+/**
+ * @swagger
+ * /user/order/create:
+ *   post:
+ *     summary: Yangi buyurtma yaratish
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - receiverInfo
+ *               - productDetails
+ *               - orderInfo
+ *             properties:
+ *               receiverInfo:
+ *                 type: object
+ *                 required:
+ *                   - fullname
+ *                   - email
+ *                   - phone
+ *                 properties:
+ *                   fullname:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *               productDetails:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - id
+ *                     - quantity
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     quantity:
+ *                       type: number
+ *               orderInfo:
+ *                 type: object
+ *                 required:
+ *                   - kontragentId
+ *                   - agentId
+ *                   - city
+ *                   - deliveryMethod
+ *                   - paymentMethod
+ *                   - total
+ *                 properties:
+ *                   kontragentId:
+ *                     type: string
+ *                     format: uuid
+ *                   agentId:
+ *                     type: string
+ *                     format: uuid
+ *                   city:
+ *                     type: string
+ *                   comment:
+ *                     type: string
+ *                   deliveryMethod:
+ *                     type: string
+ *                     example: "Самовывоз"
+ *                   paymentMethod:
+ *                     type: string
+ *                   total:
+ *                     type: number
+ *     responses:
+ *       201:
+ *         description: Buyurtma muvaffaqiyatli yaratildi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: integer
+ *       400:
+ *         description: Noto'g'ri ma'lumot
+ *       404:
+ *         description: Bog'liq resurslar topilmadi
+ */
+router.post("/create", validateUserToken, Order.createOrder);
 
 // /**
 //  * @swagger
