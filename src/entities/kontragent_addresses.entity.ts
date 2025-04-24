@@ -1,5 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { Kontragent } from "./kontragent.entity";
+import { Order } from "./order.entity";
 
 @Entity("kontragent_address")
 export class KontragentAddress {
@@ -51,4 +52,7 @@ export class KontragentAddress {
     @ManyToOne(() => Kontragent, (kontragent: Kontragent) => kontragent.address)
     @JoinColumn({ name: "kontragentId" })
     kontragent: Kontragent;
+
+    @OneToMany(() => Order, (order) => order.agent)
+    order: Order[];
 }   

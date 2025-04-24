@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, JoinColumn, ManyToOne } from "typeorm";
 import { ProductQuestion, ProductComment } from "./product_details.entity";
 import * as bcrypt from "bcrypt";
 import { Cart, SavedProduct } from "./user_details.entity";
 import { Kontragent } from "./kontragent.entity";
+import { Order } from "./order.entity";
 
 @Entity()
 export class Users {
@@ -35,6 +36,11 @@ export class Users {
 
   @OneToMany(() => Kontragent, (kontragent) => kontragent.user)
   contragents: Kontragent[];
+
+
+  @OneToMany(() => Order, (order) => order.user)
+  order: Order[];
+
 
   @BeforeInsert()
   async hashPassword() {

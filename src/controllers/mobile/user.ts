@@ -146,38 +146,38 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   }
 };
 
-// export const updateProfile = async ( req: Request, res: Response, next: NextFunction): Promise<any> => {
-//   try {
-//     const userId = req.user.id;
-//     const { name, email } = req.body;
+export const updateProfile = async ( req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const userId = req.user.id;
+    const { name, email } = req.body;
 
-//     const user = await userRepository.findOne({ where: { id: userId } });
-//     if (!user) throw new CustomError("User not found", 404);
+    const user = await userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new CustomError("User not found", 404);
 
-//     user.name = name || user.name;
-//     user.email = email || user.email;
-//     await userRepository.save(user);
+    user.name = name || user.name;
+    user.email = email || user.email;
+    await userRepository.save(user);
 
-//     const token = sign(
-//       { id: user.id, email: user.email },
-//       86400000, // 1 day in milliseconds
-//       "user"
-//     );
+    const token = sign(
+      { id: user.id, email: user.email },
+      86400000, // 1 day in milliseconds
+      "user"
+    );
 
-//     const userData = {
-//       id: user.id,
-//       email: user.email,
-//     };
+    const userData = {
+      id: user.id,
+      email: user.email,
+    };
 
-//     return res.json({
-//       message: "Profile updated successfully",
-//       token,
-//       user: userData,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    return res.json({
+      message: "Profile updated successfully",
+      token,
+      user: userData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
@@ -251,44 +251,44 @@ export const updateUserPassword = async (req: Request, res: Response, next: Next
   }
 };
 
-export const confirmEmailChange = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-  try {
-    const userId = req.user.id;
-    const { name, email, otpCode } = req.body;
+// export const confirmEmailChange = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+//   try {
+//     const userId = req.user.id;
+//     const { name, email, otpCode } = req.body;
 
-    if (!otpCode || !email) throw new CustomError("Email va tasdiqlash kodi kerak", 400);
+//     if (!otpCode || !email) throw new CustomError("Email va tasdiqlash kodi kerak", 400);
 
-    const user = await userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new CustomError("User not found", 404);
+//     const user = await userRepository.findOne({ where: { id: userId } });
+//     if (!user) throw new CustomError("User not found", 404);
 
-    const otp = await optRepository.findOne({ where: { email } });
-    if (!otp || otp.optCode !== otpCode) {
-      throw new CustomError("Tasdiqlash kodi noto'g'ri", 400);
-    }
+//     const otp = await optRepository.findOne({ where: { email } });
+//     if (!otp || otp.optCode !== otpCode) {
+//       throw new CustomError("Tasdiqlash kodi noto'g'ri", 400);
+//     }
 
-    await optRepository.delete({ email });
+//     await optRepository.delete({ email });
 
-    user.name = name || user.name;
-    user.email = email;
-    await userRepository.save(user);
+//     user.name = name || user.name;
+//     user.email = email;
+//     await userRepository.save(user);
 
-    const token = sign(
-      { id: user.id, email: user.email },
-      86400000,
-      "user"
-    );
+//     const token = sign(
+//       { id: user.id, email: user.email },
+//       86400000,
+//       "user"
+//     );
 
-    return res.json({
-      message: "Profil muvaffaqiyatli yangilandi",
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name
-      }
-    });
+//     return res.json({
+//       message: "Profil muvaffaqiyatli yangilandi",
+//       token,
+//       user: {
+//         id: user.id,
+//         email: user.email,
+//         name: user.name
+//       }
+//     });
 
-  } catch (error) {
-    next(error);
-  }
-};
+//   } catch (error) {
+//     next(error);
+//   }
+// };

@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, DeleteDateColumn, OneToOne, ManyToMany } from "typeorm";
 import { Brand } from "./brands.entity";
 import { ProductComment, ProductCondition, ProductQuestion, ProductRelevance } from "./product_details.entity";
 import { Catalog, Category, Subcatalog } from "./catalog.entity";
 import { Cart, SavedProduct } from "./user_details.entity";
 import { PopularProduct } from "./popular.entity";
-
+import { Order } from "./order.entity";
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn("uuid")
@@ -114,6 +114,9 @@ export class Product {
 
   @OneToOne(() => PopularProduct, (popularProduct) => popularProduct.product)
   popularProduct: PopularProduct;
+
+  @ManyToMany(() => Order, (order: Order) => order.products)
+  order: Order[];
 
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn, OneToOne, OneToMany } from "typeorm";
 import { Users } from "./user.entity";
 import { KontragentAddress } from "./kontragent_addresses.entity";
+import { Order } from "./order.entity";
 
 @Entity()
 export class Kontragent {
@@ -49,4 +50,7 @@ export class Kontragent {
 
     @OneToMany(() => KontragentAddress, (address) => address.kontragent)
     address: KontragentAddress[];   
+
+    @OneToMany(() => Order, (order) => order.contrAgent)
+    order: Order[];
 }

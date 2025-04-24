@@ -574,7 +574,7 @@ export const updateOrAddAmountToCart = async ( req: Request, res: Response,next:
     const { id: userId } = req.user;
 
     if (!productId || typeof count !== 'number' || count < 1) {
-      return res.status(400).json({ message: 'Invalid input', status: 400 });
+      throw new CustomError('Invalid input', 400);
     }
 
     const cartItem = await cartProductRepository.findOne({
@@ -582,10 +582,7 @@ export const updateOrAddAmountToCart = async ( req: Request, res: Response,next:
     });
 
     if (!cartItem) {
-      return res.status(404).json({
-        message: 'This product is not in the cart',
-        status: 404,
-      });
+      throw new CustomError('This product is not in the cart', 404);
     }
 
     cartItem.count = count;
