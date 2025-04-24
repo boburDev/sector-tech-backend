@@ -13,6 +13,7 @@ import regionRouter from "./region";
 import kontragentRouter from "./kontragent";
 import filterRouter from "./filter";
 import kontragentAddressRouter from "./kontragent-addresses";
+import orderRouter from "./order";
 const router = express.Router();
 
 router.use("/auth", userRouter);
@@ -29,4 +30,5 @@ router.use("/region", regionRouter)
 router.use("/kontragent", kontragentRouter)
 router.use("/filter", filterRouter)
 router.use("/kontragent-address", kontragentAddressRouter)
+router.use("/order", orderRouter)
 export default router;

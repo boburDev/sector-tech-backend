@@ -1,8 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable, JoinColumn, ManyToOne, DeleteDateColumn } from "typeorm";
-import { Product } from "./products.entity";
-import { OrderStatus } from "../common/enums/order-status.enum";
-import { Kontragent } from "./kontragent.entity";
-import { KontragentAddress } from "./kontragent_addresses.entity";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
 import { Users } from "./user.entity";
 
 @Entity()
@@ -19,35 +15,35 @@ export class Order {
     @Column("uuid")
     userId: string;
 
-    @Column()
+    @Column({ type: "varchar"})
     city: string;
 
     @Column({ nullable: true })
     comment: string;
 
-    @Column()
-    deliveryMethod: string;
+    @Column({ type: "varchar", default: "Не отгружен"})
+    orderDeleveryType: string;
 
-    @Column()
+    @Column({ type: "varchar"})
     email: string;
 
-    @Column()
-    firstname: string;
-
-    @Column()
-    lastname: string;
-
-    @Column()
+    @Column({ type: "varchar"})
     fullname: string;
 
-    @Column()
+    @Column({ type: "varchar"})
     phone: string;
 
     @Column("bigint")
     total: number;
 
-    @Column({type: "enum", enum: OrderStatus, default: OrderStatus.PENDING})
-    status: OrderStatus;
+    @Column({type: "varchar"})
+    status: string;
+
+    @Column({ type: "varchar"})
+    orderType: string;
+
+    @Column({ type: "varchar", default: "Не оплачен"})
+    orderPriceStatus: string;
 
     @Column({ nullable: true })
     paymentMethod: string;
@@ -67,16 +63,4 @@ export class Order {
     @ManyToOne(() => Users, (user) => user.order)
     @JoinColumn({ name: "userId" })
     user: Users;
-
-    @ManyToOne(() => Kontragent, (kontragent: Kontragent) => kontragent.order)
-    @JoinColumn({ name: "contrAgentId" })
-    contrAgent: Kontragent;
-
-    @ManyToOne(() => KontragentAddress, (kontragentAddress: KontragentAddress) => kontragentAddress.order)
-    @JoinColumn({ name: "agentId" })
-    agent: KontragentAddress;
-
-    @ManyToMany(() => Product, (product: Product) => product.order)
-    @JoinTable({ name: "order_products" })
-    products: Product[];
 }

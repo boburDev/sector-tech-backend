@@ -423,7 +423,7 @@ export const getLocationbyName = async (req: Request, res: Response, next: NextF
         console.log(name);
         
         const locations = await getLocations(name as string);
-        console.log(locations);
+        // console.log(locations);
         
         return res.status(200).json({
             message: "Location successfully received",

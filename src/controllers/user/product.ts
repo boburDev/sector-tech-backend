@@ -490,7 +490,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
         count: item.count,
         ...item.product,
         cartId: item.id,
-        garantees: productGarantees.map((garantee) => ({
+        garantees: productGarantees.filter((garantee) => garantee?.price && Number(garantee?.price) > 0).map((garantee) => ({
           title: garantee?.title || '',
           price: garantee?.price || 0,
         })),

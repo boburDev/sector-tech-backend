@@ -4,3 +4,9 @@ export enum OrderStatus {
     COMPLETED = "completed",
     CANCELED = "canceled",
 }
+
+export enum OrderType {
+    NEW = "NEW",
+    OLD = "OLD",
+    REJECTED = "REJECTED",
+}

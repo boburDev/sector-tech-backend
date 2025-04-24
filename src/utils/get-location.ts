@@ -78,7 +78,7 @@ export const getLocations = async (name: string) => {
         };
 
     } catch (error) {
-        console.error("❌ getLocations xatolik:", error);
+        // console.error("❌ getLocations xatolik:", error);
         throw new CustomError('❌ Xatolik yuz berdi', 500);
     }
 };
