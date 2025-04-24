@@ -146,38 +146,38 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   }
 };
 
-export const updateProfile = async ( req: Request, res: Response, next: NextFunction): Promise<any> => {
-  try {
-    const userId = req.user.id;
-    const { name, email } = req.body;
+// export const updateProfile = async ( req: Request, res: Response, next: NextFunction): Promise<any> => {
+//   try {
+//     const userId = req.user.id;
+//     const { name, email } = req.body;
 
-    const user = await userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new CustomError("User not found", 404);
+//     const user = await userRepository.findOne({ where: { id: userId } });
+//     if (!user) throw new CustomError("User not found", 404);
 
-    user.name = name || user.name;
-    user.email = email || user.email;
-    await userRepository.save(user);
+//     user.name = name || user.name;
+//     user.email = email || user.email;
+//     await userRepository.save(user);
 
-    const token = sign(
-      { id: user.id, email: user.email },
-      86400000, // 1 day in milliseconds
-      "user"
-    );
+//     const token = sign(
+//       { id: user.id, email: user.email },
+//       86400000, // 1 day in milliseconds
+//       "user"
+//     );
 
-    const userData = {
-      id: user.id,
-      email: user.email,
-    };
+//     const userData = {
+//       id: user.id,
+//       email: user.email,
+//     };
 
-    return res.json({
-      message: "Profile updated successfully",
-      token,
-      user: userData,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res.json({
+//       message: "Profile updated successfully",
+//       token,
+//       user: userData,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {

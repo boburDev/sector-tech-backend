@@ -569,13 +569,13 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     const { search, page, limit, inStock, popular, price, name } = req.query;
 
     const pageNumber = parseInt(page as string) || 1;
-    const limitNumber = parseInt(limit as string) || 40;
+    const limitNumber = parseInt(limit as string) || 10;
     const offset = (pageNumber - 1) * limitNumber;
 
     const isProductCode = /^\d+$/.test(search as string);
     const order: any = {};
+    let whereCondition: any;
 
-    // 🔁 Tartiblashlar
     if (popular === "true") order.createdAt = "DESC";
     else if (popular === "false") order.createdAt = "ASC";
 
@@ -585,83 +585,64 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     if (name === "asc") order.title = "ASC";
     else if (name === "desc") order.title = "DESC";
 
-    // 🔍 Avval productCode bo‘yicha qidirib ko‘ramiz
-    let products = await productRepository.find({
-      where: [
+    if (isProductCode) {
+      whereCondition = [
         { productCode: ILike(`%${search}%`), deletedAt: IsNull() },
+      ];
+    } else {
+      whereCondition = [
+        { title: ILike(`%${search}%`), deletedAt: IsNull() },
+        { description: ILike(`%${search}%`), deletedAt: IsNull() },
         { articul: ILike(`%${search}%`), deletedAt: IsNull() }
-      ],
+      ];
+    }
+
+    if (inStock && Array.isArray(whereCondition)) {
+      let stockFilter: any;
+      if (inStock === "true") stockFilter = MoreThan(0);
+      else if (inStock === "false") stockFilter = "Под заказ";
+      else if (!isNaN(parseInt(inStock as string))) stockFilter = parseInt(inStock as string);
+
+      whereCondition = whereCondition.map((cond) => ({
+        ...cond,
+        inStock: stockFilter,
+      }));
+    }
+
+    const products = await productRepository.find({
+      where: whereCondition,
       order,
       skip: offset,
       take: limitNumber,
       relations: ['category', 'catalog', 'subcatalog', 'relevances', 'conditions'],
       select: {
         id: true,
-        title: true,
-        articul: true,
-        slug: true,
-        price: true,
-        mainImage: true,
-        garanteeIds: true,
+        title: false,
+        articul: false,
+        slug: false,
+        price: false,
+        mainImage: false,
+        garanteeIds: false,
         productCode: true,
-        inStock: true,
-        description: true,
-        createdAt: true,
+        inStock: false,
+        description: false,
+        createdAt: false,
         category: { slug: true, title: true },
         catalog: { slug: true, title: true },
         subcatalog: { slug: true, title: true },
-        relevances: { id: true, slug: true, title: true },
-        conditions: { id: true, title: true, slug: true },
+        // relevances: { id: true, slug: true, title: true },
+        // conditions: { id: true, title: true, slug: true },
       },
     });
 
-    // 🔁 Agar productCode bo‘yicha hech narsa topilmasa → boshqa joylardan qidiramiz
-    if (!products.length) {
-      const altFilter: any[] = [
-        { title: ILike(`%${search}%`), deletedAt: IsNull() },
-        { description: ILike(`%${search}%`), deletedAt: IsNull() },
-        { articul: ILike(`%${search}%`), deletedAt: IsNull() }
-      ];
-
-      // 🧠 inStock filtrini qo‘shamiz
-      if (inStock) {
-        let stockFilter: any;
-        if (inStock === "true") stockFilter = MoreThan(0);
-        else if (inStock === "false") stockFilter = "Под заказ";
-        else if (!isNaN(parseInt(inStock as string))) stockFilter = parseInt(inStock as string);
-
-        altFilter.forEach(f => f.inStock = stockFilter);
-      }
-
-      products = await productRepository.find({
-        where: altFilter,
-        order,
-        skip: offset,
-        take: limitNumber,
-        relations: ['category', 'catalog', 'subcatalog', 'relevances', 'conditions'],
-        select: {
-          id: true,
-          title: true,
-          articul: true,
-          slug: true,
-          price: true,
-          mainImage: true,
-          garanteeIds: true,
-          productCode: true,
-          inStock: true,
-          description: true,
-          createdAt: true,
-          category: { slug: true, title: true },
-          catalog: { slug: true, title: true },
-          subcatalog: { slug: true, title: true },
-          relevances: { id: true, slug: true, title: true },
-          conditions: { id: true, title: true, slug: true },
-        },
-      });
-    }
-
     return res.status(200).json({
-      data: products,
+      data: {
+        products,
+        total: products.length,
+        pageNumber,
+        limitNumber,
+        totalPages: Math.ceil(products.length / limitNumber),
+      },
       error: null,
       status: 200,
     });
@@ -669,3 +650,4 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
+ 
