@@ -296,7 +296,7 @@ type FilterItem = {
     options: FilterOption[];
 };
 
-function mapFilterOptionsToString(data: FilterItem[]): string[] {
+export function mapFilterOptionsToString(data: FilterItem[]): string[] {
     return data.flatMap(item =>
         item.options.map(option => `${item.name}$$${option.name}`)
     );

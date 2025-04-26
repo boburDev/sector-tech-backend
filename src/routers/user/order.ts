@@ -104,19 +104,19 @@ const router = Router();
  */
 router.post("/create", validateUserToken, Order.createOrder);
 
-// /**
-//  * @swagger
-//  * /user/order/get-all:
-//  *   get:
-//  *     summary: Barcha buyurtmalarni olish
-//  *     tags: [Orders]
-//  *     security:
-//  *       - bearerAuth: []
-//  *     responses:
-//  *       200:
-//  *         description: Buyurtmalar ro‘yxati
-//  */
-// router.get("/get-all", validateUserToken, Order.getAllOrders);
+/**
+ * @swagger
+ * /user/order/get-all:
+ *   get:
+ *     summary: Barcha buyurtmalarni olish
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Buyurtmalar ro‘yxati
+ */
+router.get("/get-all", validateUserToken, Order.getAllOrders);
 
 // /**
 //  * @swagger

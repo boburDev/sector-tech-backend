@@ -7,6 +7,7 @@ import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
 import { CustomError } from "../../error-handling/error-handling";
 import { Garantee } from "../../entities/garantee.entity";
+import { In } from "typeorm";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
 const kontragentRepo = AppDataSource.getRepository(Kontragent);
@@ -36,7 +37,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
     if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
     if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
-    console.log(user,kontragent,agent);
     
     let totalPrice = 0;
     const errors: string[] = [];
@@ -102,7 +102,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       total: totalPrice,
       paymentMethod: paymentMethod || null,
       orderType: "online",
-      status: "pending",
       orderPriceStatus: "Не оплачен",
       products: productItems
     });
@@ -122,20 +121,126 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id: userId } = req.user;
 
-// export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-//     try {
-//         const { id: userId } = req.user;
-//         const orders = await orderRepo.find({
-//             relations: ["products", "agent", "contrAgent", "user"],
-//             order: { createdAt: "DESC" },
-//             where: { userId }   
-//         });
-//         return res.status(200).json({ message: "Orders fetched successfully", data: orders, error: null, status: 200 });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+    const orders = await orderRepo.find({
+      relations: ["user"],
+      order: { createdAt: "DESC" },
+      where: { userId },
+      select: {
+        id: true,
+        fullname: true,
+        phone: true,
+        email: true,
+        city: true,
+        comment: true,
+        deliveryMethod: true,
+        paymentMethod: true,
+        total: true,
+        orderPriceStatus: true,
+        orderType: true,
+        validStartDate: true,
+        validEndDate: true,
+        contrAgentId: true,
+        agentId: true,
+        products: true,
+        user: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+        }
+      }
+    });
+
+    const kontragentIds = orders.map(order => order.contrAgentId).filter(id => !!id);
+    const agentIds = orders.map(order => order.agentId).filter(id => !!id);
+
+    const kontragents = await kontragentRepo.find({
+      where: { id: In(kontragentIds) },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        inn: true,
+        pinfl: true,
+        countryOfRegistration: true,
+        oked: true,
+        legalAddress: true,
+        ownershipForm: true,
+      }
+    });
+
+    const kontragentAddresses = await kontragentAddressRepo.find({
+      where: { id: In(agentIds) },
+      select: {
+        id: true,
+        apartment: true,
+        country: true,
+        district: true,
+        house: true,
+        street: true,
+        comment: true,
+        fullAddress: true,
+        index: true,
+        region: true,
+      }
+    });
+
+    const allProductIds = orders.flatMap(order => order.products.map(product => product.productId));
+
+    const products = await productRepo.find({
+      where: { id: In(allProductIds) },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        price: true,
+        productCode: true,
+        mainImage: true,
+      }
+    });
+
+    const kontragentMap = new Map(kontragents.map(k => [k.id, k]));
+    const kontragentAddressMap = new Map(kontragentAddresses.map(k => [k.id, k]));
+    const productMap = new Map(products.map(p => [p.id, p]));
+
+    const updatedOrders = orders.map(order => {
+      const kontragent = kontragentMap.get(order.contrAgentId) || null;
+      const agent = order.agentId ? kontragentAddressMap.get(order.agentId) || null : null;
+
+      const updatedProducts = order.products.map(product => {
+        const productInfo = productMap.get(product.productId);
+        return {
+          ...product,
+          product: productInfo || null,
+          productLink: productInfo ? `/product/${productInfo.slug}` : null
+        };
+      });
+
+      return {
+        ...order,
+        kontragent,
+        agent,
+        products: updatedProducts
+      };
+    });
+
+    return res.status(200).json({
+      message: "Orders fetched successfully",
+      data: updatedOrders,
+      error: null,
+      status: 200
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 // export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
 //     try {

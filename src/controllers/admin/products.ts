@@ -642,10 +642,12 @@ export const getProductsBySubcatalogCategoryId = async (req: Request, res: Respo
 
         if (subcatalogId && !categoryId) {
             filter.subcatalogId = subcatalogId
+            filter.categoryId = null
         }
-
+        
         if (categoryId) {
             filter.categoryId = categoryId
+            filter.subcatalogId = null
         }
         const products = await productRepository.find({
             where: filter,
