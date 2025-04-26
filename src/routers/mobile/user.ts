@@ -189,7 +189,7 @@ router.post("/sign-up", loginAttemptLimiter, validate(userSchemaValidator), User
 /**
  * @swagger
  * /mobile/auth/update:
- *   put:
+ *   patch:
  *     summary: Update user profile
  *     tags: [User]
  *     security:
@@ -214,7 +214,70 @@ router.post("/sign-up", loginAttemptLimiter, validate(userSchemaValidator), User
  *       401:
  *         description: Unauthorized
  */
-router.put("/update", validateUserToken, User.updateProfile);
+router.patch("/update", validateUserToken, User.updateProfile);
+
+// /**
+//  * @swagger
+//  * /mobile/auth/confirm-email-change:
+//  *   post:
+//  *     summary: Tasdiqlash kodi yordamida name va emailni yangilash
+//  *     tags: [User]
+//  *     security:
+//  *       - bearerAuth: []
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             required:
+//  *               - email
+//  *               - otpCode
+//  *             properties:
+//  *               name:
+//  *                 type: string
+//  *                 example: Ali Valiyev
+//  *               email:
+//  *                 type: string
+//  *                 format: email
+//  *                 example: ali@example.com
+//  *               otpCode:
+//  *                 type: string
+//  *                 example: "123456"
+//  *     responses:
+//  *       200:
+//  *         description: Profil muvaffaqiyatli yangilandi
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: Profil muvaffaqiyatli yangilandi
+//  *                 token:
+//  *                   type: string
+//  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+//  *                 user:
+//  *                   type: object
+//  *                   properties:
+//  *                     id:
+//  *                       type: string
+//  *                       example: "abc123"
+//  *                     email:
+//  *                       type: string
+//  *                       example: ali@example.com
+//  *                     name:
+//  *                       type: string
+//  *                       example: Ali Valiyev
+//  *       400:
+//  *         description: Email yoki OTP noto‘g‘ri
+//  *       404:
+//  *         description: Foydalanuvchi topilmadi
+//  *       401:
+//  *         description: Avtorizatsiya qilinmagan
+//  */
+// router.post("/confirm-email-change", validateUserToken, User.confirmEmailChange);
 
 /**
  * @swagger

@@ -1,0 +1,220 @@
+import { Request, Response, NextFunction } from "express";
+import AppDataSource from "../../config/ormconfig";
+import { Order } from "../../entities/order.entity";
+import { Product } from "../../entities/products.entity";
+import { Kontragent } from "../../entities/kontragent.entity";
+import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
+import { Users } from "../../entities/user.entity";
+import { CustomError } from "../../error-handling/error-handling";
+import { Garantee } from "../../entities/garantee.entity";
+const orderRepo = AppDataSource.getRepository(Order);
+const productRepo = AppDataSource.getRepository(Product);
+const kontragentRepo = AppDataSource.getRepository(Kontragent);
+const kontragentAddressRepo = AppDataSource.getRepository(KontragentAddress);
+const userRepo = AppDataSource.getRepository(Users);
+const garanteeRepo = AppDataSource.getRepository(Garantee);
+
+export const createOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { receiverInfo, productDetails, orderInfo } = req.body;
+    const { id: userId } = req.user;
+    const { fullname, email, phone } = receiverInfo;
+    const { kontragentId, agentId, city, comment, deliveryMethod, paymentMethod } = orderInfo;
+
+    // Majburiy maydonlarni tekshirish
+    if (!userId || !fullname || !phone || !email || !productDetails?.length || !kontragentId || !city) {
+      throw new CustomError("Majburiy maydonlar to‘liq emas", 400);
+    }
+
+    // Bazaviy obyektlarni olish
+    const [kontragent, user, agent] = await Promise.all([
+      kontragentRepo.findOneBy({ id: kontragentId }),
+      userRepo.findOneBy({ id: userId }),
+      agentId ? kontragentAddressRepo.findOneBy({ id: agentId }) : Promise.resolve(null)
+    ]);
+
+    if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
+    if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
+    if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
+    console.log(user,kontragent,agent);
+    
+    let totalPrice = 0;
+    const errors: string[] = [];
+    const productItems: any[] = [];
+
+    // Mahsulotlar va kafolatlarni tekshirish
+    for (const item of productDetails) {
+      const product = await productRepo.findOneBy({ id: item.productId });
+
+      if (!product) {
+        errors.push(`Mahsulot topilmadi: ${item.productId}`);
+        continue;
+      }
+
+      const count = item.count || 1;
+      let garantee;
+      let garanteePrice = 0;
+
+      if (item.garanteeId) {
+        garantee = await garanteeRepo.findOneBy({ id: item.garanteeId });
+        if (!garantee) {
+          errors.push(`Kafolat topilmadi: ${item.garanteeId}`);
+        } else {
+          garanteePrice = Number(garantee.price || 0) * count;
+        }
+      }
+
+      const productTotal = product.price * count + garanteePrice;
+      totalPrice += productTotal;
+
+      productItems.push({
+        productId: product.id,
+        count,
+        price: product.price,
+        ...(garantee && {
+          garantee: {
+            id: garantee.id,
+            title: garantee.title,
+            price: garantee.price
+          }
+        })
+      });
+    }
+
+    if (errors.length === productDetails.length * 2) {
+      throw new CustomError("Hech bir mahsulot yoki kafolat topilmadi:\n" + errors.join("\n"), 404);
+    }
+
+    if (errors.length) {
+      console.warn("⚠️ Ogohlantirishlar:\n" + errors.join("\n"));
+    }
+
+    const newOrder = orderRepo.create({
+      agentId: agentId || null,
+      contrAgentId: kontragentId,
+      userId,
+      city,
+      comment: comment || null,
+      deliveryMethod,
+      email,
+      fullname,
+      phone,
+      total: totalPrice,
+      paymentMethod: paymentMethod || null,
+      orderType: "online",
+      status: "pending",
+      orderPriceStatus: "Не оплачен",
+      products: productItems
+    });
+
+    const savedOrder = await orderRepo.save(newOrder);
+
+    return res.status(201).json({
+      message: "Buyurtma muvaffaqiyatli yaratildi",
+      data: savedOrder,
+      warnings: errors.length ? errors : null,
+      status: 201
+    });
+
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+
+// export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+//     try {
+//         const { id: userId } = req.user;
+//         const orders = await orderRepo.find({
+//             relations: ["products", "agent", "contrAgent", "user"],
+//             order: { createdAt: "DESC" },
+//             where: { userId }   
+//         });
+//         return res.status(200).json({ message: "Orders fetched successfully", data: orders, error: null, status: 200 });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+// export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+//     try {
+//         const { id } = req.params;
+//         const { id: userId } = req.user;
+//         const order = await orderRepo.findOne({
+//             where: { id, userId },
+//             relations: ["products", "agent", "contrAgent", "user"],
+//         });
+
+//         if (!order) throw new CustomError("Order not found", 404);
+//         return res.status(200).json({ message: "Order fetched successfully", data: order, error: null, status: 200 });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+// export const updateOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+//     try {
+//         const { id } = req.params;
+//         const { id: userId } = req.user;
+//         const updateData = req.body;
+
+//         const order = await orderRepo.findOneBy({ id, userId });
+//         if (!order) throw new CustomError("Order not found", 404);
+
+//         if (updateData.products) {
+//             const updatedProducts = await productRepo.findBy({ id: In(updateData.products) });
+//             updateData.products = updatedProducts;
+//         }
+
+//         orderRepo.merge(order, updateData);
+//         const updated = await orderRepo.save(order);
+//         return res.status(200).json({ message: "Order updated", data: updated, error: null, status: 200 });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+// export const deleteOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+//     try {
+//         const { id } = req.params;
+//         const { id: userId } = req.user;
+//         const order = await orderRepo.findOneBy({ id, userId });
+
+//         if (!order) throw new CustomError("Order not found", 404);
+
+//         order.deletedAt = new Date();
+//         await orderRepo.save(order);
+//         return res.status(200).json({ message: "Order deleted", data: null, error: null, status: 200 });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+// const orderData = {
+//     receiverInfo: {
+//         "fullname": "Oybek sobirov sobirovich",
+//         "email": "john.doe@example.com",
+//         "phone": "+998991234567",
+//     },
+//     productDetails: [
+//         {
+//             productId: 1,
+//             count: 2,
+//             garanteeId: 4
+//         },
+//         {
+//             productId: 2,
+//             count: 1,
+//             garanteeId: 4
+//         }
+//     ],
+//     orderInfo: {
+//         deliveryMethod: "delivery",
+//         kontragentId: "uuid-fdfhd-fdfhd-fdfhd",
+//         agentId: "uuid-fdfhd-fdfhd-fdfhd",
+//         city: "Tashkent",
+//         comment: "Comment",
+//         total: 100,
+//     }
+// }
