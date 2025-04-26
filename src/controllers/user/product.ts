@@ -491,6 +491,7 @@ export const getProductCarts = async (req: Request, res: Response, next: NextFun
         ...item.product,
         cartId: item.id,
         garantees: productGarantees.filter((garantee) => garantee?.price && Number(garantee?.price) > 0).map((garantee) => ({
+          id: garantee?.id || '',
           title: garantee?.title || '',
           price: garantee?.price || 0,
         })),
@@ -603,7 +604,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     const { search, page, limit, inStock, popular, price, name } = req.query;
 
     const pageNumber = parseInt(page as string) || 1;
-    const limitNumber = parseInt(limit as string) || 10;
+    const limitNumber = parseInt(limit as string) || 12;
     const offset = (pageNumber - 1) * limitNumber;
 
     const isProductCode = /^\d+$/.test(search as string);
@@ -649,7 +650,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       skip: offset,
       take: limitNumber,
       relations: ['category', 'catalog'],
-      select: {
+      select: { 
         id: true,
         title: true,
         articul: true,
@@ -662,58 +663,184 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       },
     });
 
-      const groupedByCatalog: any = [];
+    let similarProducts: any[] = [];
 
-      products.forEach((product) => {
-        const catalogTitle = product.catalog.title;
-        const categoryTitle = product.category.title;
-        const productCode = product.productCode;
-
-        let catalogGroup = groupedByCatalog.find(
-          (item:any) => item.catalogName === catalogTitle
-        );
-
-        if (!catalogGroup) {
-          catalogGroup = {
-            catalogName: catalogTitle,
-            productCodes: [],
-            categories: [],
-          };
-          groupedByCatalog.push(catalogGroup);
+    if (products.length <= 50) {
+      if (products.length === 1) {
+        const mainProduct = products[0];
+        similarProducts = await productRepository.find({
+          where: {
+            category: { id: mainProduct.category.id },
+            id: Not(mainProduct.id),
+            deletedAt: IsNull()
+          },
+          take: 100,
+          relations: ['category', 'catalog'],
+          order: { createdAt: "DESC" },
+          select: {
+            id: true,
+            title: true,
+            articul: true,
+            productCode: true,
+            inStock: true,
+            description: true,
+            createdAt: true,
+            category: { id: true, slug: true, title: true },
+            catalog: { id: true, slug: true, title: true },
+          },
+        });
+      } else if (products.length >= 5 && products.length <= 10) {
+        for (const product of products) {
+          const similars = await productRepository.find({
+            where: {
+              category: { id: product.category.id },
+              id: Not(product.id),
+              deletedAt: IsNull()
+            },
+            take: 10,
+            relations: ['category', 'catalog'],
+            order: { createdAt: "DESC" },
+            select: {
+              id: true,
+              title: true,
+              articul: true,
+              productCode: true,
+              inStock: true,
+              description: true,
+              createdAt: true,
+              category: { id: true, slug: true, title: true },
+              catalog: { id: true, slug: true, title: true },
+            },
+          });
+          similarProducts.push(...similars);
+          if (similarProducts.length >= 100) break;
         }
-
-        catalogGroup.productCodes.push(productCode);
-
-        let categoryGroup = catalogGroup.categories.find(
-          (cat: any) => cat.categoryName === categoryTitle
-        );
-
-        if (!categoryGroup) {
-          categoryGroup = {
-            categoryName: categoryTitle,
-            productCodes: [],
-          };
-          catalogGroup.categories.push(categoryGroup);
+      } else if (products.length > 10 && products.length <= 20) {
+        for (const product of products) {
+          const similars = await productRepository.find({
+            where: {
+              category: { id: product.category.id },
+              id: Not(product.id),
+              deletedAt: IsNull(),
+            },
+            take: 10,
+            relations: ['category', 'catalog'],
+            order: { createdAt: "DESC" },
+            select: {
+              id: true,
+              title: true,
+              articul: true,
+              productCode: true,
+              inStock: true,
+              description: true,
+              createdAt: true,
+              category: { id: true, slug: true, title: true },
+              catalog: { id: true, slug: true, title: true },
+            },
+          });
+          similarProducts.push(...similars);
+          if (similarProducts.length >= 200) break;
         }
+      } else if (products.length > 20) {
+        const categoryIds = [...new Set(products.map(p => p.category.id))];
+        similarProducts = await productRepository.find({
+          where: {
+            category: { id: In(categoryIds) },
+            deletedAt: IsNull()
+          },
+          take: 300,
+          relations: ['category', 'catalog'],
+          order: { createdAt: "DESC" },
+          select: {
+            id: true,
+            title: true,
+            articul: true,
+            productCode: true,
+            inStock: true,
+            description: true,
+            createdAt: true,
+            category: { id: true, slug: true, title: true },
+            catalog: { id: true, slug: true, title: true },
+          },
+        });
+      }
+    }
 
-        categoryGroup.productCodes.push(productCode);
-      });
+    const mergedProducts = [...products, ...similarProducts];
 
-    
+    // duplicate productCodes'larni olib tashlaymiz
+    const productCodeSet = new Set<string>();
+    const uniqueMergedProducts = mergedProducts.filter(product => {
+      if (productCodeSet.has(product.productCode)) {
+        return false;
+      }
+      productCodeSet.add(product.productCode);
+      return true;
+    });
 
+    // total va pagination uchun uniqueMergedProducts ishlatamiz
+    const totalProducts = uniqueMergedProducts.length;
+    const paginatedProducts = uniqueMergedProducts.slice(offset, offset + limitNumber);
+
+    // GroupedByCatalog hosil qilish
+    const catalogMap = new Map<string, {
+      catalogName: string;
+      productCodes: string[];
+      categories: Map<string, { categoryName: string; productCodes: string[] }>;
+    }>();
+
+    uniqueMergedProducts.forEach((product) => {
+      if (!product.catalog || !product.category) return;
+
+      const catalogTitle = product.catalog.title;
+      const categoryTitle = product.category.title;
+      const productCode = product.productCode;
+
+      if (!catalogMap.has(catalogTitle)) {
+        catalogMap.set(catalogTitle, {
+          catalogName: catalogTitle,
+          productCodes: [],
+          categories: new Map()
+        });
+      }
+
+      const catalogGroup = catalogMap.get(catalogTitle)!;
+      catalogGroup.productCodes.push(productCode);
+
+      if (!catalogGroup.categories.has(categoryTitle)) {
+        catalogGroup.categories.set(categoryTitle, {
+          categoryName: categoryTitle,
+          productCodes: []
+        });
+      }
+
+      const categoryGroup = catalogGroup.categories.get(categoryTitle)!;
+      categoryGroup.productCodes.push(productCode);
+    });
+
+    const groupedByCatalog: any = Array.from(catalogMap.values()).map(catalog => ({
+      catalogName: catalog.catalogName,
+      productCodes: catalog.productCodes,
+      categories: Array.from(catalog.categories.values())
+    }));
+
+    // Yuboriladigan natija
     return res.status(200).json({
       data: {
-        products,
-        total: products.length,
+        products: paginatedProducts,
+        similarProducts,
+        total: totalProducts,
         pageNumber,
         limitNumber,
-        totalPages: Math.ceil(products.length / limitNumber),
-        groupedByCatalog
+        totalPages: Math.ceil(totalProducts / limitNumber),
+        groupedByCatalog,
       },
       error: null,
       status: 200,
     });
+    
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };

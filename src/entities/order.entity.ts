@@ -6,8 +6,8 @@ export class Order {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column("uuid")
-    agentId: string;
+    @Column("uuid", { nullable: true })
+    agentId?: string;
 
     @Column("uuid")
     contrAgentId: string;
@@ -74,7 +74,6 @@ export class Order {
             price: string;
         };
     }[];
-
 
     @ManyToOne(() => Users, (user) => user.order)
     @JoinColumn({ name: "userId" })

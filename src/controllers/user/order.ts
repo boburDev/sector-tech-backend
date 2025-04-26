@@ -6,7 +6,6 @@ import { Kontragent } from "../../entities/kontragent.entity";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
 import { CustomError } from "../../error-handling/error-handling";
-import { In } from "typeorm";
 import { Garantee } from "../../entities/garantee.entity";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
@@ -22,61 +21,65 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     const { fullname, email, phone } = receiverInfo;
     const { kontragentId, agentId, city, comment, deliveryMethod, paymentMethod } = orderInfo;
 
+    // Majburiy maydonlarni tekshirish
     if (!userId || !fullname || !phone || !email || !productDetails?.length || !kontragentId || !city) {
       throw new CustomError("Majburiy maydonlar to‘liq emas", 400);
     }
 
-    const [agent, kontragent, user] = await Promise.all([
-      kontragentAddressRepo.findOneBy({ id: agentId }),
+    // Bazaviy obyektlarni olish
+    const [kontragent, user, agent] = await Promise.all([
       kontragentRepo.findOneBy({ id: kontragentId }),
-      userRepo.findOneBy({ id: userId })
+      userRepo.findOneBy({ id: userId }),
+      agentId ? kontragentAddressRepo.findOneBy({ id: agentId }) : Promise.resolve(null)
     ]);
 
-    // if (!agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
     if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
     if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
-
+    if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
+    console.log(user,kontragent,agent);
+    
     let totalPrice = 0;
     const errors: string[] = [];
-    const productItems = [];
+    const productItems: any[] = [];
 
+    // Mahsulotlar va kafolatlarni tekshirish
     for (const item of productDetails) {
-    const product = await productRepo.findOneBy({ id: item.productId });
-    if (!product) {
+      const product = await productRepo.findOneBy({ id: item.productId });
+
+      if (!product) {
         errors.push(`Mahsulot topilmadi: ${item.productId}`);
         continue;
-    }
+      }
 
-    const count = item.count || 1;
-    let garantee;
-    let garanteePrice = 0;
+      const count = item.count || 1;
+      let garantee;
+      let garanteePrice = 0;
 
-    if (item.garanteeId) {
+      if (item.garanteeId) {
         garantee = await garanteeRepo.findOneBy({ id: item.garanteeId });
         if (!garantee) {
-            errors.push(`Kafolat topilmadi: ${item.garanteeId}`);
+          errors.push(`Kafolat topilmadi: ${item.garanteeId}`);
         } else {
-            garanteePrice = Number(garantee.price || 0) * count;
+          garanteePrice = Number(garantee.price || 0) * count;
         }
-    }
+      }
 
-    const productTotal = product.price * count + garanteePrice;
-    totalPrice += productTotal;
+      const productTotal = product.price * count + garanteePrice;
+      totalPrice += productTotal;
 
-    productItems.push({
+      productItems.push({
         productId: product.id,
         count,
         price: product.price,
         ...(garantee && {
-        garantee: {
+          garantee: {
             id: garantee.id,
             title: garantee.title,
             price: garantee.price
-        }
+          }
         })
-    });
+      });
     }
-
 
     if (errors.length === productDetails.length * 2) {
       throw new CustomError("Hech bir mahsulot yoki kafolat topilmadi:\n" + errors.join("\n"), 404);
@@ -86,12 +89,12 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       console.warn("⚠️ Ogohlantirishlar:\n" + errors.join("\n"));
     }
 
-    const order = orderRepo.create({
-      agentId,
+    const newOrder = orderRepo.create({
+      agentId: agentId || null,
       contrAgentId: kontragentId,
       userId,
       city,
-      comment,
+      comment: comment || null,
       deliveryMethod,
       email,
       fullname,
@@ -104,15 +107,17 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       products: productItems
     });
 
-    await orderRepo.save(order);
+    const savedOrder = await orderRepo.save(newOrder);
 
     return res.status(201).json({
       message: "Buyurtma muvaffaqiyatli yaratildi",
-      data: order,
+      data: savedOrder,
       warnings: errors.length ? errors : null,
       status: 201
     });
+
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
