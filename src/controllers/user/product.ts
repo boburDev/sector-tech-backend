@@ -648,26 +648,58 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       order,
       skip: offset,
       take: limitNumber,
-      relations: ['category', 'catalog', 'subcatalog', 'relevances', 'conditions'],
+      relations: ['category', 'catalog'],
       select: {
         id: true,
-        title: false,
-        articul: false,
-        slug: false,
-        price: false,
-        mainImage: false,
-        garanteeIds: false,
+        title: true,
+        articul: true,
         productCode: true,
-        inStock: false,
-        description: false,
-        createdAt: false,
-        category: { slug: true, title: true },
-        catalog: { slug: true, title: true },
-        subcatalog: { slug: true, title: true },
-        // relevances: { id: true, slug: true, title: true },
-        // conditions: { id: true, title: true, slug: true },
+        inStock: true,
+        description: true,
+        createdAt: true,
+        category: { id: true, slug: true, title: true },
+        catalog: { id: true, slug: true, title: true },
       },
     });
+
+      const groupedByCatalog: any = [];
+
+      products.forEach((product) => {
+        const catalogTitle = product.catalog.title;
+        const categoryTitle = product.category.title;
+        const productCode = product.productCode;
+
+        let catalogGroup = groupedByCatalog.find(
+          (item:any) => item.catalogName === catalogTitle
+        );
+
+        if (!catalogGroup) {
+          catalogGroup = {
+            catalogName: catalogTitle,
+            productCodes: [],
+            categories: [],
+          };
+          groupedByCatalog.push(catalogGroup);
+        }
+
+        catalogGroup.productCodes.push(productCode);
+
+        let categoryGroup = catalogGroup.categories.find(
+          (cat: any) => cat.categoryName === categoryTitle
+        );
+
+        if (!categoryGroup) {
+          categoryGroup = {
+            categoryName: categoryTitle,
+            productCodes: [],
+          };
+          catalogGroup.categories.push(categoryGroup);
+        }
+
+        categoryGroup.productCodes.push(productCode);
+      });
+
+    
 
     return res.status(200).json({
       data: {
@@ -676,6 +708,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
         pageNumber,
         limitNumber,
         totalPages: Math.ceil(products.length / limitNumber),
+        groupedByCatalog
       },
       error: null,
       status: 200,
@@ -684,31 +717,3 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
-
-
- [
-   {
-     "id": "642938c4-341c-4e6d-b7bc-c84fec1b1160",
-     "productCode": "46947",
-     "category": {
-       "title": "Патч-панели коммутационные",
-       "slug": "patch-paneli-kommutatsionnye"
-     },
-     "catalog": {
-       "title": "Кабельная продукция, СКС и компоненты ВОЛС",
-       "slug": "0004.kabelnaya-produktsiya-sks-i-komponenty-vols"
-     }
-   },
-   {
-     "id": "8ad62c62-a71b-4bb4-9a14-e6332df532a4",
-     "productCode": "94794",
-     "category": {
-       "title": "Фиксированные коммутаторы",
-       "slug": "fiksirovannye-kommutatory"
-     },
-     "catalog": {
-       "title": "Сетевое оборудование",
-       "slug": "setevoe-oborudovanie"
-     }
-   }
- ]

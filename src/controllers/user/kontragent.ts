@@ -416,7 +416,6 @@ export const deleteKontragentAddress = async (req: Request, res: Response, next:
 };
 
 export const getLocationbyName = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    console.log("salom");
     try {
         
         const { name } = req.query;

@@ -63,6 +63,19 @@ export class Order {
     @DeleteDateColumn()
     deletedAt: Date;
 
+    @Column({ type: 'jsonb', nullable: true })
+    products: {
+        productId: string;
+        count: number;
+        price: number;
+        garantee?: {
+            id: string;
+            title: string;
+            price: string;
+        };
+    }[];
+
+
     @ManyToOne(() => Users, (user) => user.order)
     @JoinColumn({ name: "userId" })
     user: Users;

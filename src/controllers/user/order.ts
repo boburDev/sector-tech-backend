@@ -16,77 +16,105 @@ const userRepo = AppDataSource.getRepository(Users);
 const garanteeRepo = AppDataSource.getRepository(Garantee);
 
 export const createOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    try {
-        const { receiverInfo, productDetails, orderInfo } = req.body;
-        const { id: userId } = req.user;
-        const { fullname, email, phone } = receiverInfo;
-        const { kontragentId, agentId, city, comment, deliveryMethod, paymentMethod, total } = orderInfo;
+  try {
+    const { receiverInfo, productDetails, orderInfo } = req.body;
+    const { id: userId } = req.user;
+    const { fullname, email, phone } = receiverInfo;
+    const { kontragentId, agentId, city, comment, deliveryMethod, paymentMethod } = orderInfo;
 
-        // Boshlang‘ich tekshiruv
-        if (!userId || !fullname || !phone || !email || !productDetails?.length || !kontragentId || !agentId || !city || !total) {
-            throw new CustomError("Majburiy maydonlar to‘liq emas", 400);
-        }
-
-        const [agent, kontragent, user] = await Promise.all([
-            kontragentAddressRepo.findOneBy({ id: agentId }),
-            kontragentRepo.findOneBy({ id: kontragentId }),
-            userRepo.findOneBy({ id: userId })
-        ]);
-
-        if (!agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
-        if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
-        if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
-
-        const errors: string[] = [];
-
-        // Har bir product va garantee tekshiriladi
-        for (const item of productDetails) {
-            const product = await productRepo.findOneBy({ id: item.productId });
-            const garantee = await garanteeRepo.findOneBy({ id: item.garanteeId });
-
-            if (!product) errors.push(`Mahsulot topilmadi: ${item.productId}`);
-            if (!garantee) errors.push(`Kafolat topilmadi: ${item.garanteeId}`);
-        }
-
-        if (errors.length === productDetails.length * 2) {
-            throw new CustomError("Hech bir mahsulot yoki kafolat topilmadi:\n" + errors.join("\n"), 404);
-        }
-
-        if (errors.length) {
-            console.warn("⚠️ Ogohlantirishlar:\n" + errors.join("\n"));
-        }
-
-        // Order obyektini yaratish
-        const order = orderRepo.create({
-            agentId,
-            contrAgentId: kontragentId,
-            userId,
-            city,
-            comment,
-            deliveryMethod: deliveryMethod || "Не отгружен",
-            email,
-            fullname,
-            phone,
-            total,
-            paymentMethod: paymentMethod || null,
-            orderType: "online", // yoki dynamic berishingiz mumkin
-            status: "pending",
-            orderPriceStatus: "Не оплачен",
-            user,
-        });
-
-        await orderRepo.save(order);
-
-        return res.status(201).json({
-            message: "Buyurtma muvaffaqiyatli yaratildi",
-            data: order,
-            warnings: errors.length ? errors : null,
-            status: 201
-        });
-
-    } catch (error) {
-        next(error);
+    if (!userId || !fullname || !phone || !email || !productDetails?.length || !kontragentId || !city) {
+      throw new CustomError("Majburiy maydonlar to‘liq emas", 400);
     }
+
+    const [agent, kontragent, user] = await Promise.all([
+      kontragentAddressRepo.findOneBy({ id: agentId }),
+      kontragentRepo.findOneBy({ id: kontragentId }),
+      userRepo.findOneBy({ id: userId })
+    ]);
+
+    // if (!agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
+    if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
+    if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
+
+    let totalPrice = 0;
+    const errors: string[] = [];
+    const productItems = [];
+
+    for (const item of productDetails) {
+    const product = await productRepo.findOneBy({ id: item.productId });
+    if (!product) {
+        errors.push(`Mahsulot topilmadi: ${item.productId}`);
+        continue;
+    }
+
+    const count = item.count || 1;
+    let garantee;
+    let garanteePrice = 0;
+
+    if (item.garanteeId) {
+        garantee = await garanteeRepo.findOneBy({ id: item.garanteeId });
+        if (!garantee) {
+            errors.push(`Kafolat topilmadi: ${item.garanteeId}`);
+        } else {
+            garanteePrice = Number(garantee.price || 0) * count;
+        }
+    }
+
+    const productTotal = product.price * count + garanteePrice;
+    totalPrice += productTotal;
+
+    productItems.push({
+        productId: product.id,
+        count,
+        price: product.price,
+        ...(garantee && {
+        garantee: {
+            id: garantee.id,
+            title: garantee.title,
+            price: garantee.price
+        }
+        })
+    });
+    }
+
+
+    if (errors.length === productDetails.length * 2) {
+      throw new CustomError("Hech bir mahsulot yoki kafolat topilmadi:\n" + errors.join("\n"), 404);
+    }
+
+    if (errors.length) {
+      console.warn("⚠️ Ogohlantirishlar:\n" + errors.join("\n"));
+    }
+
+    const order = orderRepo.create({
+      agentId,
+      contrAgentId: kontragentId,
+      userId,
+      city,
+      comment,
+      deliveryMethod,
+      email,
+      fullname,
+      phone,
+      total: totalPrice,
+      paymentMethod: paymentMethod || null,
+      orderType: "online",
+      status: "pending",
+      orderPriceStatus: "Не оплачен",
+      products: productItems
+    });
+
+    await orderRepo.save(order);
+
+    return res.status(201).json({
+      message: "Buyurtma muvaffaqiyatli yaratildi",
+      data: order,
+      warnings: errors.length ? errors : null,
+      status: 201
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 
