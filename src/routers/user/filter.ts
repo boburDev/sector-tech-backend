@@ -32,7 +32,6 @@ const router = express.Router();
  *         schema:
  *           type: object   
  */
-
 router.get("/", Filter.getFilterBySubcatalogCategorySlug);
 
 export default router;
