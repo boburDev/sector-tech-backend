@@ -36,9 +36,6 @@ export class Order {
     @Column("bigint")
     total: number;
 
-    @Column({type: "varchar"})
-    status: string;
-
     @Column({ type: "varchar"})
     orderType: string;
 
