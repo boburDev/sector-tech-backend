@@ -16,11 +16,9 @@ const router = Router();
  * /user/orders/create:
  *   post:
  *     summary: Foydalanuvchi tomonidan yangi buyurtma yaratish
- *     description: Foydalanuvchi mahsulot va kafolatlar bilan buyurtma yaratadi.
- *     tags:
- *       - User - Orders
+ *     tags: [Orders]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -75,26 +73,31 @@ router.post("/create", validateUserToken, Order.createOrder);
  *   get:
  *     summary: Foydalanuvchining barcha buyurtmalari
  *     description: Foydalanuvchining barcha aktiv (rejected bo'lmagan) buyurtmalari qaytariladi.
- *     tags:
- *       - User - Orders
+ *     tags: [Orders]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: last
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: Eng oxirgi orderni olish uchun true yuboring.
  *     responses:
  *       200:
  *         description: Buyurtmalar muvaffaqiyatli olindi
  */
 router.get("/get-all", validateUserToken, Order.getAllOrders);
-    
+
 /**
  * @swagger
  * /user/orders/get-by-id/{id}:
  *   get:
  *     summary: Foydalanuvchining bitta buyurtmasini olish
  *     description: Buyurtma ID-si bo'yicha foydalanuvchining buyurtmasi olinadi.
- *     tags:
- *       - User - Orders
+ *     tags: [Orders]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -116,10 +119,9 @@ router.get("/get-by-id/:id", validateUserToken, Order.getOrderById);
  *   patch:
  *     summary: Foydalanuvchining buyurtmasini bekor qilish
  *     description: Foydalanuvchi o'z buyurtmasini bekor qiladi (orderType maydoni "rejected" qilinadi).
- *     tags:
- *       - User - Orders
+ *     tags: [Orders]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

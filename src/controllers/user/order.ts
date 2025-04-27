@@ -35,7 +35,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
     if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
-    if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
+    // if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
     
     let totalPrice = 0;
     const errors: string[] = [];
@@ -125,11 +125,130 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id: userId } = req.user;
+    const { last } = req.query;
 
+    if (last === "true") {
+      const lastOrder = await orderRepo.findOne({
+        where: { userId, orderType: Not("rejected") },
+        relations: ["user"],
+        order: { createdAt: "DESC" },
+        select: {
+          id: true,
+          orderNumber: true,
+          fullname: true,
+          phone: true,
+          email: true,
+          city: true,
+          comment: true,
+          deliveryMethod: true,
+          paymentMethod: true,
+          total: true,
+          orderPriceStatus: true,
+          orderType: true,
+          validStartDate: true,
+          validEndDate: true,
+          contrAgentId: true,
+          agentId: true,
+          products: true,
+          createdAt: true,
+          user: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+          }
+        }
+      });
+
+      if (!lastOrder) {
+        return res.status(200).json({
+          message: "No order found",
+          data: [],
+          error: null,
+          status: 200
+        });
+      }
+
+      const kontragent = lastOrder.contrAgentId
+        ? await kontragentRepo.findOne({
+          where: { id: lastOrder.contrAgentId },
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            inn: true,
+            pinfl: true,
+            countryOfRegistration: true,
+            oked: true,
+            legalAddress: true,
+            ownershipForm: true,
+          }
+        })
+        : null;
+
+      const agent = lastOrder.agentId
+        ? await kontragentAddressRepo.findOne({
+          where: { id: lastOrder.agentId },
+          select: {
+            id: true,
+            apartment: true,
+            country: true,
+            district: true,
+            house: true,
+            street: true,
+            comment: true,
+            fullAddress: true,
+            index: true,
+            region: true,
+          }
+        })
+        : null;
+
+      const productIds = lastOrder.products.map(p => p.productId);
+
+      const products = await productRepo.find({
+        where: { id: In(productIds) },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          price: true,
+          productCode: true,
+          mainImage: true,
+        }
+      });
+
+      const productMap = new Map(products.map(p => [p.id, p]));
+
+      const updatedProducts = lastOrder.products.map(product => {
+        const productInfo = productMap.get(product.productId);
+        return {
+          ...product,
+          product: productInfo || null,
+          productLink: productInfo ? `/product/${productInfo.slug}` : null
+        };
+      });
+
+      const updatedOrder = {
+        ...lastOrder,
+        kontragent,
+        agent,
+        products: updatedProducts
+      };
+
+      return res.status(200).json({
+        message: "Order fetched successfully",
+        data: [updatedOrder], // list ichida qaytaramiz, chunki client taraf umumiy format kutadi
+        error: null,
+        status: 200
+      });
+    }
+
+    // Agar last=false bo'lsa (yoki kelmasa)
     const orders = await orderRepo.find({
       relations: ["user"],
-      order: { createdAt: "DESC" },
       where: { userId, orderType: Not("rejected") },
+      order: { createdAt: "DESC" },
       select: {
         id: true,
         orderNumber: true,
@@ -148,6 +267,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         contrAgentId: true,
         agentId: true,
         products: true,
+        createdAt: true,
         user: {
           id: true,
           name: true,
@@ -157,53 +277,60 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       }
     });
 
+    if (orders.length === 0) {
+      return res.status(200).json({
+        message: "No orders found",
+        data: [],
+        error: null,
+        status: 200
+      });
+    }
+
     const kontragentIds = orders.map(order => order.contrAgentId).filter(id => !!id);
     const agentIds = orders.map(order => order.agentId).filter(id => !!id);
 
-    const kontragents = await kontragentRepo.find({
-      where: { id: In(kontragentIds) },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        inn: true,
-        pinfl: true,
-        countryOfRegistration: true,
-        oked: true,
-        legalAddress: true,
-        ownershipForm: true,
-      }
-    });
-
-    const kontragentAddresses = await kontragentAddressRepo.find({
-      where: { id: In(agentIds) },
-      select: {
-        id: true,
-        apartment: true,
-        country: true,
-        district: true,
-        house: true,
-        street: true,
-        comment: true,
-        fullAddress: true,
-        index: true,
-        region: true,
-      }
-    });
-
-    const allProductIds = orders.flatMap(order => order.products.map(product => product.productId));
-
-    const products = await productRepo.find({
-      where: { id: In(allProductIds) },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        price: true,
-        productCode: true,
-        mainImage: true,
-      }
-    });
+    const [kontragents, kontragentAddresses, products] = await Promise.all([
+      kontragentRepo.find({
+        where: { id: In(kontragentIds) },
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          inn: true,
+          pinfl: true,
+          countryOfRegistration: true,
+          oked: true,
+          legalAddress: true,
+          ownershipForm: true,
+        }
+      }),
+      kontragentAddressRepo.find({
+        where: { id: In(agentIds) },
+        select: {
+          id: true,
+          apartment: true,
+          country: true,
+          district: true,
+          house: true,
+          street: true,
+          comment: true,
+          fullAddress: true,
+          index: true,
+          region: true,
+        }
+      }),
+      productRepo.find({
+        where: { id: In(orders.flatMap(order => order.products.map(product => product.productId))) },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          price: true,
+          productCode: true,
+          mainImage: true,
+        }
+      })
+    ]);
 
     const kontragentMap = new Map(kontragents.map(k => [k.id, k]));
     const kontragentAddressMap = new Map(kontragentAddresses.map(k => [k.id, k]));
@@ -238,6 +365,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     });
 
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
