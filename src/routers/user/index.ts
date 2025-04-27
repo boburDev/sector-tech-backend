@@ -30,5 +30,5 @@ router.use("/region", regionRouter)
 router.use("/kontragent", kontragentRouter)
 router.use("/filter", filterRouter)
 router.use("/kontragent-address", kontragentAddressRouter)
-router.use("/order", orderRouter)
+router.use("/orders", orderRouter)
 export default router;

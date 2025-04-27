@@ -1,10 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn, ManyToMany, JoinTable } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
 import { Users } from "./user.entity";
+import { Admin } from "./admin.entity";
 
 @Entity()
 export class Order {
     @PrimaryGeneratedColumn("uuid")
     id: string;
+
+    @Column({ type: "varchar" })
+    orderNumber: string;
 
     @Column("uuid", { nullable: true })
     agentId?: string;
@@ -21,7 +25,7 @@ export class Order {
     @Column({ nullable: true })
     comment: string;
 
-    @Column({ type: "varchar", default: "Не отгружен" })
+    @Column({ type: "varchar", default: "Самовывоз" })
     deliveryMethod: string;
 
     @Column({ type: "varchar"})
@@ -38,6 +42,9 @@ export class Order {
 
     @Column({ type: "varchar"})
     orderType: string;
+
+    @Column({ type: "varchar", default: "Не отгружен" })
+    orderDeleveryType: string;
 
     @Column({ type: "varchar", default: "Не оплачен"})
     orderPriceStatus: string;
@@ -75,4 +82,11 @@ export class Order {
     @ManyToOne(() => Users, (user) => user.order)
     @JoinColumn({ name: "userId" })
     user: Users;
+
+    @Column("uuid", { nullable: true })
+    adminId: string;
+
+    @ManyToOne(() => Admin)
+    @JoinColumn({ name: "adminId" })
+    admin: Admin;
 }

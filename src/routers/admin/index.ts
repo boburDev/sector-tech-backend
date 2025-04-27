@@ -11,7 +11,7 @@ import changeOrderRouter from "./change-order"
 import logsRouter from "./logs"
 import garanteeRouter from "./garantee"
 import fetchDataRouter from "./fetch_data"
-
+import orderRouter from "./order"
 const router = express.Router();
 
 router.use('/admin', adminRouter)
@@ -26,5 +26,6 @@ router.use("/change-order", changeOrderRouter)
 router.use("/logs", logsRouter)
 router.use("/garantee", garanteeRouter)
 router.use("/fetch-data", fetchDataRouter)
+router.use("/orders", orderRouter);
 
 export default router
