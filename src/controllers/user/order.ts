@@ -35,7 +35,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
     if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
-    // if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
+    if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
     
     let totalPrice = 0;
     const errors: string[] = [];
