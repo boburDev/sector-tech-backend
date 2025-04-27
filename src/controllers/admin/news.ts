@@ -5,13 +5,11 @@ import { createSlug } from "../../utils/slug";
 import { CustomError } from "../../error-handling/error-handling";
 import { IsNull } from "typeorm";
 import { deleteFileBeforeSave } from "../../middlewares/removeFiltePath";
+import normalizePaths from "../../utils/normalize-path";
 
 const newsRepository = AppDataSource.getRepository(News);
 
-const normalizePaths = (files: Express.Multer.File[]) =>
-    files.map(file => file.path.replace(/\\/g, "/").replace(/^public\//, ""));
-
-export const createNews = async (req: Request, res: Response, next: NextFunction) => {
+export const createNews = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { title, description, fullDescription, createdAt } = req.body;
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -42,7 +40,7 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const updateNews = async (req: Request, res: Response, next: NextFunction) => {
+export const updateNews = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
         const { title, description, fullDescription, slug } = req.body;
@@ -74,7 +72,7 @@ export const updateNews = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const deleteNews = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteNews = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
@@ -92,7 +90,7 @@ export const deleteNews = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const getAllNews = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllNews = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const news = await newsRepository.find({ where: { deletedAt: IsNull() } });
 
@@ -106,7 +104,7 @@ export const getAllNews = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const getNewsById = async (req: Request, res: Response, next: NextFunction) => {
+export const getNewsById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
 
