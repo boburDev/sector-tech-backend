@@ -7,7 +7,8 @@ import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
 import { CustomError } from "../../error-handling/error-handling";
 import { Garantee } from "../../entities/garantee.entity";
-import { In } from "typeorm";
+import { In, IsNull, Not } from "typeorm";
+import { generateOrderNumber } from "../../utils/generate-order-number";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
 const kontragentRepo = AppDataSource.getRepository(Kontragent);
@@ -22,12 +23,10 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     const { fullname, email, phone } = receiverInfo;
     const { kontragentId, agentId, city, comment, deliveryMethod, paymentMethod } = orderInfo;
 
-    // Majburiy maydonlarni tekshirish
     if (!userId || !fullname || !phone || !email || !productDetails?.length || !kontragentId || !city) {
       throw new CustomError("Majburiy maydonlar to‘liq emas", 400);
     }
 
-    // Bazaviy obyektlarni olish
     const [kontragent, user, agent] = await Promise.all([
       kontragentRepo.findOneBy({ id: kontragentId }),
       userRepo.findOneBy({ id: userId }),
@@ -42,7 +41,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     const errors: string[] = [];
     const productItems: any[] = [];
 
-    // Mahsulotlar va kafolatlarni tekshirish
     for (const item of productDetails) {
       const product = await productRepo.findOneBy({ id: item.productId });
 
@@ -89,7 +87,10 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       console.warn("⚠️ Ogohlantirishlar:\n" + errors.join("\n"));
     }
 
+    const orderNumber = generateOrderNumber();
+
     const newOrder = orderRepo.create({
+      orderNumber,
       agentId: agentId || null,
       contrAgentId: kontragentId,
       userId,
@@ -101,7 +102,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       phone,
       total: totalPrice,
       paymentMethod: paymentMethod || null,
-      orderType: "online",
+      orderType: "new",
       orderPriceStatus: "Не оплачен",
       products: productItems
     });
@@ -128,9 +129,10 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     const orders = await orderRepo.find({
       relations: ["user"],
       order: { createdAt: "DESC" },
-      where: { userId },
+      where: { userId, orderType: Not("rejected") },
       select: {
         id: true,
+        orderNumber: true,
         fullname: true,
         phone: true,
         email: true,
@@ -240,86 +242,153 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
+export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const { id: userId } = req.user;
 
+    const order = await orderRepo.findOne({
+      where: { id, userId, orderType: Not("rejected") },
+      relations: ["user"],
+      select: {
+        id: true,
+        orderNumber: true,
+        fullname: true,
+        phone: true,
+        email: true,
+        city: true,
+        comment: true,
+        deliveryMethod: true,
+        paymentMethod: true,
+        total: true,
+        orderPriceStatus: true,
+        orderType: true,
+        validStartDate: true,
+        validEndDate: true,
+        contrAgentId: true,
+        agentId: true,
+        products: true,
+        user: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+        }
+      }
+    });
 
-// export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-//     try {
-//         const { id } = req.params;
-//         const { id: userId } = req.user;
-//         const order = await orderRepo.findOne({
-//             where: { id, userId },
-//             relations: ["products", "agent", "contrAgent", "user"],
-//         });
+    if (!order) throw new CustomError("Order not found", 404);
 
-//         if (!order) throw new CustomError("Order not found", 404);
-//         return res.status(200).json({ message: "Order fetched successfully", data: order, error: null, status: 200 });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+    const kontragentId = order.contrAgentId;
+    const agentId = order.agentId;
 
-// export const updateOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-//     try {
-//         const { id } = req.params;
-//         const { id: userId } = req.user;
-//         const updateData = req.body;
+    const kontragent = kontragentId
+      ? await kontragentRepo.findOne({
+        where: { id: kontragentId },
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          inn: true,
+          pinfl: true,
+          countryOfRegistration: true,
+          oked: true,
+          legalAddress: true,
+          ownershipForm: true,
+        }
+      })
+      : null;
 
-//         const order = await orderRepo.findOneBy({ id, userId });
-//         if (!order) throw new CustomError("Order not found", 404);
+    const agent = agentId
+      ? await kontragentAddressRepo.findOne({
+        where: { id: agentId },
+        select: {
+          id: true,
+          apartment: true,
+          country: true,
+          district: true,
+          house: true,
+          street: true,
+          comment: true,
+          fullAddress: true,
+          index: true,
+          region: true,
+        }
+      })
+      : null;
 
-//         if (updateData.products) {
-//             const updatedProducts = await productRepo.findBy({ id: In(updateData.products) });
-//             updateData.products = updatedProducts;
-//         }
+    const allProductIds = order.products.map(product => product.productId);
 
-//         orderRepo.merge(order, updateData);
-//         const updated = await orderRepo.save(order);
-//         return res.status(200).json({ message: "Order updated", data: updated, error: null, status: 200 });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+    const products = await productRepo.find({
+      where: { id: In(allProductIds) },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        price: true,
+        productCode: true,
+        mainImage: true,
+      }
+    });
 
-// export const deleteOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-//     try {
-//         const { id } = req.params;
-//         const { id: userId } = req.user;
-//         const order = await orderRepo.findOneBy({ id, userId });
+    const productMap = new Map(products.map(p => [p.id, p]));
 
-//         if (!order) throw new CustomError("Order not found", 404);
+    const updatedProducts = order.products.map(product => {
+      const productInfo = productMap.get(product.productId);
+      return {
+        ...product,
+        product: productInfo || null,
+        productLink: productInfo ? `/product/${productInfo.slug}` : null
+      };
+    });
 
-//         order.deletedAt = new Date();
-//         await orderRepo.save(order);
-//         return res.status(200).json({ message: "Order deleted", data: null, error: null, status: 200 });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+    const updatedOrder = {
+      ...order,
+      kontragent,
+      agent,
+      products: updatedProducts
+    };
 
-// const orderData = {
-//     receiverInfo: {
-//         "fullname": "Oybek sobirov sobirovich",
-//         "email": "john.doe@example.com",
-//         "phone": "+998991234567",
-//     },
-//     productDetails: [
-//         {
-//             productId: 1,
-//             count: 2,
-//             garanteeId: 4
-//         },
-//         {
-//             productId: 2,
-//             count: 1,
-//             garanteeId: 4
-//         }
-//     ],
-//     orderInfo: {
-//         deliveryMethod: "delivery",
-//         kontragentId: "uuid-fdfhd-fdfhd-fdfhd",
-//         agentId: "uuid-fdfhd-fdfhd-fdfhd",
-//         city: "Tashkent",
-//         comment: "Comment",
-//         total: 100,
-//     }
-// }
+    return res.status(200).json({
+      message: "Order fetched successfully",
+      data: updatedOrder,
+      error: null,
+      status: 200
+    });
+
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const cancelOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const { id: userId } = req.user;
+    const { orderType } = req.body;
+
+    const order = await orderRepo.findOne({
+      where: { id, userId, deletedAt: IsNull() }
+    });
+
+    if (!order) {
+      throw new CustomError("Buyurtma topilmadi", 404);
+    }
+
+    if (orderType) order.orderType = orderType;
+
+    const updatedOrder = await orderRepo.save(order);
+
+    return res.status(200).json({
+      message: "Buyurtma statusi o'zgartirildi",
+      data: updatedOrder,
+      error: null,
+      status: 200
+    });
+
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};

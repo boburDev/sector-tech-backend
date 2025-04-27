@@ -48,7 +48,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
       };
     }
 
-    relations.push("category", "subcatalog", "catalog");
+    relations.push("category", "subcatalog", "catalog", "conditions", "relevances");
 
     const products = await productRepository.find({
       relations,
