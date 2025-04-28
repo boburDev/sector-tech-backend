@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as Cart from "../../controllers/mobile/product";
+import * as Product from "../../controllers/mobile/product";
 import { validateUserToken } from "../../middlewares/userValidator";
 import { validate } from "../../middlewares/validate";
 import { productIdParamsSchema } from "../../validators/product-comment.validate";
@@ -67,7 +67,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), Cart.toggleCart);
+router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), Product.toggleCart);
 
 /**
  * @swagger
@@ -87,7 +87,23 @@ router.post('/toggle-cart', validateUserToken, validate(productIdParamsSchema), 
  *       500:
  *         description: Internal server error
  */
-router.get('/all', validateUserToken, Cart.getProductCarts);
+router.get('/all', validateUserToken, Product.getProductCarts);
+
+/**
+ * @swagger
+ * /mobile/cart/delete:
+ *   delete:
+ *     summary: Delete all carts user
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cart deleted successfully.
+ *       500:
+ *         description: Internal server error
+ */     
+router.delete('/delete', validateUserToken, Product.deleteCartByUserId);
 
 /**
  * @swagger
@@ -138,6 +154,6 @@ router.get('/all', validateUserToken, Cart.getProductCarts);
  *       500:
  *         description: Internal server error
  */
-router.post('/update-amount', validateUserToken, Cart.updateOrAddAmountToCart);
+router.post('/update-amount', validateUserToken, Product.updateOrAddAmountToCart);
 
-export default router;  
+export default router;

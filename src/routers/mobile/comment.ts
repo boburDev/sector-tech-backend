@@ -5,7 +5,7 @@ import { validate, validateParams } from '../../middlewares/validate';
 import { productCommentSchema, productIdParamsSchema } from '../../validators/product-comment.validate';
 
 const router = Router();
-// Comment router
+
 /**
  * @swagger
  * tags:

@@ -36,6 +36,11 @@ const router = express.Router();
  *                   type: string
  *                 data:
  *                   type: object
+ *                   properties:
+ *                     results:
+ *                       type: array
+ *                       items:
+ *                         type: object
  *                 error:   
  *                   type: string
  *                 status:
@@ -96,7 +101,7 @@ router.get("/location", kontragentController.getLocationbyName);
  *               ownershipForm: "Юридическое лицо"
  *               inn: "123456789"
  *               pnfl: ""
- *               oked: "10122"
+ *               oked: "12345"
  *               name: "Kontragent Name"
  *               legalAddress: "Tashkent, Uzbekistan"
  *               isFavorite: true
@@ -159,7 +164,7 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                 message:
  *                   type: string
  *                 data:
- *                   type: array
+ *                   type: array    
  *                   items:
  *                     type: object
  *                     properties:
@@ -169,7 +174,7 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                         type: string
  *                       inn:
  *                         type: string
- *                       pnfl:
+ *                       pnfl:  
  *                         type: string
  *                       oked:
  *                         type: string
@@ -178,30 +183,18 @@ router.post("/create", validateUserToken, validate(kontragentSchemaValidator), k
  *                       legalAddress:
  *                         type: string
  *                       isFavorite:
- *                         type: boolean
+ *                         type: boolean    
  *                       countryOfRegistration:
- *                         type: string
+ *                         type: string 
  *                       address:
  *                         type: object
  *                         properties:
  *                           id:
  *                             type: string
- *                           fullAddress:
- *                             type: string
- *                           country:
- *                             type: string
- *                           region:
- *                             type: string
- *                           district:
- *                             type: string
- *                           street:
+ *                           address:
  *                             type: string
  *                           createdAt:
  *                             type: string
- *                           updatedAt:
- *                             type: string
- *                           deletedAt:
- *                             type: string | null      
  *                 error:
  *                   type: string
  *                 status:

@@ -6,8 +6,7 @@ import { Brand } from "../../entities/brands.entity";
 import { Product } from "../../entities/products.entity";
 const categoryRepository = AppDataSource.getRepository(Category);
 const brandRepository = AppDataSource.getRepository(Brand);
-
-const productRepository = AppDataSource.getRepository(Product);
+const productRepository = AppDataSource.getRepository(Product); 
 
 export const getPopular = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {

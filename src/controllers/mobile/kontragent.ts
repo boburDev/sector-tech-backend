@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppDataSource from "../../config/ormconfig";
 import { Kontragent } from "../../entities/kontragent.entity";
-import { ILike, In, IsNull, Like, Not } from "typeorm";
+import { ILike, In, IsNull, Not } from "typeorm";
 import { CustomError } from "../../error-handling/error-handling";
 import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { getLocations } from "../../utils/get-location";
@@ -75,9 +75,9 @@ export const getKontragents = async (req: Request, res: Response, next: NextFunc
         let whereCondition: any = { userId, deletedAt: IsNull() };
 
         if (inn && typeof inn === "string") {
-            const isNumeric = /^\d+$/.test(inn); // faqat raqamlardan iboratmi?
+            const isNumeric = /^\d+$/.test(inn);
             if (isNumeric) {
-                whereCondition.inn = Like(`%${inn}%`);
+                whereCondition.inn = ILike(`%${inn}%`);
             } else {
                 whereCondition.name = ILike(`%${inn}%`);
             }
@@ -146,40 +146,40 @@ export const getKontragentById = async (req: Request, res: Response, next: NextF
         const { id } = req.params;
         const userId = req.user.id;
 
-        const kontragent = await kontragentRepository.findOne({
-            where: { id, userId, deletedAt: IsNull() },
-            relations: ["address", "user"],
+        const kontragent = await kontragentRepository.findOne({ 
+            where: { id, userId, deletedAt: IsNull() }, 
+            relations: ["address", "user"], 
             select: {
+            id: true,
+            ownershipForm: true,
+            inn: true,
+            pinfl: true,
+            oked: true,
+            name: true,
+            legalAddress: true,
+            isFavorite: true,
+            countryOfRegistration: true,
+            user: {
                 id: true,
-                ownershipForm: true,
-                inn: true,
-                pinfl: true,
-                oked: true,
                 name: true,
-                legalAddress: true,
-                isFavorite: true,
-                countryOfRegistration: true,
-                user: {
-                    id: true,
-                    name: true,
-                    phone: true,
-                    email: true,
-                },
-                address: {
-                    id: true,
-                    fullAddress: true,
-                    country: true,
-                    region: true,
-                    district: true,
-                    street: true,
-                    house: true,
-                    apartment: true,
-                    index: true,
-                    comment: true,
-                    isMain: true,
-                    createdAt: true,
-                }
+                phone: true,
+                email: true,
+            },
+            address: {
+                id: true,
+                fullAddress: true,
+                country: true,
+                region: true,
+                district: true,
+                street: true,
+                house: true,
+                apartment: true,
+                index: true,
+                comment: true,
+                isMain: true,
+                createdAt: true,
             }
+        }
         });
         if (!kontragent) throw new CustomError('Kontragent not found', 404);
 
@@ -197,7 +197,16 @@ export const getKontragentById = async (req: Request, res: Response, next: NextF
 export const updateKontragent = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
-        const { ownershipForm, inn, pinfl, oked, name, legalAddress, isFavorite, countryOfRegistration } = req.body;
+        const {
+            ownershipForm,
+            inn,
+            pinfl,
+            oked,
+            name,
+            legalAddress,
+            isFavorite,
+            countryOfRegistration
+        } = req.body;
 
         const userId = req.user.id;
 
@@ -277,7 +286,7 @@ export const deleteKontragent = async (req: Request, res: Response, next: NextFu
         const kontragent = await kontragentRepository.findOne({ where: { id, userId, deletedAt: IsNull() } });
 
         if (!kontragent) throw new CustomError('Kontragent not found', 404);
-        
+
         kontragent.deletedAt = new Date();
         await kontragentRepository.save(kontragent);
         return res.status(200).json({
@@ -408,9 +417,13 @@ export const deleteKontragentAddress = async (req: Request, res: Response, next:
 
 export const getLocationbyName = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+        
         const { name } = req.query;
+        console.log(name);
+        
         const locations = await getLocations(name as string);
-
+        // console.log(locations);
+        
         return res.status(200).json({
             message: "Location successfully received",
             data: locations,
@@ -418,6 +431,8 @@ export const getLocationbyName = async (req: Request, res: Response, next: NextF
             status: 200
         });
     } catch (error) {
+        console.log(error);
         next(error);
+        
     }
 };

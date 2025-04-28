@@ -7,8 +7,8 @@ const regionRepository = AppDataSource.getRepository(Region);
 export const getRegions = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { name } = req.query;
-        let where: any = { deletedAt: IsNull() };
-        if(name){
+        let where: any  = { deletedAt: IsNull() };
+        if(name){ 
             where = { name: ILike(`%${name}%`) };
         }
         const regions = await regionRepository.find({

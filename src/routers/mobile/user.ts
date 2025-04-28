@@ -213,8 +213,102 @@ router.post("/sign-up", loginAttemptLimiter, validate(userSchemaValidator), User
  *         description: Profile updated successfully
  *       401:
  *         description: Unauthorized
+ *       400:
+ *         description: Invalid data
  */
 router.patch("/update", validateUserToken, User.updateProfile);
+
+/**
+ * @swagger
+ * /mobile/auth/me:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "a1b2c3d4"
+ *                     name:
+ *                       type: string
+ *                       example: "John Doe"
+ *                     email:
+ *                       type: string
+ *                       example: "john.doe@example.com"
+ *                     phone:
+ *                       type: string
+ *                       example: "+1234567890"
+ *                 error:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *                 status:
+ *                   type: number
+ *                   example: 200
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.get('/me', validateUserToken, User.getUserById);
+
+/**
+ * @swagger
+ * /mobile/auth/update-password:
+ *   patch:
+ *     summary: Update user password
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string 
+ *                 example: oldPassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newPassword123
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Invalid data    
+ */
+router.patch("/update-password", validateUserToken, User.updateUserPassword);   
 
 // /**
 //  * @swagger
@@ -278,66 +372,5 @@ router.patch("/update", validateUserToken, User.updateProfile);
 //  *         description: Avtorizatsiya qilinmagan
 //  */
 // router.post("/confirm-email-change", validateUserToken, User.confirmEmailChange);
-
-/**
- * @swagger
- * /mobile/auth/me:
- *   get:
- *     summary: Get user by ID
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: User details retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: "a1b2c3d4"
- *                     name:
- *                       type: string
- *                       example: "John Doe"
- *                     email:
- *                       type: string
- *                       example: "john.doe@example.com"
- *                     phone:
- *                       type: string
- *                       example: "+1234567890"
- *                 error:
- *                   type: string
- *                   nullable: true
- *                   example: null
- *                 status:
- *                   type: number
- *                   example: 200
- *       404:
- *         description: User not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User not found"
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal server error"
- */
-router.get('/me', validateUserToken, User.getUserById);
 
 export default router;

@@ -70,7 +70,7 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
                 slug: true,
                 updatedAt: true,
             };
-        }
+        } 
 
         const catalogs = await catalogRepository.find({
             where: { deletedAt: IsNull() },
@@ -78,7 +78,7 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
             select,
             order: {
                 updatedAt: "ASC",
-                subcatalogs: { updatedAt: "ASC", categories: { updatedAt: "ASC" } },
+                subcatalogs: { updatedAt: "ASC" ,categories: { updatedAt: "ASC" }},
             },
         });
 
@@ -91,6 +91,7 @@ export const getCatalogs = async (req: Request, res: Response, next: NextFunctio
 export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { catalogSlug } = req.params;
+        
         const subcatalog = await subcatalogRepository.find({
             where: {
                 deletedAt: IsNull(),
@@ -98,7 +99,7 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, ne
                     slug: catalogSlug
                 },
             },
-            order: { createdAt : "DESC" },
+            order: { updatedAt: "ASC" },
             relations: ["catalog"]
         });
         return res.status(200).json({ data: subcatalog, error: null, status: 200 });
@@ -111,6 +112,7 @@ export const getSubCatalogByCatalogSlug = async (req: Request, res: Response, ne
 export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { subCatalogSlug } = req.params;
+        
         const categories = await categoryRepository.find({
             where: {
                 deletedAt: IsNull(),
@@ -118,7 +120,7 @@ export const getCategoryBySubCatalogSlug = async (req: Request, res: Response, n
                     slug: subCatalogSlug
                 }
             },
-            order: { createdAt: "DESC" },
+            order: { updatedAt: "ASC" },
             relations: ["subCatalog"]
         });
 
@@ -166,7 +168,7 @@ export const getFilterBySubcatalogCategorySlug = async (req: Request, res: Respo
             relations: ['subcatalog', 'category'],
             select: ['id', 'data']
         });
-
+        
         const updatedCategoryFilter = categoryFilter?.data.map((filters: any) => {
             const updatedOptions = filters.options?.map((option: any) => {
                 const { productsId, ...rest } = option;

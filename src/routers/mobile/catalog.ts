@@ -3,7 +3,6 @@ import * as Catalog from "../../controllers/mobile/catalog";
 
 const router = express.Router();
 
-// Catalog routes
 /**
  * @swagger
  * tags:
