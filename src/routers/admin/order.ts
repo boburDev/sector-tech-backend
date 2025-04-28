@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { updateOrderForAdmin } from "../../controllers/admin/order";
+import { updateOrderForAdmin, getAllOrders } from "../../controllers/admin/order";
 import { validateAdminToken } from "../../middlewares/adminValidator";
 
 const router = Router();
@@ -13,7 +13,7 @@ const router = Router();
  *     tags:
  *       - Admin - Orders
  *     security:
- *       - BearerAuth: [] 
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -91,5 +91,39 @@ const router = Router();
  *         description: Server xatosi
  */
 router.patch("/update/:id", validateAdminToken, updateOrderForAdmin);
+
+/**
+ * @swagger
+ * /orders/all:
+ *   get:
+ *     summary: Barcha buyurtmalarni olish
+ *     description: Admin buyurtmalarni barchasini olish
+ *     tags:
+ *       - Admin - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Buyurtmalar muvaffaqiyatli olingan
+ *         content:
+ *           application/json:
+ *             schema:  
+ *               type: object
+ *               properties:
+ *                 orders:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'   
+ *                 error:
+ *                   type: string
+ *                   nullable: true
+ *                 status:
+ *                   type: number
+ *                   example: 200   
+ *       500:
+ *         description: Server xatosi
+ */
+router.get("/all", validateAdminToken, getAllOrders);
+
 
 export default router;
