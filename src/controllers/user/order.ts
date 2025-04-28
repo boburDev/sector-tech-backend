@@ -126,11 +126,11 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id: userId } = req.user;
-    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber } = req.query;
+    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price } = req.query;
 
     if (last === "true") {
       const lastOrder = await orderRepo.findOne({
-        where: { userId, orderType: Not("rejected") },
+        where: { userId, deletedAt: IsNull() },
         relations: ["user"],
         order: { createdAt: "DESC" },
         select: {
@@ -245,7 +245,8 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       });
     }
 
-    const where: any = { userId, orderType: Not("rejected") };
+    const where: any = { userId, deletedAt: IsNull() };
+    let orderBy: any = { createdAt: "DESC" };
 
     if (orderPriceStatus) {
       where.orderPriceStatus = orderPriceStatus;
@@ -271,10 +272,16 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       where.kontragentName = ILike(`%${kontragentName}%`);
     }
 
+    if (price === "asc") {
+      orderBy.total = "ASC";
+    } else if (price === "desc") {
+      orderBy.total = "DESC";
+    }
+
     const orders = await orderRepo.find({
       relations: ["user"],
       where,
-      order: { createdAt: "DESC" },
+      order: orderBy,
       select: {
         id: true,
         orderNumber: true,
@@ -403,7 +410,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
     const { id: userId } = req.user;
 
     const order = await orderRepo.findOne({
-      where: { id, userId, orderType: Not("rejected") },
+      where: { id, userId, deletedAt: IsNull() },
       relations: ["user"],
       select: {
         id: true,

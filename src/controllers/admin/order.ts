@@ -63,7 +63,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 
         const orders = await orderRepo.find({
             relations: ["user"],
-            where: { orderType: Not("rejected") },
+            where: { deletedAt: IsNull() },
             order: { createdAt: "DESC" },
             select: {
                 id: true,

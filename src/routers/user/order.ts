@@ -130,6 +130,13 @@ router.post("/create", validateUserToken, Order.createOrder);
  *           type: string
  *         required: false
  *         description: Order raqamiga ko'ra qidirish.
+ *       - in: query
+ *         name: price
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         required: false  
+ *         description: Buyurtma narxi bo'yicha filtrlash.
  *     responses:
  *       200:
  *         description: Buyurtmalar muvaffaqiyatli olindi
