@@ -78,13 +78,19 @@ router.post("/create", validateUserToken, Order.createOrder);
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: last
+ *         name: page
  *         schema:
- *           type: boolean
+ *           type: number
  *         required: false
- *         description: Agar true yuborilsa, eng oxirgi buyurtma olinadi.
+ *         description: Page number.
  *       - in: query
- *         name: kontragentName
+ *         name: limit
+ *         schema:
+ *           type: number
+ *         required: false
+ *         description: Limit number.
+ *       - in: query
+ *         name: kontragentName 
  *         schema:
  *           type: string
  *         required: false
@@ -135,8 +141,15 @@ router.post("/create", validateUserToken, Order.createOrder);
  *         schema:
  *           type: string
  *           enum: [asc, desc]
- *         required: false
+ *         required: false  
  *         description: Buyurtma narxi bo'yicha filtrlash.
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         required: false
+ *         description: Buyurtma nomi bo'yicha filtrlash.
  *     responses:
  *       200:
  *         description: Buyurtmalar muvaffaqiyatli olindi
