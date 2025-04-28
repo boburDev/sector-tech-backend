@@ -4,7 +4,7 @@ import { Promotion } from '../../entities/promotion.entity';
 import { IsNull } from 'typeorm';
 import { CustomError } from '../../error-handling/error-handling';
 const promotionRepository = AppDataSource.getRepository(Promotion);
-
+ 
 export const getPromotions = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const promotions = await promotionRepository.find({
