@@ -72,7 +72,7 @@ router.post("/create", validateUserToken, Order.createOrder);
  * /user/orders/get-all:
  *   get:
  *     summary: Foydalanuvchining barcha buyurtmalari
- *     description: Foydalanuvchining barcha aktiv (rejected bo'lmagan) buyurtmalari qaytariladi.
+ *     description: Foydalanuvchining barcha aktiv (rejected bo'lmagan) buyurtmalari yoki so'rov bo'yicha filtrlangan buyurtmalari qaytariladi.
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -82,10 +82,72 @@ router.post("/create", validateUserToken, Order.createOrder);
  *         schema:
  *           type: boolean
  *         required: false
- *         description: Eng oxirgi orderni olish uchun true yuboring.
+ *         description: Agar true yuborilsa, eng oxirgi buyurtma olinadi.
+ *       - in: query
+ *         name: kontragentName
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Kontragent nomi bo'yicha qidirish.
+ *       - in: query
+ *         name: orderPriceStatus
+ *         schema:
+ *           type: string
+ *           enum: [Оплачен, Не оплачен]
+ *         required: false
+ *         description: Buyurtma to'lov statusi bo'yicha filtrlash.
+ *       - in: query
+ *         name: orderDeleveryType
+ *         schema:
+ *           type: string
+ *           enum: [Отгружен, Не отгружен]
+ *         required: false
+ *         description: Buyurtma yetkazib berish statusi bo'yicha filtrlash.
+ *       - in: query
+ *         name: orderType
+ *         schema:
+ *           type: string
+ *           enum: [new, old, rejected]
+ *         required: false
+ *         description: Buyurtmaning turini belgilash (masalan, yangi, eski yoki bekor qilingan).
+ *       - in: query
+ *         name: periodStart
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Qaysi sanadan boshlab (YYYY-MM-DD) filtrlashni boshlash.
+ *       - in: query
+ *         name: periodEnd
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Qaysi sanagacha (YYYY-MM-DD) filtrlashni yakunlash.
+ *       - in: query
+ *         name: orderNumber
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Order raqamiga ko'ra qidirish.
  *     responses:
  *       200:
  *         description: Buyurtmalar muvaffaqiyatli olindi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 error:
+ *                   type: string
+ *                 status:
+ *                   type: number
  */
 router.get("/get-all", validateUserToken, Order.getAllOrders);
 

@@ -7,7 +7,7 @@ import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
 import { CustomError } from "../../error-handling/error-handling";
 import { Garantee } from "../../entities/garantee.entity";
-import { In, IsNull, Not } from "typeorm";
+import { Between, ILike, In, IsNull, Not } from "typeorm";
 import { generateOrderNumber } from "../../utils/generate-order-number";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
@@ -94,6 +94,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       agentId: agentId || null,
       contrAgentId: kontragentId,
       userId,
+      kontragentName: kontragent.name,
       city,
       comment: comment || null,
       deliveryMethod,
@@ -125,7 +126,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id: userId } = req.user;
-    const { last } = req.query;
+    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber } = req.query;
 
     if (last === "true") {
       const lastOrder = await orderRepo.findOne({
@@ -238,16 +239,41 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 
       return res.status(200).json({
         message: "Order fetched successfully",
-        data: [updatedOrder], // list ichida qaytaramiz, chunki client taraf umumiy format kutadi
+        data: [updatedOrder],
         error: null,
         status: 200
       });
     }
 
-    // Agar last=false bo'lsa (yoki kelmasa)
+    const where: any = { userId, orderType: Not("rejected") };
+
+    if (orderPriceStatus) {
+      where.orderPriceStatus = orderPriceStatus;
+    }
+
+    if (orderDeleveryType) {
+      where.orderDeleveryType = orderDeleveryType;
+    }
+
+    if (orderType) {
+      where.orderType = orderType;
+    }
+
+    if (orderNumber) {
+      where.orderNumber = ILike(`%${orderNumber}%`);
+    }
+
+    if (periodStart && periodEnd) {
+      where.createdAt = Between(new Date(periodStart as string), new Date(periodEnd as string));
+    }
+
+    if (kontragentName) {
+      where.kontragentName = ILike(`%${kontragentName}%`);
+    }
+
     const orders = await orderRepo.find({
       relations: ["user"],
-      where: { userId, orderType: Not("rejected") },
+      where,
       order: { createdAt: "DESC" },
       select: {
         id: true,
@@ -265,6 +291,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         validStartDate: true,
         validEndDate: true,
         contrAgentId: true,
+        kontragentName: true,
         agentId: true,
         products: true,
         createdAt: true,
@@ -384,6 +411,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
         fullname: true,
         phone: true,
         email: true,
+        kontragentName: true,
         city: true,
         comment: true,
         deliveryMethod: true,
