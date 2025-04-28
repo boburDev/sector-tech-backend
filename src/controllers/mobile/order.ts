@@ -126,7 +126,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id: userId } = req.user;
-    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price } = req.query;
+    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price, name, limit, page } = req.query;
 
     if (last === "true") {
       const lastOrder = await orderRepo.findOne({
@@ -248,6 +248,11 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     const where: any = { userId, deletedAt: IsNull() };
     let orderBy: any = { createdAt: "DESC" };
 
+    const pageNumber = parseInt(page as string) || 1;
+    const limitNumber = parseInt(limit as string) || 10;
+    const offset = (pageNumber - 1) * limitNumber;
+
+
     if (orderPriceStatus) {
       where.orderPriceStatus = orderPriceStatus;
     }
@@ -276,6 +281,12 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       orderBy.total = "ASC";
     } else if (price === "desc") {
       orderBy.total = "DESC";
+    }
+
+    if (name === "asc") {
+      orderBy.kontragentName = "ASC";
+    } else if (name === "desc") {
+      orderBy.kontragentName = "DESC";
     }
 
     const orders = await orderRepo.find({
@@ -308,7 +319,9 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           phone: true,
           email: true,
         }
-      }
+      },
+      skip: offset,
+      take: limitNumber
     });
 
     if (orders.length === 0) {
@@ -393,7 +406,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 
     return res.status(200).json({
       message: "Orders fetched successfully",
-      data: updatedOrders,
+      data: { orders: updatedOrders, total: updatedOrders.length, page: pageNumber, limit: limitNumber },
       error: null,
       status: 200
     });
