@@ -1,0 +1,47 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const PORT = process.env.PORT;
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL;
+const LINKEDIN_ID = process.env.LINKEDIN_ID;
+const LINKEDIN_SECRET = process.env.LINKEDIN_SECRET;
+const LINKEDIN_CALLBACK_URL = process.env.LINKEDIN_CALLBACK_URL;
+const YANDEX_CLIENT_ID = process.env.YANDEX_CLIENT_ID;
+const YANDEX_CLIENT_SECRET = process.env.YANDEX_CLIENT_SECRET;
+const YANDEX_CALLBACK_URL = process.env.YANDEX_CALLBACK_URL;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_NAME = process.env.DB_NAME;
+const BASE_URL = process.env.BASE_URL;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET_USER = process.env.JWT_SECRET_USER;
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+export { 
+    BOT_TOKEN,
+    PORT,
+    FACEBOOK_APP_ID, 
+    FACEBOOK_APP_SECRET, 
+    FACEBOOK_CALLBACK_URL, 
+    GOOGLE_CLIENT_ID, 
+    GOOGLE_CLIENT_SECRET, 
+    GOOGLE_CALLBACK_URL, 
+    LINKEDIN_ID, 
+    LINKEDIN_SECRET, 
+    LINKEDIN_CALLBACK_URL, 
+    YANDEX_CLIENT_ID, 
+    YANDEX_CLIENT_SECRET, 
+    YANDEX_CALLBACK_URL, 
+    DB_PASSWORD, 
+    DB_NAME,
+    BASE_URL,
+    JWT_SECRET,
+    JWT_SECRET_USER,
+    EMAIL_USER,
+    EMAIL_PASS
+};

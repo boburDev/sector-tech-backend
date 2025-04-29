@@ -1,15 +1,13 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
 import passport from "passport";
 import { Strategy as FaceBookStrategy } from "passport-facebook";
+import { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, FACEBOOK_CALLBACK_URL } from "../../config/env";
 
 passport.use(
   new FaceBookStrategy(
     {
-      clientID: process.env.FACEBOOK_APP_ID as string,
-      clientSecret: process.env.FACEBOOK_APP_SECRET as string,
-      callbackURL: process.env.FACEBOOK_CALLBACK_URL as string,
+      clientID: FACEBOOK_APP_ID as string,
+      clientSecret: FACEBOOK_APP_SECRET as string,
+      callbackURL: FACEBOOK_CALLBACK_URL as string,
       profileFields: ["id", "displayName", "name", "email"],
     },
     (accessToken: string, refreshToken: string, profile: any, done) => {

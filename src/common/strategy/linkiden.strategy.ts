@@ -1,7 +1,5 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
 import passport from "passport";
+import { LINKEDIN_ID, LINKEDIN_SECRET, LINKEDIN_CALLBACK_URL } from "../../config/env";
 import {
   Strategy as OpenIDConnectStrategy,
   Profile,
@@ -15,9 +13,9 @@ passport.use(
       authorizationURL: "https://www.linkedin.com/oauth/v2/authorization",
       tokenURL: "https://www.linkedin.com/oauth/v2/accessToken",
       userInfoURL: "https://api.linkedin.com/v2/userinfo",
-      clientID: process.env.LINKEDIN_ID || "",
-      clientSecret: process.env.LINKEDIN_SECRET || "",
-      callbackURL: process.env.LINKEDIN_CALLBACK_URL || "",
+      clientID: LINKEDIN_ID as string,
+      clientSecret: LINKEDIN_SECRET as string,
+      callbackURL: LINKEDIN_CALLBACK_URL as string,
       scope: ["openid", "profile", "email"],
     },
     (

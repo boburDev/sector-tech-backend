@@ -143,13 +143,6 @@ router.post("/create", validateUserToken, Order.createOrder);
  *           enum: [asc, desc]
  *         required: false  
  *         description: Buyurtma narxi bo'yicha filtrlash.
- *       - in: query
- *         name: name
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *         required: false
- *         description: Buyurtma nomi bo'yicha filtrlash.
  *     responses:
  *       200:
  *         description: Buyurtmalar muvaffaqiyatli olindi

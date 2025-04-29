@@ -7,7 +7,7 @@ import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
 import { CustomError } from "../../error-handling/error-handling";
 import { Garantee } from "../../entities/garantee.entity";
-import { Between, ILike, In, IsNull, Not } from "typeorm";
+import { Between, ILike, In, IsNull } from "typeorm";
 import { generateOrderNumber } from "../../utils/generate-order-number";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
@@ -133,7 +133,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id: userId } = req.user;
-    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price, name, limit, page } = req.query;
+    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price, limit, page } = req.query;
 
     if (last === "true") {
       const lastOrder = await orderRepo.findOne({
@@ -159,6 +159,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           agentId: true,
           products: true,
           createdAt: true,
+          orderDeleveryType: true,
           user: {
             id: true,
             name: true,
@@ -290,12 +291,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       orderBy.total = "DESC";
     }
 
-    if (name === "asc") {
-      orderBy.kontragentName = "ASC";
-    } else if (name === "desc") {
-      orderBy.kontragentName = "DESC";
-    } 
-
     if (Object.keys(orderBy).length === 0) {
       orderBy.createdAt = "DESC";
     }
@@ -323,6 +318,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         kontragentName: true,
         agentId: true,
         products: true,
+        orderDeleveryType: true,
         createdAt: true,
         user: {
           id: true,
@@ -455,6 +451,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
         contrAgentId: true,
         agentId: true,
         products: true,
+        orderDeleveryType: true,
         user: {
           id: true,
           name: true,

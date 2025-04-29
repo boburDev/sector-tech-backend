@@ -1,3 +1,4 @@
+import bot from "./bot";
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
@@ -21,12 +22,10 @@ import "./common/strategy/linkiden.strategy";
 import "./common/strategy/yandex.strategy";
 
 import passport from "passport";
-
+import { PORT } from "./config/env";
 
 dotenv.config(); 
 
-
-const PORT = Number(process.env.PORT) || 3030;
 
 AppDataSource.initialize()
   .then(() => console.log("Database connected"))
@@ -81,9 +80,16 @@ app.use(errorMiddleware);
 
 setupSwagger(app);
 
-  server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`User Swagger docs at http://localhost:${PORT}/api-docs`);
-    console.log(`Admin Swagger docs at http://localhost:${PORT}/admin-docs`);
-    console.log(`Mobile Swagger docs at http://localhost:${PORT}/mobile-docs`);
-  });
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`User Swagger docs at http://localhost:${PORT}/api-docs`);
+  console.log(`Admin Swagger docs at http://localhost:${PORT}/admin-docs`);
+  console.log(`Mobile Swagger docs at http://localhost:${PORT}/mobile-docs`);
+    
+  try {
+    bot.launch();
+    console.log("Bot ishga tushdi!");
+  } catch (error) {
+    console.error("❌ Botni ishga tushirishda xatolik:", error);
+  }
+});

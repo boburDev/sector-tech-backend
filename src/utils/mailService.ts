@@ -1,7 +1,5 @@
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-import 'dotenv/config';
-dotenv.config();
+import { EMAIL_USER, EMAIL_PASS } from '../config/env';
 
 export const mailService = async (email: string, otp: string) => {
     try {
@@ -10,8 +8,8 @@ export const mailService = async (email: string, otp: string) => {
             port: 465,
             secure: true,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: EMAIL_USER,
+                pass: EMAIL_PASS,
             },
             logger: true,
             debug: true,
@@ -20,7 +18,7 @@ export const mailService = async (email: string, otp: string) => {
         await transporter.verify();
 
         const mailOptions = {
-            from: `"OTP Service" <${process.env.EMAIL_USER}>`,
+            from: `"OTP Service" <${EMAIL_USER}>`,
             to: email,
             subject: 'Your OTP Code',
             html: `<p style="font-size: 20px; font-weight: bold; background-color: red;">Your OTP code is: ${otp}</p>`

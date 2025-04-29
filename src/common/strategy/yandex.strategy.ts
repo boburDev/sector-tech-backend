@@ -1,15 +1,13 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
 import passport from "passport";
 import { Strategy as YandexStrategy } from "passport-yandex";
+import { YANDEX_CLIENT_ID, YANDEX_CLIENT_SECRET, YANDEX_CALLBACK_URL } from "../../config/env";
 
 passport.use(
   new YandexStrategy(
     {
-      clientID: process.env.YANDEX_CLIENT_ID as string,
-      clientSecret: process.env.YANDEX_CLIENT_SECRET as string,
-      callbackURL: process.env.YANDEX_CALLBACK_URL as string,
+      clientID: YANDEX_CLIENT_ID as string,
+      clientSecret: YANDEX_CLIENT_SECRET as string,
+      callbackURL: YANDEX_CALLBACK_URL as string,
     },
     (accessToken: string, refreshToken: string, profile: any, done) => {
       try {

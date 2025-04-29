@@ -1,7 +1,7 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import { Express } from "express";
-
+import { BASE_URL } from "./env";
 const createSwaggerConfig = (title: string, url: string, apis: string[]) => ({
   definition: {
     openapi: "3.0.0",
@@ -27,7 +27,7 @@ const createSwaggerConfig = (title: string, url: string, apis: string[]) => ({
   apis,
 });
 
-const baseUrl = process.env.BASE_URL || "localhost:4000/"
+const baseUrl = BASE_URL || "localhost:4000/"
 
 const userSwaggerSpec = swaggerJSDoc(
   createSwaggerConfig("User API", baseUrl, [

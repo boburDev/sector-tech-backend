@@ -126,7 +126,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id: userId } = req.user;
-    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price, name, limit, page } = req.query;
+    const { last, kontragentName, orderPriceStatus, orderDeleveryType, orderType, periodStart, periodEnd, orderNumber, price, limit, page } = req.query;
 
     if (last === "true") {
       const lastOrder = await orderRepo.findOne({
@@ -152,6 +152,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           agentId: true,
           products: true,
           createdAt: true,
+          orderDeleveryType: true,
           user: {
             id: true,
             name: true,
@@ -246,7 +247,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
 
     const where: any = { userId, deletedAt: IsNull() };
-    let orderBy: any = { createdAt: "DESC" };
+    let orderBy: any = {};
 
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
@@ -283,10 +284,8 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       orderBy.total = "DESC";
     }
 
-    if (name === "asc") {
-      orderBy.kontragentName = "ASC";
-    } else if (name === "desc") {
-      orderBy.kontragentName = "DESC";
+    if (Object.keys(orderBy).length === 0) {
+      orderBy.createdAt = "DESC";
     }
 
     const orders = await orderRepo.find({
@@ -312,6 +311,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         kontragentName: true,
         agentId: true,
         products: true,
+        orderDeleveryType: true,
         createdAt: true,
         user: {
           id: true,
@@ -444,6 +444,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
         contrAgentId: true,
         agentId: true,
         products: true,
+        orderDeleveryType: true,
         user: {
           id: true,
           name: true,

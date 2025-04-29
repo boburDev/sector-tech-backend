@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv';
-import 'dotenv/config';
-dotenv.config();
-const secretKey: string = String(process.env.JWT_SECRET)
-const secretKeyUser: string = String(process.env.JWT_SECRET_USER)
+import { JWT_SECRET, JWT_SECRET_USER } from '../config/env';
+
+const secretKey: string = String(JWT_SECRET)
+const secretKeyUser: string = String(JWT_SECRET_USER)
 
 // 60sec * 60min * 24hour = 1d   
 function sign(payload: any, expireTime: number = 60 * 60 * 24, role?: string) {
