@@ -89,6 +89,11 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     const orderNumber = generateOrderNumber();
 
+    const now = new Date();
+    const validStartDate = now;
+    const validEndDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+
     const newOrder = orderRepo.create({
       orderNumber,
       agentId: agentId || null,
@@ -105,7 +110,9 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       paymentMethod: paymentMethod || null,
       orderType: "new",
       orderPriceStatus: "Не оплачен",
-      products: productItems
+      products: productItems,
+      validStartDate,
+      validEndDate
     });
 
     const savedOrder = await orderRepo.save(newOrder);
@@ -246,7 +253,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
 
     const where: any = { userId, deletedAt: IsNull() };
-    let orderBy: any = { createdAt: "DESC" };
+    let orderBy: any = { };
 
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
@@ -288,6 +295,10 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     } else if (name === "desc") {
       orderBy.kontragentName = "DESC";
     } 
+
+    if (Object.keys(orderBy).length === 0) {
+      orderBy.createdAt = "DESC";
+    }
 
     const orders = await orderRepo.find({
       relations: ["user"],
