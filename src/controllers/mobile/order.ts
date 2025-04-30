@@ -7,7 +7,7 @@ import { KontragentAddress } from "../../entities/kontragent_addresses.entity";
 import { Users } from "../../entities/user.entity";
 import { CustomError } from "../../error-handling/error-handling";
 import { Garantee } from "../../entities/garantee.entity";
-import { Between, ILike, In, IsNull, Not } from "typeorm";
+import { Between, ILike, In, IsNull } from "typeorm";
 import { generateOrderNumber } from "../../utils/generate-order-number";
 const orderRepo = AppDataSource.getRepository(Order);
 const productRepo = AppDataSource.getRepository(Product);
@@ -89,6 +89,11 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     const orderNumber = generateOrderNumber();
 
+    const now = new Date();
+    const validStartDate = now;
+    const validEndDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+
     const newOrder = orderRepo.create({
       orderNumber,
       agentId: agentId || null,
@@ -105,7 +110,9 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       paymentMethod: paymentMethod || null,
       orderType: "new",
       orderPriceStatus: "Не оплачен",
-      products: productItems
+      products: productItems,
+      validStartDate,
+      validEndDate
     });
 
     const savedOrder = await orderRepo.save(newOrder);
@@ -210,6 +217,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 
       const products = await productRepo.find({
         where: { id: In(productIds) },
+        relations: ["category", "subcatalog", "catalog"],
         select: {
           id: true,
           slug: true,
@@ -217,6 +225,15 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           price: true,
           productCode: true,
           mainImage: true,
+          category: {
+            slug: true,
+          },
+          subcatalog: {
+            slug: true,
+          },
+          catalog: {
+            slug: true,
+          },
         }
       });
 
@@ -247,7 +264,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
 
     const where: any = { userId, deletedAt: IsNull() };
-    let orderBy: any = {};
+    let orderBy: any = { };
 
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
@@ -368,6 +385,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       }),
       productRepo.find({
         where: { id: In(orders.flatMap(order => order.products.map(product => product.productId))) },
+        relations: ["category", "subcatalog", "catalog"],
         select: {
           id: true,
           slug: true,
@@ -375,6 +393,15 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           price: true,
           productCode: true,
           mainImage: true,
+          category: {
+            slug: true,
+          },
+          subcatalog: {
+            slug: true,
+          },
+          catalog: {
+            slug: true,
+          },
         }
       })
     ]);
@@ -423,7 +450,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
     const { id: userId } = req.user;
 
     const order = await orderRepo.findOne({
-      where: { id, userId },
+      where: { id, userId, deletedAt: IsNull() },
       relations: ["user"],
       select: {
         id: true,
@@ -498,6 +525,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 
     const products = await productRepo.find({
       where: { id: In(allProductIds) },
+      relations: ["category", "subcatalog", "catalog"],
       select: {
         id: true,
         slug: true,
@@ -505,7 +533,16 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
         price: true,
         productCode: true,
         mainImage: true,
-      }
+        category: {
+            slug: true,
+          },
+          subcatalog: {
+            slug: true,
+          },
+          catalog: {
+            slug: true,
+          },
+        }
     });
 
     const productMap = new Map(products.map(p => [p.id, p]));

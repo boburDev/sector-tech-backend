@@ -36,7 +36,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     if (!kontragent) throw new CustomError("Kontragent topilmadi", 404);
     if (!user) throw new CustomError("Foydalanuvchi topilmadi", 404);
     if (agentId && !agent) throw new CustomError("Agent (KontragentAddress) topilmadi", 404);
-    
+
     let totalPrice = 0;
     const errors: string[] = [];
     const productItems: any[] = [];
@@ -217,6 +217,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 
       const products = await productRepo.find({
         where: { id: In(productIds) },
+        relations: ["category", "subcatalog", "catalog"],
         select: {
           id: true,
           slug: true,
@@ -224,6 +225,15 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           price: true,
           productCode: true,
           mainImage: true,
+          category: {
+            slug: true,
+          },
+          subcatalog: {
+            slug: true,
+          },
+          catalog: {
+            slug: true,
+          },
         }
       });
 
@@ -375,6 +385,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
       }),
       productRepo.find({
         where: { id: In(orders.flatMap(order => order.products.map(product => product.productId))) },
+        relations: ["category", "subcatalog", "catalog"],
         select: {
           id: true,
           slug: true,
@@ -382,6 +393,15 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           price: true,
           productCode: true,
           mainImage: true,
+          category: {
+            slug: true,
+          },
+          subcatalog: {
+            slug: true,
+          },
+          catalog: {
+            slug: true,
+          },
         }
       })
     ]);
@@ -505,6 +525,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 
     const products = await productRepo.find({
       where: { id: In(allProductIds) },
+      relations: ["category", "subcatalog", "catalog"],
       select: {
         id: true,
         slug: true,
@@ -512,7 +533,16 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
         price: true,
         productCode: true,
         mainImage: true,
-      }
+        category: {
+            slug: true,
+          },
+          subcatalog: {
+            slug: true,
+          },
+          catalog: {
+            slug: true,
+          },
+        }
     });
 
     const productMap = new Map(products.map(p => [p.id, p]));
