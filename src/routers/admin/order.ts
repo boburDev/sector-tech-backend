@@ -66,6 +66,10 @@ const router = Router();
  *                 format: date-time
  *                 example: "2025-04-29T04:39:50.736Z"
  *                 description: Buyurtma amal qilish tugash vaqti
+ *               orderDeliveryType:
+ *                 type: string
+ *                 example: "Комплектуется"
+ *                 description: Yetkazib berish turi
  *     responses:
  *       200:
  *         description: Order muvaffaqiyatli yangilandi

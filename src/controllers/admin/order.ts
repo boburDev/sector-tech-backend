@@ -30,6 +30,7 @@ export const updateOrderForAdmin = async (req: Request, res: Response, next: Nex
             'paymentMethod',
             'orderPriceStatus',
             'deliveryMethod',
+            'orderDeliveryType',
             'comment',
             'validStartDate',
             'validEndDate',
