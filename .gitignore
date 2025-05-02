@@ -129,12 +129,3 @@ logs/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-public/banners
-public/categories
-public/products
-public/descImages
-public/promotions
-public/shopnag
-public/brands
-public/news
- 
