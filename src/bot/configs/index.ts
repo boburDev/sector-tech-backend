@@ -14,9 +14,6 @@ const userRequests: Map<number, number[]> = new Map();
 
 bot.use(async (ctx, next) => {
     if (!ctx.chat) return next();
-    console.log(ctx.chat);
-    
-
     const userId = ctx.chat.id;
     const currentTime = Date.now();
 
@@ -34,7 +31,6 @@ bot.use(async (ctx, next) => {
 
     userRequests.set(userId, timestamps);
     await next();
-    console.log(1);
 });
 
 bot.use(session());
