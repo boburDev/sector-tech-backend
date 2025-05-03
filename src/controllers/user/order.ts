@@ -606,3 +606,45 @@ export const cancelOrder = async (req: Request, res: Response, next: NextFunctio
     next(error);
   }
 };
+
+export const dublicateOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const { id: userId } = req.user;
+
+    const existingOrder = await orderRepo.findOne({
+      where: { id, userId, deletedAt: IsNull() }
+    });
+
+    if (!existingOrder) {
+      throw new CustomError("Buyurtma topilmadi", 404);
+    }
+
+    const now = new Date();
+    const validStartDate = now;
+    const validEndDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+    const { id: _, createdAt: __, updatedAt: ___, deletedAt: ____, orderNumber: _____, ...restOrder } = existingOrder;
+
+    const duplicatedOrder = orderRepo.create({
+      ...restOrder,
+      orderNumber: generateOrderNumber(),
+      orderType: "new",
+      orderPriceStatus: "Не оплачен",
+      validStartDate,
+      validEndDate
+    });
+
+    const savedOrder = await orderRepo.save(duplicatedOrder);
+
+    return res.status(201).json({
+      message: "Buyurtma muvaffaqiyatli nusxalandi",
+      data: savedOrder,
+      status: 201
+    });
+
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};

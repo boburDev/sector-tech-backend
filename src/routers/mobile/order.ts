@@ -222,4 +222,27 @@ router.get("/get-by-id/:id", validateUserToken, Order.getOrderById);
  */
 router.patch("/cancel/:id", validateUserToken, Order.cancelOrder);
 
+/**
+ * @swagger
+ * /mobile/orders/dublicate/{id}:
+ *   post:
+ *     summary: Buyurtmani nusxalash
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Buyurtma ID-si
+ *     responses:
+ *       200:
+ *         description: Buyurtma muvaffaqiyatli nusxalandi
+ *       404:
+ *         description: Buyurtma topilmadi
+ */         
+router.post("/dublicate/:id", validateUserToken, Order.dublicateOrder);
+
 export default router;
