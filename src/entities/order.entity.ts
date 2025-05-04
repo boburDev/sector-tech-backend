@@ -46,7 +46,7 @@ export class Order {
     @Column({ type: "varchar", nullable: true })
     kontragentName: string;
 
-    @Column({ type: "varchar" })
+    @Column({ type: "varchar", default: "not shipped" })
     orderDeleveryType: string;
 
     @Column({ type: "varchar" })
