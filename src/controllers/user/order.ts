@@ -109,7 +109,8 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       total: totalPrice,
       paymentMethod: paymentMethod || null,
       orderType: "new",
-      orderPriceStatus: "Не оплачен",
+      orderPriceStatus: "not paid",
+      orderDeleveryType: "not shipped",
       products: productItems,
       validStartDate,
       validEndDate
@@ -630,7 +631,7 @@ export const dublicateOrder = async (req: Request, res: Response, next: NextFunc
       ...restOrder,
       orderNumber: generateOrderNumber(),
       orderType: "new",
-      orderPriceStatus: "Не оплачен",
+      orderPriceStatus: "not paid",
       validStartDate,
       validEndDate
     });

@@ -25,8 +25,8 @@ export class Order {
     @Column({ nullable: true })
     comment: string;
 
-    @Column({ type: "varchar", default: "Самовывоз" })
-    deliveryMethod: string;
+    @Column({ type: "varchar" })
+    deliveryMethod: string; 
 
     @Column({ type: "varchar"})
     email: string;
@@ -46,10 +46,10 @@ export class Order {
     @Column({ type: "varchar", nullable: true })
     kontragentName: string;
 
-    @Column({ type: "varchar", default: "Не отгружен" })
+    @Column({ type: "varchar" })
     orderDeleveryType: string;
 
-    @Column({ type: "varchar", default: "Не оплачен"})
+    @Column({ type: "varchar" })
     orderPriceStatus: string;
 
     @Column({ nullable: true })
