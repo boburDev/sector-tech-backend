@@ -649,7 +649,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       order,
       skip: offset,
       take: limitNumber,
-      relations: ['category', 'catalog'],
+      relations: ['category', 'catalog',"subcatalog"],
       select: { 
         id: true,
         title: true,
@@ -660,8 +660,10 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
         price: true,
         description: true,
         createdAt: true,
+        mainImage:true,
         category: { id: true, slug: true, title: true },
         catalog: { id: true, slug: true, title: true },
+        subcatalog: { id: true, slug: true, title: true },
       },
     });
 
@@ -677,20 +679,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             deletedAt: IsNull()
           },
           take: 100,
-          relations: ['category', 'catalog'],
+          relations: ['category', 'catalog',"subcatalog"],
           order: { createdAt: "DESC" },
           select: {
             id: true,
             title: true,
             articul: true,
             productCode: true,
+            inStock: true,
             slug: true,
             price: true,
-            inStock: true,
             description: true,
             createdAt: true,
+            mainImage:true,
             category: { id: true, slug: true, title: true },
             catalog: { id: true, slug: true, title: true },
+            subcatalog: { id: true, slug: true, title: true },
           },
         });
       } else if (products.length >= 5 && products.length <= 10) {
@@ -702,7 +706,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               deletedAt: IsNull()
             },
             take: 10,
-            relations: ['category', 'catalog'],
+             relations: ['category', 'catalog',"subcatalog"],
             order: { createdAt: "DESC" },
             select: {
               id: true,
@@ -710,12 +714,14 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               articul: true,
               productCode: true,
               inStock: true,
-              price:true,
               slug: true,
+              price: true,
               description: true,
               createdAt: true,
+              mainImage:true,
               category: { id: true, slug: true, title: true },
               catalog: { id: true, slug: true, title: true },
+              subcatalog: { id: true, slug: true, title: true },
             },
           });
           similarProducts.push(...similars);
@@ -730,20 +736,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               deletedAt: IsNull(),
             },
             take: 10,
-            relations: ['category', 'catalog'],
+            relations: ['category', 'catalog',"subcatalog"],
             order: { createdAt: "DESC" },
             select: {
               id: true,
               title: true,
               articul: true,
-              price: true,
-              slug: true,
               productCode: true,
               inStock: true,
+              slug: true,
+              price: true,
               description: true,
               createdAt: true,
+              mainImage:true,
               category: { id: true, slug: true, title: true },
               catalog: { id: true, slug: true, title: true },
+              subcatalog: { id: true, slug: true, title: true },
             },
           });
           similarProducts.push(...similars);
@@ -757,20 +765,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             deletedAt: IsNull()
           },
           take: 300,
-          relations: ['category', 'catalog'],
+          relations: ['category', 'catalog',"subcatalog"],
           order: { createdAt: "DESC" },
           select: {
             id: true,
             title: true,
             articul: true,
-            price: true,
-            slug: true,
             productCode: true,
             inStock: true,
+            slug: true,
+            price: true,
             description: true,
             createdAt: true,
+            mainImage:true,
             category: { id: true, slug: true, title: true },
             catalog: { id: true, slug: true, title: true },
+            subcatalog: { id: true, slug: true, title: true },
           },
         });
       }
