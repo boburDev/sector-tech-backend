@@ -805,20 +805,28 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     // GroupedByCatalog hosil qilish
     const catalogMap = new Map<string, {
       catalogName: string;
+      catalogSlug: string;
       productCodes: string[];
-      categories: Map<string, { categoryName: string; productCodes: string[] }>;
+      categories: Map<string, {
+        categoryName: string;
+        categorySlug: string;
+        productCodes: string[];
+      }>;
     }>();
 
     uniqueMergedProducts.forEach((product) => {
       if (!product.catalog || !product.category) return;
 
       const catalogTitle = product.catalog.title;
+      const catalogSlug = product.catalog.slug;
       const categoryTitle = product.category.title;
+      const categorySlug = product.category.slug;
       const productCode = product.productCode;
 
       if (!catalogMap.has(catalogTitle)) {
         catalogMap.set(catalogTitle, {
           catalogName: catalogTitle,
+          catalogSlug: catalogSlug,
           productCodes: [],
           categories: new Map()
         });
@@ -830,6 +838,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       if (!catalogGroup.categories.has(categoryTitle)) {
         catalogGroup.categories.set(categoryTitle, {
           categoryName: categoryTitle,
+          categorySlug: categorySlug,
           productCodes: []
         });
       }
@@ -840,6 +849,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
 
     const groupedByCatalog: any = Array.from(catalogMap.values()).map(catalog => ({
       catalogName: catalog.catalogName,
+      catalogSlug: catalog.catalogSlug,
       productCodes: catalog.productCodes,
       categories: Array.from(catalog.categories.values())
     }));
