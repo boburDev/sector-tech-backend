@@ -15,6 +15,7 @@ import filterRouter from "./filter";
 import kontragentAddressRouter from "./kontragent-addresses";
 import orderRouter from "./order";
 import newsRouter from "./news";
+import requestRouter from "./request";
 const router = express.Router();
 
 router.use("/auth", userRouter);
@@ -33,5 +34,7 @@ router.use("/filter", filterRouter)
 router.use("/kontragent-address", kontragentAddressRouter)
 router.use("/orders", orderRouter)
 router.use("/news", newsRouter)
+router.use("/request", requestRouter)
+
 
 export default router;

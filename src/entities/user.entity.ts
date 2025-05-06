@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 import { Cart, SavedProduct } from "./user_details.entity";
 import { Kontragent } from "./kontragent.entity";
 import { Order } from "./order.entity";
-
+import { RequestEntity } from "./requests.entity";
 @Entity()
 export class Users {
   @PrimaryGeneratedColumn("uuid")
@@ -40,6 +40,10 @@ export class Users {
 
   @OneToMany(() => Order, (order) => order.user)
   order: Order[];
+
+  @OneToMany(() => RequestEntity, (request) => request.user)
+  requests: RequestEntity[];
+
 
 
   @BeforeInsert()

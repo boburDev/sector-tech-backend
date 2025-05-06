@@ -2,7 +2,7 @@ import multer, { FileFilterCallback, StorageEngine } from 'multer';
 import fs from 'fs';
 
 const photo = ["image/jpeg", "image/png", "image/gif","image/webp"];    
-const fields = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage', 'coverImage', 'promotionBannerImage', 'promotionDescriptionImages', "newsFullDescriptionImages"];
+const fields = ['logo', 'categoryImage', 'productImages', 'fullDescriptionImages', 'bannerImage', 'productMainImage', 'coverImage', 'promotionBannerImage', 'promotionDescriptionImages', "newsFullDescriptionImages", "imageRequest"];
 
 const storage: StorageEngine = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -23,6 +23,8 @@ const storage: StorageEngine = multer.diskStorage({
                 uploadPath += '/promotions'
             } else if (file.fieldname == 'newsFullDescriptionImages') {
                 uploadPath += '/news'
+            } else if (file.fieldname == 'imageRequest') {
+                uploadPath += '/requests'
             } else {
                 throw new Error("Invalid Type or fieldName");
             }

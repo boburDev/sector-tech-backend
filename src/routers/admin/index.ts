@@ -13,6 +13,7 @@ import garanteeRouter from "./garantee"
 import fetchDataRouter from "./fetch_data"
 import orderRouter from "./order"
 import newsRouter from "./news"
+import requestRouter from "./request"
 const router = express.Router();
 
 router.use('/admin', adminRouter)
@@ -29,5 +30,5 @@ router.use("/garantee", garanteeRouter)
 router.use("/fetch-data", fetchDataRouter)
 router.use("/orders", orderRouter);
 router.use("/news", newsRouter);
-
+router.use("/request", requestRouter);
 export default router

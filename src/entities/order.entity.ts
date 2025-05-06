@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn, OneToMany } from "typeorm";
 import { Users } from "./user.entity";
 import { Admin } from "./admin.entity";
+import { RequestEntity } from "./requests.entity";
 
 @Entity()
 export class Order {
@@ -92,4 +93,7 @@ export class Order {
     @ManyToOne(() => Admin)
     @JoinColumn({ name: "adminId" })
     admin: Admin;
+
+    @OneToMany(() => RequestEntity, (request) => request.order)
+    requests: RequestEntity[];
 }

@@ -680,7 +680,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
           },
           take: 100,
           relations: ['category', 'catalog',"subcatalog"],
-          order: { createdAt: "DESC" },
+          order: order,
           select: {
             id: true,
             title: true,
@@ -707,7 +707,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             },
             take: 10,
              relations: ['category', 'catalog',"subcatalog"],
-            order: { createdAt: "DESC" },
+            order: order,
             select: {
               id: true,
               title: true,
@@ -737,7 +737,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             },
             take: 10,
             relations: ['category', 'catalog',"subcatalog"],
-            order: { createdAt: "DESC" },
+            order: order,
             select: {
               id: true,
               title: true,
@@ -766,7 +766,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
           },
           take: 300,
           relations: ['category', 'catalog',"subcatalog"],
-          order: { createdAt: "DESC" },
+          order: order,
           select: {
             id: true,
             title: true,

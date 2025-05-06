@@ -649,17 +649,21 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       order,
       skip: offset,
       take: limitNumber,
-      relations: ['category', 'catalog'],
+      relations: ['category', 'catalog',"subcatalog"],
       select: { 
         id: true,
         title: true,
         articul: true,
         productCode: true,
         inStock: true,
+        slug: true,
+        price: true,
         description: true,
         createdAt: true,
+        mainImage:true,
         category: { id: true, slug: true, title: true },
         catalog: { id: true, slug: true, title: true },
+        subcatalog: { id: true, slug: true, title: true },
       },
     });
 
@@ -675,18 +679,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             deletedAt: IsNull()
           },
           take: 100,
-          relations: ['category', 'catalog'],
-          order: { createdAt: "DESC" },
+          relations: ['category', 'catalog',"subcatalog"],
+          order: order,
           select: {
             id: true,
             title: true,
             articul: true,
             productCode: true,
             inStock: true,
+            slug: true,
+            price: true,
             description: true,
             createdAt: true,
+            mainImage:true,
             category: { id: true, slug: true, title: true },
             catalog: { id: true, slug: true, title: true },
+            subcatalog: { id: true, slug: true, title: true },
           },
         });
       } else if (products.length >= 5 && products.length <= 10) {
@@ -698,18 +706,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               deletedAt: IsNull()
             },
             take: 10,
-            relations: ['category', 'catalog'],
-            order: { createdAt: "DESC" },
+             relations: ['category', 'catalog',"subcatalog"],
+            order: order,
             select: {
               id: true,
               title: true,
               articul: true,
               productCode: true,
               inStock: true,
+              slug: true,
+              price: true,
               description: true,
               createdAt: true,
+              mainImage:true,
               category: { id: true, slug: true, title: true },
               catalog: { id: true, slug: true, title: true },
+              subcatalog: { id: true, slug: true, title: true },
             },
           });
           similarProducts.push(...similars);
@@ -724,18 +736,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               deletedAt: IsNull(),
             },
             take: 10,
-            relations: ['category', 'catalog'],
-            order: { createdAt: "DESC" },
+            relations: ['category', 'catalog',"subcatalog"],
+            order: order,
             select: {
               id: true,
               title: true,
               articul: true,
               productCode: true,
               inStock: true,
+              slug: true,
+              price: true,
               description: true,
               createdAt: true,
+              mainImage:true,
               category: { id: true, slug: true, title: true },
               catalog: { id: true, slug: true, title: true },
+              subcatalog: { id: true, slug: true, title: true },
             },
           });
           similarProducts.push(...similars);
@@ -749,18 +765,22 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             deletedAt: IsNull()
           },
           take: 300,
-          relations: ['category', 'catalog'],
-          order: { createdAt: "DESC" },
+          relations: ['category', 'catalog',"subcatalog"],
+          order: order,
           select: {
             id: true,
             title: true,
             articul: true,
             productCode: true,
             inStock: true,
+            slug: true,
+            price: true,
             description: true,
             createdAt: true,
+            mainImage:true,
             category: { id: true, slug: true, title: true },
             catalog: { id: true, slug: true, title: true },
+            subcatalog: { id: true, slug: true, title: true },
           },
         });
       }
@@ -785,20 +805,28 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     // GroupedByCatalog hosil qilish
     const catalogMap = new Map<string, {
       catalogName: string;
+      catalogSlug: string;
       productCodes: string[];
-      categories: Map<string, { categoryName: string; productCodes: string[] }>;
+      categories: Map<string, {
+        categoryName: string;
+        categorySlug: string;
+        productCodes: string[];
+      }>;
     }>();
 
     uniqueMergedProducts.forEach((product) => {
       if (!product.catalog || !product.category) return;
 
       const catalogTitle = product.catalog.title;
+      const catalogSlug = product.catalog.slug;
       const categoryTitle = product.category.title;
+      const categorySlug = product.category.slug;
       const productCode = product.productCode;
 
       if (!catalogMap.has(catalogTitle)) {
         catalogMap.set(catalogTitle, {
           catalogName: catalogTitle,
+          catalogSlug: catalogSlug,
           productCodes: [],
           categories: new Map()
         });
@@ -810,6 +838,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       if (!catalogGroup.categories.has(categoryTitle)) {
         catalogGroup.categories.set(categoryTitle, {
           categoryName: categoryTitle,
+          categorySlug: categorySlug,
           productCodes: []
         });
       }
@@ -820,6 +849,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
 
     const groupedByCatalog: any = Array.from(catalogMap.values()).map(catalog => ({
       catalogName: catalog.catalogName,
+      catalogSlug: catalog.catalogSlug,
       productCodes: catalog.productCodes,
       categories: Array.from(catalog.categories.values())
     }));
