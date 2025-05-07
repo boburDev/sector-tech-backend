@@ -531,5 +531,44 @@ router.delete('/delete-saved', validateUserToken, Product.deleteSavedByUserId);
  *         description: Internal server error
  */
 router.get('/search', Product.getSearchProducts);
-    
+
+/**
+ * @swagger
+ * /user/product/search-by-codes/{subcatalogSlug}/{categorySlug}:
+ *   get:
+ *     summary: Get products by productCodes in query
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: subcatalogSlug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Subcatalog slug
+ *       - in: path
+ *         name: categorySlug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Category slug
+ *       - in: query
+ *         name: search
+ *         required: true
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         style: form
+ *         explode: true
+ *         description: Array of product codes
+ *     responses:
+ *       200:
+ *         description: Products matching codes
+ *       400:
+ *         description: Missing or invalid parameters
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/search-by-codes/:subcatalogSlug/:categorySlug', Product.getSearchProductsByCodes);
+
 export default router;

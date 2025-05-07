@@ -13,8 +13,8 @@ export class News {
   @Column("text")
   fullDescription: string;
 
-  @Column({ type: "varchar", nullable: true })
-  fullDescriptionImages?: string[];
+  @Column("json", { nullable: true })
+  fullDescriptionImages?: string[];  
 
   @Column()
   slug: string;

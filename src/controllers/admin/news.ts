@@ -4,7 +4,6 @@ import { News } from "../../entities/news.entity";
 import { createSlug } from "../../utils/slug";
 import { CustomError } from "../../error-handling/error-handling";
 import { IsNull } from "typeorm";
-import { deleteFileBeforeSave } from "../../middlewares/removeFiltePath";
 import normalizePaths from "../../utils/normalize-path";
 
 const newsRepository = AppDataSource.getRepository(News);
@@ -51,7 +50,6 @@ export const updateNews = async (req: Request, res: Response, next: NextFunction
         if (!news) throw new CustomError("News not found", 404);
 
         if (fullDescriptionImages.length > 0) {
-            news.fullDescriptionImages?.forEach(image => deleteFileBeforeSave(image));
             news.fullDescriptionImages = fullDescriptionImages;
         }
 
@@ -92,7 +90,7 @@ export const deleteNews = async (req: Request, res: Response, next: NextFunction
 
 export const getAllNews = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const news = await newsRepository.find({ where: { deletedAt: IsNull() } });
+        const news = await newsRepository.find({ where: { deletedAt: IsNull() }, order: { createdAt: "DESC" } });
 
         return res.status(200).json({
             status: 200,
