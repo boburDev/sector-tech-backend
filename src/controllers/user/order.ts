@@ -139,7 +139,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     if (last === "true") {
       const lastOrder = await orderRepo.findOne({
         where: { userId, deletedAt: IsNull() },
-        relations: ["user"],
+        relations: ["user","requests"],
         order: { createdAt: "DESC" },
         select: {
           id: true,
@@ -166,6 +166,19 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
             name: true,
             phone: true,
             email: true,
+          },
+          requests: {
+            id: true,
+            fullName: true,
+            topicCategory: true,
+            topic: true,
+            createdAt: true,
+            email: true,
+            messages: true,
+            orderNumber: true,
+            status: true,
+            requestNumber: true,
+            orderId: true
           }
         }
       });
@@ -307,7 +320,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
 
     const orders = await orderRepo.find({
-      relations: ["user"],
+      relations: ["user","requests"],
       where,
       order: orderBy,
       select: {
@@ -336,6 +349,19 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           name: true,
           phone: true,
           email: true,
+        },
+        requests: {
+          id: true,
+          fullName: true,
+          topicCategory: true,
+          topic: true,
+          createdAt: true,
+          email: true,
+          messages: true,
+          orderNumber: true,
+          status: true,
+          requestNumber: true,
+          orderId: true
         }
       },
       skip: offset,
@@ -452,7 +478,7 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 
     const order = await orderRepo.findOne({
       where: { id, userId, deletedAt: IsNull() },
-      relations: ["user"],
+      relations: ["user", "requests"],
       select: {
         id: true,
         orderNumber: true,
@@ -478,6 +504,19 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
           name: true,
           phone: true,
           email: true,
+        },
+        requests: {
+          id: true,
+          fullName: true,
+          topicCategory: true,
+          topic: true,
+          createdAt: true,
+          email: true,
+          messages: true,
+          orderNumber: true,
+          status: true,
+          requestNumber: true,
+          orderId: true
         }
       }
     });
@@ -600,48 +639,6 @@ export const cancelOrder = async (req: Request, res: Response, next: NextFunctio
       data: updatedOrder,
       error: null,
       status: 200
-    });
-
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-};
-
-export const dublicateOrder = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-  try {
-    const { id } = req.params;
-    const { id: userId } = req.user;
-
-    const existingOrder = await orderRepo.findOne({
-      where: { id, userId, deletedAt: IsNull() }
-    });
-
-    if (!existingOrder) {
-      throw new CustomError("Buyurtma topilmadi", 404);
-    }
-
-    const now = new Date();
-    const validStartDate = now;
-    const validEndDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-
-    const { id: _, createdAt: __, updatedAt: ___, deletedAt: ____, orderNumber: _____, ...restOrder } = existingOrder;
-
-    const duplicatedOrder = orderRepo.create({
-      ...restOrder,
-      orderNumber: generateOrderNumber(),
-      orderType: "new",
-      orderPriceStatus: "not paid",
-      validStartDate,
-      validEndDate
-    });
-
-    const savedOrder = await orderRepo.save(duplicatedOrder);
-
-    return res.status(201).json({
-      message: "Buyurtma muvaffaqiyatli nusxalandi",
-      data: savedOrder,
-      status: 201
     });
 
   } catch (error) {

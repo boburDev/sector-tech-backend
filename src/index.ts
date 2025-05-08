@@ -1,4 +1,4 @@
-import bot from "./bot";
+// import bot from "./bot";
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
@@ -87,8 +87,8 @@ server.listen(PORT, () => {
   console.log(`Mobile Swagger docs at http://localhost:${PORT}/mobile-docs`);
     
   try {
-    bot.launch();
-    console.log("Bot ishga tushdi!");
+    // bot.launch();
+    // console.log("Bot ishga tushdi!");
   } catch (error) {
     console.error("❌ Botni ishga tushirishda xatolik:", error);
   }

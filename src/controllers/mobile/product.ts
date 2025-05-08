@@ -803,56 +803,63 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     const paginatedProducts = uniqueMergedProducts.slice(offset, offset + limitNumber);
 
     // GroupedByCatalog hosil qilish
-    const catalogMap = new Map<string, {
-      catalogName: string;
-      catalogSlug: string;
-      productCodes: string[];
-      categories: Map<string, {
-        categoryName: string;
-        categorySlug: string;
-        productCodes: string[];
-      }>;
-    }>();
+// Yangi structure bilan grouping
+    const catalogMap = new Map();
 
     uniqueMergedProducts.forEach((product) => {
-      if (!product.catalog || !product.category) return;
+      const { catalog, subcatalog, category, productCode } = product;
+      if (!catalog || !subcatalog || !category) return;
 
-      const catalogTitle = product.catalog.title;
-      const catalogSlug = product.catalog.slug;
-      const categoryTitle = product.category.title;
-      const categorySlug = product.category.slug;
-      const productCode = product.productCode;
-
-      if (!catalogMap.has(catalogTitle)) {
-        catalogMap.set(catalogTitle, {
-          catalogName: catalogTitle,
-          catalogSlug: catalogSlug,
+      if (!catalogMap.has(catalog.title)) {
+        catalogMap.set(catalog.title, {
+          catalogName: catalog.title,
+          catalogSlug: catalog.slug,
           productCodes: [],
-          categories: new Map()
+          subcatalogs: new Map()
         });
       }
 
-      const catalogGroup = catalogMap.get(catalogTitle)!;
-      catalogGroup.productCodes.push(productCode);
+    const catalogGroup = catalogMap.get(catalog.title);
+    catalogGroup.productCodes.push(productCode);
 
-      if (!catalogGroup.categories.has(categoryTitle)) {
-        catalogGroup.categories.set(categoryTitle, {
-          categoryName: categoryTitle,
-          categorySlug: categorySlug,
-          productCodes: []
-        });
-      }
+    if (!catalogGroup.subcatalogs.has(subcatalog.title)) {
+    catalogGroup.subcatalogs.set(subcatalog.title, {
+      subcatalogName: subcatalog.title,
+      subcatalogSlug: subcatalog.slug,
+      categories: new Map()
+      });
+    }
 
-      const categoryGroup = catalogGroup.categories.get(categoryTitle)!;
-      categoryGroup.productCodes.push(productCode);
+    const subcatalogGroup = catalogGroup.subcatalogs.get(subcatalog.title);
+
+    if (!subcatalogGroup.categories.has(category.title)) {
+    subcatalogGroup.categories.set(category.title, {
+      categoryName: category.title,
+      categorySlug: category.slug,
+      productCodes: []
     });
+  }
 
-    const groupedByCatalog: any = Array.from(catalogMap.values()).map(catalog => ({
+    const categoryGroup = subcatalogGroup.categories.get(category.title);
+    categoryGroup.productCodes.push(productCode);
+  });
+
+  // Final array conversion
+    const groupedByCatalog = Array.from(catalogMap.values()).map(catalog => ({
       catalogName: catalog.catalogName,
       catalogSlug: catalog.catalogSlug,
       productCodes: catalog.productCodes,
-      categories: Array.from(catalog.categories.values())
+      subcatalogs: Array.from(catalog.subcatalogs.values()).map((sub: any) => ({
+        subcatalogName: sub.subcatalogName,
+        subcatalogSlug: sub.subcatalogSlug,
+        categories: Array.from(sub.categories.values()).map((cat: any) => ({
+          categoryName: cat.categoryName,
+          categorySlug: cat.categorySlug,
+          productCodes: cat.productCodes
+        }))
+      }))
     }));
+
 
     // Yuboriladigan natija
     return res.status(200).json({
