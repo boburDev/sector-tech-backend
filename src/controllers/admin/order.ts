@@ -186,3 +186,150 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         next(error);
     }
 };
+
+export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const { id } = req.params;
+
+      const order = await orderRepo.findOne({
+        where: { id, deletedAt: IsNull() },
+        relations: ["user", "requests"],
+        select: {
+          id: true,
+          orderNumber: true,
+          fullname: true,
+          phone: true,
+          email: true,
+          kontragentName: true,
+          city: true,
+          comment: true,
+          deliveryMethod: true,
+          paymentMethod: true,
+          total: true,
+          orderPriceStatus: true,
+          orderType: true,
+          validStartDate: true,
+          validEndDate: true,
+          contrAgentId: true,
+          agentId: true,
+          products: true,
+          orderDeleveryType: true,
+          user: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+          },
+          requests: {
+            id: true,
+            fullName: true,
+            topicCategory: true,
+            topic: true,
+            createdAt: true,
+            email: true,
+            messages: true,
+            orderNumber: true,
+            status: true,
+            requestNumber: true,
+            orderId: true
+          }
+        }
+      });
+  
+      if (!order) throw new CustomError("Order not found", 404);
+      order.watched = true;
+      await orderRepo.save(order);
+
+      const kontragentId = order.contrAgentId;
+      const agentId = order.agentId;
+  
+      const kontragent = kontragentId
+        ? await kontragentRepo.findOne({
+          where: { id: kontragentId },
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            inn: true,
+            pinfl: true,
+            countryOfRegistration: true,
+            oked: true,
+            legalAddress: true,
+            ownershipForm: true,
+          }
+        })
+        : null;
+  
+      const agent = agentId
+        ? await kontragentAddressRepo.findOne({
+          where: { id: agentId },
+          select: {
+            id: true,
+            apartment: true,
+            country: true,
+            district: true,
+            house: true,
+            street: true,
+            comment: true,
+            fullAddress: true,
+            index: true,
+            region: true,
+          }
+        })
+        : null;
+  
+      const allProductIds = order.products.map(product => product.productId);
+  
+      const products = await productRepo.find({
+        where: { id: In(allProductIds) },
+        relations: ["category", "subcatalog", "catalog"],
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          price: true,
+          productCode: true,
+          mainImage: true,
+          category: {
+              slug: true,
+            },
+            subcatalog: {
+              slug: true,
+            },
+            catalog: {
+              slug: true,
+            },
+          }
+      });
+  
+      const productMap = new Map(products.map(p => [p.id, p]));
+  
+      const updatedProducts = order.products.map(product => {
+        const productInfo = productMap.get(product.productId);
+        return {
+          ...product,
+          product: productInfo || null,
+        };
+      });
+  
+      const updatedOrder = {
+        ...order,
+        kontragent,
+        agent,
+        products: updatedProducts
+      };
+
+  
+      return res.status(200).json({
+        message: "Order fetched successfully",
+        data: updatedOrder,
+        error: null,
+        status: 200
+      });
+  
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+};
+  

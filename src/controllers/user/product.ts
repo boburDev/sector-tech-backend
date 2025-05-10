@@ -798,12 +798,9 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       return true;
     });
 
-    // total va pagination uchun uniqueMergedProducts ishlatamiz
     const totalProducts = uniqueMergedProducts.length;
     const paginatedProducts = uniqueMergedProducts.slice(offset, offset + limitNumber);
 
-    // GroupedByCatalog hosil qilish
-    // Yangi structure bilan grouping
     const catalogMap = new Map();
 
     uniqueMergedProducts.forEach((product) => {
