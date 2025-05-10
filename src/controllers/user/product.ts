@@ -844,10 +844,11 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       categoryGroup.productCodes.push(productCode);
     });
 
-    console.log(Array.from(Array.from(catalogMap.values())[0].subcatalogs.values())[0]);
+    const baseUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
     const groupedByCatalog: Catalog[] = Array.from(catalogMap.values()).map((catalog: any): Catalog => {
-      const catalogUrl = new URL('/catalog/' + catalog.catalogSlug);
+      const catalogUrl = new URL('/catalog/' + catalog.catalogSlug, baseUrl);
+    
       catalog.productCodes.forEach((code: string, index: number) => {
         catalogUrl.searchParams.append(`search[${index}]`, code);
       });
@@ -862,7 +863,8 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             subcatalogName: sub.subcatalogName,
             subcatalogSlug: sub.subcatalogSlug,
             categories: Array.from(sub.categories.values()).map((cat: any): Category => {
-              const categoryUrl = new URL('/catalog/' + sub.subcatalogSlug + '/' + cat.categorySlug);
+              const categoryUrl = new URL('/catalog/' + sub.subcatalogSlug + '/' + cat.categorySlug, baseUrl);
+    
               cat.productCodes.forEach((code: string, index: number) => {
                 categoryUrl.searchParams.append(`search[${index}]`, code);
               });
@@ -879,8 +881,6 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       };
     });
     
-    
-
     // Yuboriladigan natija
     return res.status(200).json({
       data: {
