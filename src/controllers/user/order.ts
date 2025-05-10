@@ -258,7 +258,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         return {
           ...product,
           product: productInfo || null,
-          productLink: productInfo ? `/product/${productInfo.slug}` : null
         };
       });
 
@@ -320,7 +319,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
 
     const orders = await orderRepo.find({
-      relations: ["user","requests"],
+      relations: ["user"],
       where,
       order: orderBy,
       select: {
@@ -350,19 +349,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
           phone: true,
           email: true,
         },
-        requests: {
-          id: true,
-          fullName: true,
-          topicCategory: true,
-          topic: true,
-          createdAt: true,
-          email: true,
-          messages: true,
-          orderNumber: true,
-          status: true,
-          requestNumber: true,
-          orderId: true
-        }
       },
       skip: offset,
       take: limitNumber
@@ -446,7 +432,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
         return {
           ...product,
           product: productInfo || null,
-          productLink: productInfo ? `/product/${productInfo.slug}` : null
         };
       });
 
@@ -592,7 +577,6 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
       return {
         ...product,
         product: productInfo || null,
-        productLink: productInfo ? `/product/${productInfo.slug}` : null
       };
     });
 
