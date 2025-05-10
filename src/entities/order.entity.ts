@@ -53,6 +53,9 @@ export class Order {
     @Column({ type: "varchar" })
     orderPriceStatus: string;
 
+    @Column({ type: "boolean", default: false })
+    watched: boolean
+
     @Column({ nullable: true })
     paymentMethod: string;
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { updateOrderForAdmin, getAllOrders } from "../../controllers/admin/order";
+import { updateOrderForAdmin, getAllOrders, getOrderById } from "../../controllers/admin/order";
 import { validateAdminToken } from "../../middlewares/adminValidator";
 
 const router = Router();
@@ -129,5 +129,28 @@ router.patch("/update/:id", validateAdminToken, updateOrderForAdmin);
  */
 router.get("/all", validateAdminToken, getAllOrders);
 
+/**
+ * @swagger
+ * /orders/get-by-id/{id}:
+ *   get:
+ *     summary: Foydalanuvchining bitta buyurtmasini olish
+ *     description: Buyurtma ID-si bo'yicha foydalanuvchining buyurtmasi olinadi.
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Buyurtma ID-si
+ *     responses:
+ *       200:
+ *         description: Buyurtma muvaffaqiyatli olindi
+ *       404:
+ *         description: Buyurtma topilmadi
+ */
+router.get('/get-by-id/:id', validateAdminToken, getOrderById)
 
 export default router;
