@@ -8,6 +8,32 @@ const newsRepository = AppDataSource.getRepository(News);
 
 export const getAllNews = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+        const { home } = req.query;
+        if(home){
+            const news = await newsRepository.find({
+                where: { deletedAt: IsNull() },
+                order: {
+                    createdAt: "DESC"
+                },
+                take: 2,
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    fullDescription: true,
+                    fullDescriptionImages: true,
+                    slug: true,
+                    createdAt: true
+                }
+            });
+    
+            return res.status(200).json({
+                status: 200,
+                message: "News retrieved successfully",
+                data: news
+            });
+        }
+        
         const news = await newsRepository.find({
             where: { deletedAt: IsNull() },
             order: {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { IsNull } from 'typeorm';
+import { ILike, IsNull } from 'typeorm';
 import AppDataSource from '../../config/ormconfig';
 import { RequestEntity } from '../../entities/requests.entity';
 import { CustomError } from '../../error-handling/error-handling';
@@ -62,8 +62,8 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
 
     const where: any = { deletedAt: IsNull() };
     if (status) where.status = status;
-    if (topic) where.topic = topic;
-     where.userId = userId;
+    if (topic) where.topic = ILike(`%${topic}%`);
+    where.userId = userId;
 
     const pageNumber = parseInt(page as string);
     const limitNumber = parseInt(limit as string);

@@ -12,10 +12,16 @@ const router = Router();
 
 /**
  * @swagger
- * /mobile/news/all:
+ * /user/news/all:
  *   get:
  *     summary: Get all news
  *     tags: [News]
+ *     parameters:
+ *       - in: query
+ *         name: home
+ *         schema:
+ *           type: boolean
+ *         description: Agar home true bo‘lsa, faqat 2 ta yangilik qaytariladi
  *     responses:
  *       200:
  *         description: A list of news
