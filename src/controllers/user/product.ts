@@ -15,7 +15,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
   try {
     const { recommended, condition, revalance, popular, limit = 12 } = req.query;
     if (typeof limit != 'number') throw new CustomError('Limit must be number', 400);
-    
+
     const whereCondition: any = { deletedAt: IsNull() };
 
     const conditionMapping: Record<string, string> = {
@@ -96,7 +96,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export const getProductById = async (req: Request,res: Response, next: NextFunction): Promise<any> => {
+export const getProductById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { slug } = req.params;
     const product = await productRepository.findOne({
@@ -187,7 +187,7 @@ export const getProductById = async (req: Request,res: Response, next: NextFunct
   }
 };
 
-export const toggleSaved = async (req: Request,res: Response, next: NextFunction): Promise<any> => {
+export const toggleSaved = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { productId } = req.body;
     const { id: userId } = req.user;
@@ -201,7 +201,7 @@ export const toggleSaved = async (req: Request,res: Response, next: NextFunction
 
     if (existingSaved) {
       await savedProductRepository.remove(existingSaved);
-      return res.status(200).json({ id:existingSaved.id, message: "Product removed from saved." });
+      return res.status(200).json({ id: existingSaved.id, message: "Product removed from saved." });
     }
 
     const newSavedProduct = savedProductRepository.create({
@@ -210,7 +210,7 @@ export const toggleSaved = async (req: Request,res: Response, next: NextFunction
     });
 
     await savedProductRepository.save(newSavedProduct);
-    return res.status(201).json({ id:newSavedProduct.id, message: "Product saved successfully." });
+    return res.status(201).json({ id: newSavedProduct.id, message: "Product saved successfully." });
   } catch (error) {
     next(error);
   }
@@ -245,16 +245,16 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
             slug: true,
             title: true,
           },
-          subcatalog: { 
+          subcatalog: {
             id: true,
             slug: true,
             title: true,
           },
           category: {
-            id: true, 
+            id: true,
             slug: true,
             title: true,
-          },  
+          },
           relevances: {
             id: true,
             slug: true,
@@ -269,7 +269,7 @@ export const getUserSavedProducts = async (req: Request, res: Response, next: Ne
             id: true,
             slug: true,
             title: true,
-          },  
+          },
         },
       },
     });
@@ -301,7 +301,7 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
 
     // 🔍 Katalog yoki subkatalog aniqlash
     if (typeof slug === "string") {
-      const numericPrefix = parseInt(slug.split('.')[0]); 
+      const numericPrefix = parseInt(slug.split('.')[0]);
 
       if (!isNaN(numericPrefix)) {
         if (numericPrefix < 100) {
@@ -514,7 +514,7 @@ export const toggleCart = async (req: Request, res: Response, next: NextFunction
     const { productId } = req.body;
     const { id: userId } = req.user;
     const { count } = req.query;
-    
+
     const existingCartItem = await cartProductRepository.findOne({
       where: {
         userId,
@@ -558,9 +558,9 @@ export const deleteCartByUserId = async (req: Request, res: Response, next: Next
 export const deleteSavedByUserId = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.user;
-    await savedProductRepository.delete({ userId: id });  
+    await savedProductRepository.delete({ userId: id });
     const saved = await savedProductRepository.find({ where: { userId: id } });
-    if(saved.length > 0) {
+    if (saved.length > 0) {
       return res.status(400).json({ message: "Saved already deleted", error: null, status: 400 });
     }
     return res.status(200).json({ message: "Saved deleted successfully", error: null, status: 200 });
@@ -569,7 +569,7 @@ export const deleteSavedByUserId = async (req: Request, res: Response, next: Nex
   }
 }
 
-export const updateOrAddAmountToCart = async ( req: Request, res: Response,next: NextFunction ): Promise<any> => {
+export const updateOrAddAmountToCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { productId, count } = req.body;
     const { id: userId } = req.user;
@@ -649,8 +649,8 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       order,
       skip: offset,
       take: limitNumber,
-      relations: ['category', 'catalog',"subcatalog"],
-      select: { 
+      relations: ['category', 'catalog', "subcatalog"],
+      select: {
         id: true,
         title: true,
         articul: true,
@@ -660,7 +660,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
         price: true,
         description: true,
         createdAt: true,
-        mainImage:true,
+        mainImage: true,
         category: { id: true, slug: true, title: true },
         catalog: { id: true, slug: true, title: true },
         subcatalog: { id: true, slug: true, title: true },
@@ -679,7 +679,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             deletedAt: IsNull()
           },
           take: 100,
-          relations: ['category', 'catalog',"subcatalog"],
+          relations: ['category', 'catalog', "subcatalog"],
           order: order,
           select: {
             id: true,
@@ -691,7 +691,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             price: true,
             description: true,
             createdAt: true,
-            mainImage:true,
+            mainImage: true,
             category: { id: true, slug: true, title: true },
             catalog: { id: true, slug: true, title: true },
             subcatalog: { id: true, slug: true, title: true },
@@ -706,7 +706,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               deletedAt: IsNull()
             },
             take: 10,
-             relations: ['category', 'catalog',"subcatalog"],
+            relations: ['category', 'catalog', "subcatalog"],
             order: order,
             select: {
               id: true,
@@ -718,7 +718,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               price: true,
               description: true,
               createdAt: true,
-              mainImage:true,
+              mainImage: true,
               category: { id: true, slug: true, title: true },
               catalog: { id: true, slug: true, title: true },
               subcatalog: { id: true, slug: true, title: true },
@@ -736,7 +736,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               deletedAt: IsNull(),
             },
             take: 10,
-            relations: ['category', 'catalog',"subcatalog"],
+            relations: ['category', 'catalog', "subcatalog"],
             order: order,
             select: {
               id: true,
@@ -748,7 +748,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
               price: true,
               description: true,
               createdAt: true,
-              mainImage:true,
+              mainImage: true,
               category: { id: true, slug: true, title: true },
               catalog: { id: true, slug: true, title: true },
               subcatalog: { id: true, slug: true, title: true },
@@ -765,7 +765,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             deletedAt: IsNull()
           },
           take: 300,
-          relations: ['category', 'catalog',"subcatalog"],
+          relations: ['category', 'catalog', "subcatalog"],
           order: order,
           select: {
             id: true,
@@ -777,7 +777,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
             price: true,
             description: true,
             createdAt: true,
-            mainImage:true,
+            mainImage: true,
             category: { id: true, slug: true, title: true },
             catalog: { id: true, slug: true, title: true },
             subcatalog: { id: true, slug: true, title: true },
@@ -803,7 +803,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
     const paginatedProducts = uniqueMergedProducts.slice(offset, offset + limitNumber);
 
     // GroupedByCatalog hosil qilish
-// Yangi structure bilan grouping
+    // Yangi structure bilan grouping
     const catalogMap = new Map();
 
     uniqueMergedProducts.forEach((product) => {
@@ -819,47 +819,67 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
         });
       }
 
-    const catalogGroup = catalogMap.get(catalog.title);
-    catalogGroup.productCodes.push(productCode);
+      const catalogGroup = catalogMap.get(catalog.title);
+      catalogGroup.productCodes.push(productCode);
 
-    if (!catalogGroup.subcatalogs.has(subcatalog.title)) {
-    catalogGroup.subcatalogs.set(subcatalog.title, {
-      subcatalogName: subcatalog.title,
-      subcatalogSlug: subcatalog.slug,
-      categories: new Map()
-      });
-    }
+      if (!catalogGroup.subcatalogs.has(subcatalog.title)) {
+        catalogGroup.subcatalogs.set(subcatalog.title, {
+          subcatalogName: subcatalog.title,
+          subcatalogSlug: subcatalog.slug,
+          categories: new Map()
+        });
+      }
 
-    const subcatalogGroup = catalogGroup.subcatalogs.get(subcatalog.title);
+      const subcatalogGroup = catalogGroup.subcatalogs.get(subcatalog.title);
 
-    if (!subcatalogGroup.categories.has(category.title)) {
-    subcatalogGroup.categories.set(category.title, {
-      categoryName: category.title,
-      categorySlug: category.slug,
-      productCodes: []
+      if (!subcatalogGroup.categories.has(category.title)) {
+        subcatalogGroup.categories.set(category.title, {
+          categoryName: category.title,
+          categorySlug: category.slug,
+          productCodes: []
+        });
+      }
+
+      const categoryGroup = subcatalogGroup.categories.get(category.title);
+      categoryGroup.productCodes.push(productCode);
     });
-  }
 
-    const categoryGroup = subcatalogGroup.categories.get(category.title);
-    categoryGroup.productCodes.push(productCode);
-  });
+    console.log(Array.from(Array.from(catalogMap.values())[0].subcatalogs.values())[0]);
 
-  // Final array conversion
-    const groupedByCatalog = Array.from(catalogMap.values()).map(catalog => ({
-      catalogName: catalog.catalogName,
-      catalogSlug: catalog.catalogSlug,
-      productCodes: catalog.productCodes,
-      subcatalogs: Array.from(catalog.subcatalogs.values()).map((sub: any) => ({
-        subcatalogName: sub.subcatalogName,
-        subcatalogSlug: sub.subcatalogSlug,
-        categories: Array.from(sub.categories.values()).map((cat: any) => ({
-          categoryName: cat.categoryName,
-          categorySlug: cat.categorySlug,
-          productCodes: cat.productCodes
-        }))
-      }))
-    }));
-
+    const groupedByCatalog: Catalog[] = Array.from(catalogMap.values()).map((catalog: any): Catalog => {
+      const catalogUrl = new URL('https://sectortechnology.uz/catalog/' + catalog.catalogSlug);
+      catalog.productCodes.forEach((code: string, index: number) => {
+        catalogUrl.searchParams.append(`search[${index}]`, code);
+      });
+    
+      return {
+        catalogName: catalog.catalogName,
+        catalogSlug: catalog.catalogSlug,
+        productsCount: catalog.productCodes.length ? catalog.productCodes.length : 0,
+        url: catalogUrl.toString(),
+        subcatalogs: Array.from(catalog.subcatalogs.values()).map((sub: any): Subcatalog => {
+          return {
+            subcatalogName: sub.subcatalogName,
+            subcatalogSlug: sub.subcatalogSlug,
+            categories: Array.from(sub.categories.values()).map((cat: any): Category => {
+              const categoryUrl = new URL('https://sectortechnology.uz/catalog/' + sub.subcatalogSlug + '/' + cat.categorySlug);
+              cat.productCodes.forEach((code: string, index: number) => {
+                categoryUrl.searchParams.append(`search[${index}]`, code);
+              });
+    
+              return {
+                categoryName: cat.categoryName,
+                categorySlug: cat.categorySlug,
+                productsCount: cat.productCodes.length ? cat.productCodes.length : 0,
+                url: categoryUrl.toString()
+              };
+            })
+          };
+        })
+      };
+    });
+    
+    
 
     // Yuboriladigan natija
     return res.status(200).json({
@@ -875,7 +895,7 @@ export const getSearchProducts = async (req: Request, res: Response, next: NextF
       error: null,
       status: 200,
     });
-    
+
   } catch (error) {
     console.error(error);
     next(error);
@@ -886,7 +906,7 @@ export const getSearchProductsByCodes = async (req: Request, res: Response, next
   try {
     const { subcatalogSlug, categorySlug } = req.params;
     let { search } = req.query;
-    
+
     if (!search) {
       throw new CustomError("search[] query param is required", 400);
     }
@@ -894,7 +914,7 @@ export const getSearchProductsByCodes = async (req: Request, res: Response, next
     if (typeof search === "string") {
       search = [search];
     }
-    
+
     const productCodes = Array.isArray(search) ? search : Object.values(search);
     console.log(productCodes);
     const products = await productRepository.find({
@@ -916,8 +936,8 @@ export const getSearchProductsByCodes = async (req: Request, res: Response, next
         category: { slug: true, title: true }
       },
     });
-    
-  
+
+
     return res.status(200).json({
       status: 200,
       message: "Products by codes retrieved",
@@ -927,3 +947,26 @@ export const getSearchProductsByCodes = async (req: Request, res: Response, next
     next(error);
   }
 };
+
+interface Category {
+  categoryName: string;
+  categorySlug: string;
+  productCodes?: string[];
+  productsCount: number;
+  url?: string;
+}
+
+interface Subcatalog {
+  subcatalogName: string;
+  subcatalogSlug: string;
+  categories: Category[];
+}
+
+interface Catalog {
+  catalogName: string;
+  catalogSlug: string;
+  productCodes?: string[];
+  productsCount: number;
+  url?: string;
+  subcatalogs: Subcatalog[];
+}
