@@ -221,8 +221,8 @@ export const addProductToFilter = async (req: Request, res: Response, next: Next
                 );
 
                 if (matchedOption) {
-                    if (!option.productsId.includes(productId)) {
-                        option.productsId.push(productId);
+                    if (!option.productsId?.includes(productId)) {
+                        option.productsId?.push(productId);
                     }
                 }
             }

@@ -34,7 +34,8 @@ export const updateOrderForAdmin = async (req: Request, res: Response, next: Nex
             'comment',
             'validStartDate',
             'validEndDate',
-            'deletedAt'
+            'deletedAt',
+            'orderDeleveryType'
         ];
 
         for (const key of allowedFields) {

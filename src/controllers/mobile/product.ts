@@ -4,7 +4,15 @@ import { Product } from "../../entities/products.entity";
 import { ILike, In, IsNull, Like, MoreThan, Not } from "typeorm";
 import { Cart, SavedProduct } from "../../entities/user_details.entity";
 import { CustomError } from "../../error-handling/error-handling";
+
+import { CatalogFilter } from "../../entities/catalog_filter.entity";
+import { Category as CatalogCategory, Subcatalog as CatalogSubcatalog } from "../../entities/catalog.entity";
 import { Garantee } from "../../entities/garantee.entity";
+
+const categoryRepository = AppDataSource.getRepository(CatalogCategory);
+const subcatalogRepository = AppDataSource.getRepository(CatalogSubcatalog);
+const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
+
 
 const productRepository = AppDataSource.getRepository(Product);
 const savedProductRepository = AppDataSource.getRepository(SavedProduct);
@@ -298,16 +306,17 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
 
     const filter: any = { deletedAt: IsNull() };
     const order: any = {};
-
+    let subcatalogSlug: any
     // 🔍 Katalog yoki subkatalog aniqlash
     if (typeof slug === "string") {
-      const numericPrefix = parseInt(slug.split('.')[0]); 
+      const numericPrefix = parseInt(slug.split('.')[0]);
 
       if (!isNaN(numericPrefix)) {
         if (numericPrefix < 100) {
           filter.catalog = { slug: slug as string, deletedAt: IsNull() };
         } else if (numericPrefix >= 100 && numericPrefix < 1000) {
           filter.subcatalog = { slug: slug as string, deletedAt: IsNull() };
+          subcatalogSlug = slug
         }
       }
     }
@@ -385,10 +394,60 @@ export const getProductsByCatalogSubcatalogCategory = async (req: Request, res: 
       productRepository.count({ where: filter }),
     ]);
 
-    const totalPages = Math.ceil(total / limitNumber);
+      const totalPages = Math.ceil(total / limitNumber);
+
+          const whereCondition: any = {
+            deletedAt: IsNull()
+        };
+        
+        if (categorySlug) {
+            const category = await categoryRepository.findOne({
+                where: { deletedAt: IsNull(), slug: categorySlug as string }
+            })
+            if (category) {
+                whereCondition.categoryId = category.id;
+                whereCondition.subcatalogId = null;
+            } else {
+                return res.status(200).json({ data: [], error: null, status: 200 });
+            }
+        } else if (subcatalogSlug) {
+            const subcatalog = await subcatalogRepository.findOne({
+                where: { deletedAt: IsNull(), slug: subcatalogSlug as string }
+            })
+            if (subcatalog) {
+                whereCondition.subcatalogId = subcatalog.id;
+                whereCondition.categoryId = null;
+            } else {
+                return res.status(200).json({ data: [], error: null, status: 200 });
+            }
+        } else {
+            return res.status(200).json({ data: [], error: null, status: 200 });
+        }
+
+        const categoryFilter = await catalogFilterRepository.findOne({
+            where: whereCondition,
+            relations: ['subcatalog', 'category'],
+            select: ['id', 'data']
+        });
+        
+        const updatedCategoryFilter = categoryFilter?.data.map((filters: any) => {
+            const updatedOptions = filters.options?.map((option: any) => {
+                const { productsId, ...rest } = option;
+                return {
+                    ...rest,
+                    productCount: productsId?.length || 0,
+                };
+            });
+
+        return {
+            ...filters,
+            options: updatedOptions,
+        };
+    });
+
 
     return res.status(200).json({
-      data: { products, total, pageNumber, limitNumber, totalPages },
+      data: { products, total, pageNumber, limitNumber, totalPages, filters: updatedCategoryFilter ? updatedCategoryFilter : [] },
       error: null,
       status: 200
     });
