@@ -58,11 +58,12 @@ export const createRequest = async (req: Request, res: Response, next: NextFunct
 export const getRequests = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id: userId } = req.user;
-    const { page = 1, limit = 10, status, topic } = req.query;
+    const { page = 1, limit = 10, status, topic, topicCategory } = req.query;
 
     const where: any = { deletedAt: IsNull() };
     if (status) where.status = status;
     if (topic) where.topic = ILike(`%${topic}%`);
+    if (topicCategory) where.topicCategory = topicCategory;
     where.userId = userId;
 
     const pageNumber = parseInt(page as string);
@@ -85,7 +86,8 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
         status: true,   
         createdAt: true,
         orderId: true,
-        requestNumber: true,        
+        requestNumber: true,   
+        watched: true,     
         user: {
           id: true,
           name: true,
@@ -125,9 +127,10 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
 export const getRequestById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+    const { id: userId } = req?.user
 
     const request = await requestRepository.findOne({
-      where: { id, deletedAt: IsNull() },
+      where: { id, userId, deletedAt: IsNull() },
       relations: ['user', 'order'],
       order: { createdAt: 'DESC' },
       select: {
@@ -141,6 +144,7 @@ export const getRequestById = async (req: Request, res: Response, next: NextFunc
         createdAt: true,
         orderId: true,
         requestNumber: true,
+        watched: true,     
         messages: {
           filePath: true,
           message: true,

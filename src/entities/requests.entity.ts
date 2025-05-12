@@ -43,6 +43,8 @@ export class RequestEntity {
     createdAt: string;
   }[];
 
+  @Column({ type: "boolean", default: false })
+  watched: boolean
 
   @CreateDateColumn()
   createdAt: Date;

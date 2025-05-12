@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getRequests, replyRequest, deleteRequest } from '../../controllers/admin/request';
+import { getRequests, replyRequest, deleteRequest, getRequestById } from '../../controllers/admin/request';
 import { validateAdminToken } from '../../middlewares/adminValidator';
 import { uploadPhoto } from '../../middlewares/multer';
 
@@ -116,5 +116,33 @@ router.patch('/:id', validateAdminToken, uploadPhoto.single("imageRequest"), rep
  *         description: Internal server error
  */
 router.delete('/:id', validateAdminToken, deleteRequest);
+
+/**
+ * @swagger
+ * /request/{id}:
+ *   get:
+ *     summary: Get a request by ID
+ *     tags: [Requests]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Request ID
+ *     responses:
+ *       200:
+ *         description: Request data
+ *       404:
+ *         description: Request not found
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:id', validateAdminToken, getRequestById);
+
 
 export default router;
