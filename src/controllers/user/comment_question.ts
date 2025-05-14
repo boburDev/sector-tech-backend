@@ -45,6 +45,7 @@ export const getCommentByProductId = async (req: Request, res: Response, next: N
         reply: true,
         body: true,
         star: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
@@ -99,6 +100,7 @@ export const getQuestionByProductId = async (req: Request, res: Response, next: 
         id: true,
         body: true,
         reply: true,
+        createdAt: true,
         user: {
           id: true,
           email: true,
