@@ -7,7 +7,7 @@ import { Product } from '../../entities/products.entity';
 const STATIC_TITLE = ['Подкатегории', 'Состояние товара', 'Актуальность товара', 'Наличие в филиалах']
 const catalogFilterRepository = AppDataSource.getRepository(CatalogFilter);
 const productRepository = AppDataSource.getRepository(Product);
-
+ 
 export const getCatalogFilterById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { id } = req.params;
