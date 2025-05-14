@@ -66,7 +66,10 @@ export const getCommentByProductId = async (req: Request, res: Response, next: N
       },
     });
 
-    return res.status(200).json({data: comments, error:null, status: 200 });
+    const totalStars = comments.reduce((sum, item) => sum + (item.star || 0), 0);
+    const mediaStar = comments.length > 0 ? +(totalStars / comments.length).toFixed(1) : 0;
+
+    return res.status(200).json({data: { comments, mediaStar }, error:null, status: 200 });
   } catch (error) {
     next(error);
   }
