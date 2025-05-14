@@ -185,9 +185,9 @@ export const updateRequest = async (req: Request, res: Response, next: NextFunct
       const { message, status } = req.body;
       const filePath = req.file?.path?.replace(/\\/g, '/').replace(/^public\//, '');
   
-      if (!message) {
-        throw new CustomError("message is required", 400);
-      }
+      // if (!message) {
+      //   throw new CustomError("message is required", 400);
+      // }
   
       const request = await requestRepository.findOne({
         where: { id, deletedAt: IsNull(), userId }
@@ -195,6 +195,7 @@ export const updateRequest = async (req: Request, res: Response, next: NextFunct
   
       if (!request) throw new CustomError("Request not found", 404);
   
+      if(message) {
       const newMessage = {
         message,
         filePath,
@@ -202,6 +203,7 @@ export const updateRequest = async (req: Request, res: Response, next: NextFunct
         createdAt: new Date().toISOString()
       };
       request.messages.push(newMessage);
+    }
       if(status) request.status = status;
       await requestRepository.save(request);
   

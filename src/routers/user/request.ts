@@ -138,13 +138,11 @@ router.get('/:id', validateUserToken, getRequestById);
  *           type: string
  *         description: Request ID
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required:
- *               - message
  *             properties:
  *               message:
  *                 type: string
