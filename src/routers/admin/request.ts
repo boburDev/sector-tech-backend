@@ -49,7 +49,7 @@ router.get('/all', validateAdminToken, getRequests);
 
 /**
  * @swagger
- * /request/{id}:
+ * /request/reply/{id}:
  *   patch:
  *     summary: Add a user reply to the request
  *     tags: [Requests]
@@ -88,7 +88,7 @@ router.get('/all', validateAdminToken, getRequests);
  *       500:
  *         description: Internal server error
  */
-router.patch('/:id', validateAdminToken, uploadPhoto.single("imageRequest"), replyRequest );
+router.patch('/reply/:id', validateAdminToken, uploadPhoto.single("imageRequest"), replyRequest );
 
 /**
  * @swagger

@@ -8,14 +8,10 @@ const requestRepository = AppDataSource.getRepository(RequestEntity);
 
 export const replyRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('Nega ');
-      
       const { id } = req.params;
       const { id: adminId } = req.admin;
       const { message, status } = req.body;
       const filePath = req.file?.path?.replace(/\\/g, '/').replace(/^public\//, '');
-      console.log(id, adminId, message, filePath,req.file);
-      
   
       if (!message) {
         throw new CustomError("message is required", 400);

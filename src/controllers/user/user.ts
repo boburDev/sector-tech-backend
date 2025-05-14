@@ -30,8 +30,8 @@ export const OAuthCallback = async (req: Request, res: Response, next: NextFunct
       "user"
     );
 
-    // return res.redirect(`http://localhost:3000?token=${token}`);
-    return res.redirect(`https://sectortechnology.uz?token=${token}`);
+    return res.redirect(`http://localhost:3000?token=${token}`);
+    // return res.redirect(`https://sectortechnology.uz?token=${token}`);
   } catch (error) {
     next(error);
   }
