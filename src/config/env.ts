@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const BOT_TOKEN = process.env.BOT_TOKEN || "7964456154:AAGuy38rtgXB5npP_L7aitoSSvhv-4FFprI";
 const PORT = process.env.PORT;
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
@@ -23,7 +22,6 @@ const JWT_SECRET_USER = process.env.JWT_SECRET_USER;
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 export { 
-    BOT_TOKEN,
     PORT,
     FACEBOOK_APP_ID, 
     FACEBOOK_APP_SECRET, 
